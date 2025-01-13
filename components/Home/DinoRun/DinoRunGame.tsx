@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
   obstacle: {
     position: 'absolute',
     top: 150,
-    width: 30,
-    height: 50,
+    width: 10,
+    height: 20,
     backgroundColor: 'red',
   },
   ground: {
