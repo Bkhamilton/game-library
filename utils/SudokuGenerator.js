@@ -42,7 +42,7 @@ const fillBoard = (board) => {
 };
 
 const createPuzzle = (board, difficulty) => {
-    const emptySpaces = difficulty === 'Easy' ? 30 : difficulty === 'Medium' ? 40 : 60;
+    const emptySpaces = difficulty === 'Easy' ? 30 : difficulty === 'Medium' ? 40 : difficulty === 'Hard' ? 60 : 65;
     const puzzle = board.map(row => row.slice());
 
     let count = 0;
