@@ -1,14 +1,20 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
+import { StyleSheet, Dimensions } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import { FontAwesome } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
 
 export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <View style={styles.card}>
+        <View style={styles.image}> 
+          <FontAwesome name="image" size={48} color="black" />
+        </View>
+      
+      </View>
+
+        
     </View>
   );
 }
@@ -19,13 +25,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  card: {
+    borderWidth: 1,
+    borderRadius: 40,
+    shadowColor: 'black',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.8,
+    width: '85%',  // 50% of screen width
+    height: '80%' // 50% of screen height
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
+  image: {
+    marginHorizontal: '45%'
+  }
 });
