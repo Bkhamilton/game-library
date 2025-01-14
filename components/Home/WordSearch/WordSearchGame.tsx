@@ -18,15 +18,39 @@ interface GridSettings {
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 const WORD_POOLS = {
-  easy: ['CAT', 'DOG', 'RAT', 'PIG'],
-  medium: ['REACT', 'NATIVE', 'CODE', 'APP', 'WEB', 'GAME'],
-  hard: ['PILGRIM', 'ELECTRIC', 'PENJAMIN', 'DABSKI', 'MOUSE', 'MIC']
+    easy: [
+        'CAT', 'DOG', 'RAT', 'PIG', 'BAT', 'COW', 'HEN', 'FOX', 'ANT', 'BEE',
+        'OWL', 'APE', 'FLY', 'HAT', 'MAP', 'CUP', 'SUN', 'BOX', 'PEN', 'LOG',
+        'BAG', 'CAR', 'BUS', 'KEY', 'FAN', 'JAR', 'MUG', 'NET', 'PIN', 'RUG',
+        'SAW', 'TIE', 'VAN', 'WAX', 'YAK', 'ZIP', 'AXE', 'BOW', 'CAN', 'DIP',
+        'EAR', 'FIG', 'GYM', 'HIP', 'INK', 'JAM', 'KIT', 'LID', 'MOB', 'NAP'
+      ],
+      medium: [
+        'REACT', 'SPACE', 'PLANT', 'HEART', 'BREAD', 'CLOCK', 'BROWN', 'CLOUD',
+        'DREAM', 'FLAME', 'GRAPE', 'HOUSE', 'JUICE', 'LIGHT', 'MOUSE', 'NIGHT',
+        'PAPER', 'QUEEN', 'RADIO', 'SNAKE', 'STORM', 'TIGER', 'WATER', 'YOUTH',
+        'PHONE', 'BEACH', 'CHAIR', 'DANCE', 'EAGLE', 'FLUTE', 'GRAIN', 'HONEY',
+        'KNIFE', 'LEMON', 'MUSIC', 'NURSE', 'OCEAN', 'PIANO', 'QUIET', 'RIVER',
+        'STEAM', 'TABLE', 'VOICE', 'WHALE', 'ZEBRA', 'BREAD', 'COAST', 'DANCE',
+        'EARTH', 'FROST'
+      ],
+      hard: [
+        'ELEPHANT', 'BASEBALL', 'COMPUTER', 'DINOSAUR', 'EXERCISE', 'FOOTBALL',
+        'GRAPHICS', 'HOSPITAL', 'INTERNET', 'KEYBOARD', 'LIGHTNING', 'MOUNTAIN',
+        'NOTEBOOK', 'PAINTING', 'QUESTION', 'RAINBOW', 'SCISSORS', 'TELESCOPE',
+        'UMBRELLA', 'VACATION', 'WORKSHOP', 'XYLOPHONE', 'YOUNGEST', 'ZUCCHINI',
+        'AIRPLANE', 'BIRTHDAY', 'CALENDAR', 'DIAMOND', 'ENVELOPE', 'FESTIVAL',
+        'GRAVITY', 'HARMONY', 'ICEBERG', 'JOURNEY', 'KINGDOM', 'LIBRARY',
+        'MYSTERY', 'NEUTRON', 'OCTOPUS', 'PENGUIN', 'QUICKER', 'RAINBOW',
+        'SAILING', 'THUNDER', 'UNIFORM', 'VOLCANO', 'WHISPER', 'YOGHURT',
+        'ZEALOUS', 'ZOMBIE'
+      ]
 };
 
 const DIFFICULTY_SETTINGS = {
-    easy: { wordCount: 3, gridSize: 8 },
-    medium: { wordCount: 5, gridSize: 10 },
-    hard: { wordCount: 6, gridSize: 11 }  // Increased grid size for longer words
+    easy: { wordCount: 5, gridSize: 6 },
+    medium: { wordCount: 6, gridSize: 8 },
+    hard: { wordCount: 8, gridSize: 10 }  // Increased grid size for longer words
   };
 
 export default function WordSearchGame() {

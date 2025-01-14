@@ -1,145 +1,139 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Animated, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 
-const GRAVITY = 1.5;
-const JUMP_FORCE = -15;
-const GROUND_HEIGHT = 50;
-
-export default function DinoGame() {
-  const [gameOver, setGameOver] = useState(false);
+const DinoRunGame: React.FC = () => {
+  const [isJumping, setIsJumping] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const dinoY = useRef(new Animated.Value(0)).current;
-  const velocity = useRef(0);
-  const obstacleX = useRef(new Animated.Value(400)).current;
-  const gameLoop = useRef(null);
+  const cactusX = useRef(new Animated.Value(0)).current;
+  const gameInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    startGame();
-    return () => cancelAnimationFrame(gameLoop.current);
-  }, []);
+    const handleJump = () => {
+      if (!isJumping) {
+        setIsJumping(true);
+        Animated.timing(dinoY, {
+          toValue: -100,
+          duration: 300,
+          useNativeDriver: true,
+          easing: Easing.linear,
+        }).start(() => {
+          Animated.timing(dinoY, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+            easing: Easing.linear,
+          }).start(() => setIsJumping(false));
+        });
+      }
+    };
 
-  const startGame = () => {
-    gameLoop.current = requestAnimationFrame(update);
-  };
+    const interval = setInterval(() => {
+      setScore((prevScore) => prevScore + 1);
+      checkCollision();
+    }, 100);
 
-  const update = () => {
-    // Apply gravity
-    velocity.current += GRAVITY;
-    let newY = dinoY._value + velocity.current;
+    gameInterval.current = interval;
 
-    // Ground collision
-    if (newY > 0) {
-      newY = 0;
-      velocity.current = 0;
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isJumping]);
+
+  useEffect(() => {
+    if (!isGameOver) {
+      Animated.loop(
+        Animated.timing(cactusX, {
+          toValue: -300,
+          duration: 2000,
+          useNativeDriver: true,
+          easing: Easing.linear,
+        })
+      ).start();
+    } else {
+      cactusX.stopAnimation();
     }
-
-    dinoY.setValue(newY);
-    
-    // Move obstacle
-    obstacleX.setValue(obstacleX._value - 5);
-    if (obstacleX._value < -50) {
-      obstacleX.setValue(400);
-      setScore(prev => prev + 1);
-    }
-
-    // Collision detection
-    if (checkCollision()) {
-      setGameOver(true);
-      cancelAnimationFrame(gameLoop.current);
-      return;
-    }
-
-    gameLoop.current = requestAnimationFrame(update);
-  };
-
-  const jump = () => {
-    if (dinoY._value === 0) {
-      velocity.current = JUMP_FORCE;
-    }
-  };
+  }, [isGameOver]);
 
   const checkCollision = () => {
-    const dinoBox = {
-      left: 50,
-      right: 90,
-      top: dinoY._value + 150,
-      bottom: dinoY._value + 200,
-    };
+    // Simplified collision detection
+    if (dinoY._value === 0 && cactusX._value < 50 && cactusX._value > 0) {
+      setIsGameOver(true);
+      if (gameInterval.current) {
+        clearInterval(gameInterval.current);
+      }
+    }
+  };
 
-    const obstacleBox = {
-      left: obstacleX._value,
-      right: obstacleX._value + 30,
-      top: 150,
-      bottom: 200,
-    };
-
-    return !(dinoBox.right < obstacleBox.left || 
-             dinoBox.left > obstacleBox.right || 
-             dinoBox.bottom < obstacleBox.top || 
-             dinoBox.top > obstacleBox.bottom);
+  const restartGame = () => {
+    setIsGameOver(false);
+    setScore(0);
+    cactusX.setValue(0);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={jump}>
-      <View style={styles.container}>
-        <Text style={styles.score}>Score: {score}</Text>
-        {gameOver && <Text style={styles.gameOver}>Game Over!</Text>}
-        <Animated.View
-          style={[
-            styles.dino,
-            { transform: [{ translateY: dinoY }] }
-          ]}
-        />
-        <Animated.View
-          style={[
-            styles.obstacle,
-            { transform: [{ translateX: obstacleX }] }
-          ]}
-        />
-        <View style={styles.ground} />
-      </View>
-    </TouchableWithoutFeedback>
+    <View style={styles.gameContainer}>
+      <Animated.View style={[styles.dino, { transform: [{ translateY: dinoY }] }]} />
+      <Animated.View style={[styles.cactus, { transform: [{ translateX: cactusX }] }]} />
+      {isGameOver && (
+        <View style={styles.gameOver}>
+          <Text>Game Over</Text>
+          <TouchableOpacity onPress={restartGame}>
+            <Text>Restart</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <Text style={styles.score}>Score: {score}</Text>
+      <TouchableOpacity style={styles.jumpButton} onPress={() => handleJump()}>
+        <Text>Jump</Text>
+      </TouchableOpacity>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
+  gameContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
   },
   dino: {
     position: 'absolute',
-    left: 50,
-    top: 150,
-    width: 40,
-    height: 50,
-    backgroundColor: 'green',
-  },
-  obstacle: {
-    position: 'absolute',
-    top: 150,
-    width: 10,
-    height: 20,
-    backgroundColor: 'red',
-  },
-  ground: {
-    position: 'absolute',
     bottom: 0,
-    width: '100%',
-    height: GROUND_HEIGHT,
+    left: 50,
+    width: 50,
+    height: 50,
     backgroundColor: '#000',
   },
-  score: {
+  cactus: {
     position: 'absolute',
-    top: 20,
-    right: 20,
-    fontSize: 24,
+    bottom: 0,
+    right: 0,
+    width: 20,
+    height: 50,
+    backgroundColor: '#000',
   },
   gameOver: {
     position: 'absolute',
     top: '50%',
-    alignSelf: 'center',
-    fontSize: 48,
-    fontWeight: 'bold',
+    left: '50%',
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+    textAlign: 'center',
+  },
+  score: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+  },
+  jumpButton: {
+    position: 'absolute',
+    bottom: 50,
+    padding: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
   },
 });
+
+export default DinoRunGame;
