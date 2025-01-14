@@ -1,9 +1,9 @@
-import ProfilePage from '@/components/Profile/ProfilePage';
+import ProfileScreen from '@/components/Profile/ProfileScreen';
 
-export default function ProfileScreen() {
+export default function ProfilePage() {
     return (
         <>
-            <ProfilePage />
+            <ProfileScreen />
         </>
     );
 }
