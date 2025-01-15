@@ -53,9 +53,9 @@ function RootLayoutNav() {
             <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="sudoku" options={{ title: 'Sudoku' }} />
-                <Stack.Screen name="dinorun" options={{ title: 'Dino Run' }} />
-                <Stack.Screen name="wordSearch" options={{ title: 'Word Search' }} />
+                <Stack.Screen name="sudoku" options={{ title: 'Sudoku', headerBackTitle: 'Home' }} />
+                <Stack.Screen name="dinorun" options={{ title: 'Dino Run', headerBackTitle: 'Home' }} />
+                <Stack.Screen name="wordSearch" options={{ title: 'Word Search', headerBackTitle: 'Home' }} />
             </Stack>
         </ThemeProvider>
     );
