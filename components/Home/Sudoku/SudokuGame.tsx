@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { View, Text } from '@/components/Themed';
 import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
 
+import SudokuBoard from './SudokuBoard';
+
 export default function SudokuGame() {
-    const [board, setBoard] = useState(generateSudokuPuzzle('Hard'));
+    const [difficulty, setDifficulty] = useState('Hard');
+    const [board, setBoard] = useState(generateSudokuPuzzle(difficulty));
 
     const handleInputChange = (row: number, col: number, value: string) => {
         const newBoard = [...board];
@@ -13,22 +17,7 @@ export default function SudokuGame() {
 
     return (
         <View style={styles.container}>
-            {board.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.row}>
-                    {row.map((cell, colIndex) => (
-                        <TouchableWithoutFeedback key={colIndex} onPress={Keyboard.dismiss}>
-                            <TextInput
-                                key={colIndex}
-                                style={styles.cell}
-                                keyboardType="numeric"
-                                maxLength={1}
-                                value={cell === 0 ? '' : cell.toString()}
-                                onChangeText={(value) => handleInputChange(rowIndex, colIndex, value)}
-                            />
-                        </TouchableWithoutFeedback>
-                    ))}
-                </View>
-            ))}
+            <SudokuBoard board={board} handleInputChange={handleInputChange} />
         </View>
     );
 }
