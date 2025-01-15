@@ -1,5 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from "react-native";
 
 const DinoRunGame: React.FC = () => {
   const [isJumping, setIsJumping] = useState(false);
@@ -74,8 +81,12 @@ const DinoRunGame: React.FC = () => {
 
   return (
     <View style={styles.gameContainer}>
-      <Animated.View style={[styles.dino, { transform: [{ translateY: dinoY }] }]} />
-      <Animated.View style={[styles.cactus, { transform: [{ translateX: cactusX }] }]} />
+      <Animated.View
+        style={[styles.dino, { transform: [{ translateY: dinoY }] }]}
+      />
+      <Animated.View
+        style={[styles.cactus, { transform: [{ translateX: cactusX }] }]}
+      />
       {isGameOver && (
         <View style={styles.gameOver}>
           <Text>Game Over</Text>
@@ -95,43 +106,43 @@ const DinoRunGame: React.FC = () => {
 const styles = StyleSheet.create({
   gameContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f7f7f7",
   },
   dino: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 50,
     width: 50,
     height: 50,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   cactus: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
     width: 20,
     height: 50,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   gameOver: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     transform: [{ translateX: -50 }, { translateY: -50 }],
-    textAlign: 'center',
+    textAlign: "center",
   },
   score: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     left: 10,
   },
   jumpButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
     padding: 10,
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
     borderRadius: 5,
   },
 });
