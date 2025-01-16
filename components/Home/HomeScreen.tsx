@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
 import GameSelector from "./GameSelector/GameSelector";
 import SelectGame from '@/components/Modals/SelectGame';
 import { useRouter } from "expo-router";
 
+type GameTitle = "Sudoku" | "Dino Run" | "Word Search";
+
 export default function HomeScreen() {
-    const gameTitles = ["Sudoku", "Dino Run", "Word Search"];
-    const difficulties = ["Easy", "Medium", "Hard"];
+    const gameTitles: GameTitle[] = ["Sudoku", "Dino Run", "Word Search"];
+    const gameDifficulties: Record<GameTitle, string[]> = {
+        "Sudoku": ["Easy", "Medium", "Hard", "Extreme"],
+        "Dino Run": ["Easy", "Hard"],
+        "Word Search": ["Easy", "Medium", "Hard"]
+    };
 
     const [showSelectGame, setShowSelectGame] = useState(false);
-    const [selectedGame, setSelectedGame] = useState<string | null>(null);
+    const [selectedGame, setSelectedGame] = useState<GameTitle | null>(null);
 
     const router = useRouter();
 
-    const handleSelectGame = (game: string) => {
+    const handleSelectGame = (game: GameTitle) => {
         setSelectedGame(game);
         setShowSelectGame(true);
     };
@@ -43,13 +49,17 @@ export default function HomeScreen() {
                 <Text style={{ fontSize: 16 }}>Games</Text>
                 <GameSelector gameTitles={gameTitles} handleSelectGame={handleSelectGame}/>
             </View>
-            <SelectGame 
-                visible={showSelectGame} 
-                title={selectedGame} 
-                close={handleCloseModal}
-                difficulties={difficulties}
-                selectGame={confirmSelectGame}
-            />
+            {
+                selectedGame && (
+                    <SelectGame 
+                        visible={showSelectGame} 
+                        title={selectedGame} 
+                        close={handleCloseModal}
+                        difficulties={gameDifficulties[selectedGame]}
+                        selectGame={confirmSelectGame}
+                    />
+                )
+            }
         </View>
     );
 }
