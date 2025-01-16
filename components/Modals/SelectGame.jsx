@@ -5,6 +5,21 @@ import useTheme from '@/hooks/useTheme';
 
 export default function SelectGame({ visible, close, title, difficulties, selectGame }) {
 
+    const [showDifficultyModal, setShowDifficultyModal] = useState(false);
+
+    const openDifficultyModal = () => {
+        setShowDifficultyModal(true);
+    }
+
+    const closeDifficultyModal = () => {
+        setShowDifficultyModal(false);
+    }
+
+    const selectDifficulty = (difficulty) => {
+        closeDifficultyModal();
+        setSelectedDifficulty(difficulty);
+    }
+
     const { primary, grayBackground } = useTheme();
 
     const [selectedDifficulty, setSelectedDifficulty] = useState(difficulties[0]);
@@ -25,6 +40,7 @@ export default function SelectGame({ visible, close, title, difficulties, select
                     <View style={{ paddingTop: 16 }}>
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: grayBackground }]}
+                            onPress={openDifficultyModal}
                         >
                             <Text>Difficulty: <Text style={{ fontWeight: 'bold' }}>{selectedDifficulty}</Text></Text>
                         </TouchableOpacity>
@@ -48,6 +64,34 @@ export default function SelectGame({ visible, close, title, difficulties, select
                     </View>
                 </View>
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showDifficultyModal}
+                onRequestClose={closeDifficultyModal}
+            >
+                <View style={styles.container}>
+                    <View style={styles.innerContainer}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Select Difficulty</Text>
+                        {difficulties.map((difficulty, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={[styles.button, { backgroundColor: grayBackground }]}
+                                onPress={() => selectDifficulty(difficulty)}
+                            >
+                                <Text>{difficulty}</Text>
+                            </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: primary }]}
+                            onPress={closeDifficultyModal}
+                        >
+                            <Text>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </Modal>
     );
 }
