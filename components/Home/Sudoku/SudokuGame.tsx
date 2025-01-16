@@ -39,8 +39,15 @@ export default function SudokuGame() {
 
     return (
         <View style={styles.container}>
-            <SudokuBoard board={board} handleInputChange={handleInputChange} selectedNumber={selectedNumber} initialNumbers={initialNumbers}/>
-            <SudokuNumbers selectNumber={handleSelectNumber} />
+            <SudokuBoard 
+                board={board} 
+                handleInputChange={handleInputChange} 
+                selectedNumber={selectedNumber} 
+                initialNumbers={initialNumbers}
+            />
+            <SudokuNumbers 
+                selectNumber={handleSelectNumber} 
+            />
         </View>
     );
 }
