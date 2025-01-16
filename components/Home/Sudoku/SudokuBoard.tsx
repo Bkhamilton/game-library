@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from
 import { View, Text } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
-export default function SudokuBoard({ board, handleInputChange, selectedNumber }: { board: number[][], handleInputChange: (row: number, col: number, value: string) => void, selectedNumber: number | null }) {
+export default function SudokuBoard({ board, handleInputChange, selectedNumber, initialNumbers }: { board: number[][], handleInputChange: (row: number, col: number, value: string) => void, selectedNumber: number | null, initialNumbers: { [key: string]: boolean } }) {
     const [selectedTile, setSelectedTile] = useState<{ row: number, col: number } | null>(null);
 
     const handleTilePress = (row: number, col: number) => {
@@ -27,7 +27,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber }
     }, [selectedNumber]);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { borderColor: primary }]}>
             {board.map((row: number[], rowIndex: number) => (
                 <View key={rowIndex} style={styles.row}>
                     {row.map((cell: number, colIndex: number) => (
@@ -43,7 +43,9 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber }
                                 ]}
                                 onPress={() => handleTilePress(rowIndex, colIndex)}
                             >
-                                <Text style={styles.cellText}>{cell === 0 ? '' : cell.toString()}</Text>
+                                <Text style={[styles.cellText, initialNumbers[`${rowIndex}-${colIndex}`] ? styles.initialCellText : styles.placedCellText]}>
+                                    {cell === 0 ? '' : cell.toString()}
+                                </Text>
                             </TouchableOpacity>
                         </TouchableWithoutFeedback>
                     ))}
@@ -57,6 +59,8 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 4,
+        borderRadius: 2,
     },
     row: {
         flexDirection: 'row',
@@ -71,10 +75,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    selectedCell: {
-        backgroundColor: 'lightblue',
-    },
     cellText: {
         textAlign: 'center',
+    },
+    initialCellText: {
+        fontWeight: '800',
+    },
+    placedCellText: {
+        opacity: 0.8,
     },
 });
