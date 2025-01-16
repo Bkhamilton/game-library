@@ -64,7 +64,7 @@ export default function SelectGame({ visible, close, title, difficulties, select
                     </View>
                 </View>
             </View>
-
+            {/* Difficulty Modal */}
             <Modal
                 animationType="slide"
                 transparent={true}
