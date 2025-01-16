@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
+import { useLocalSearchParams } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
 import SudokuNumbers from './SudokuNumbers';
 
 export default function SudokuGame() {
-    const [difficulty, setDifficulty] = useState('Hard');
+    const { difficulty } = useLocalSearchParams();
     const [board, setBoard] = useState<number[][]>([]);
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);

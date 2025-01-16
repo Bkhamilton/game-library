@@ -27,11 +27,11 @@ export default function HomeScreen() {
         handleCloseModal();
         switch (title) {
             case "Sudoku":
-                return router.push("/sudoku");
+                return router.push(`/sudoku?difficulty=${difficulty}`);
             case "Dino Run":
-                return router.push("/dinorun");
+                return router.push(`/dinorun?difficulty=${difficulty}`);
             case "Word Search":
-                return router.push("/wordSearch");
+                return router.push(`/wordSearch?difficulty=${difficulty}`);
             default:
                 return "";
         }
