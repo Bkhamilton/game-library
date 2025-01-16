@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { View, Text } from '@/components/Themed';
+import { View } from '@/components/Themed';
 import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
 
 import SudokuBoard from './SudokuBoard';
@@ -8,7 +8,7 @@ import SudokuNumbers from './SudokuNumbers';
 
 export default function SudokuGame() {
     const [difficulty, setDifficulty] = useState('Hard');
-    const [board, setBoard] = useState(generateSudokuPuzzle(difficulty));
+    const [board, setBoard] = useState<number[][]>([]);
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
     const handleInputChange = (row: number, col: number, value: string) => {
@@ -20,6 +20,10 @@ export default function SudokuGame() {
     const handleSelectNumber = (value: number) => {
         setSelectedNumber(value);
     };
+
+    useEffect(() => {
+        setBoard(generateSudokuPuzzle(difficulty));
+    }, [difficulty]);
 
     return (
         <View style={styles.container}>
@@ -33,16 +37,5 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    row: {
-        flexDirection: 'row',
-    },
-    cell: {
-        width: 40,
-        height: 40,
-        borderWidth: 1,
-        borderColor: 'gold',
-        textAlign: 'center',
-        color: 'blue',
     },
 });
