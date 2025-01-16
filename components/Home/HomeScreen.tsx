@@ -1,27 +1,62 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
-import SudokuGame from "./Sudoku/SudokuGame";
-import DinoGame from "./DinoRun/DinoRunGame";
-import WordSearchGame from "./WordSearch/WordSearchGame";
 import GameSelector from "./GameSelector/GameSelector";
+import SelectGame from '@/components/Modals/SelectGame';
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
-  const gameTitles = ["Sudoku", "Dino Run", "Word Search"];
+    const gameTitles = ["Sudoku", "Dino Run", "Word Search"];
+    const difficulties = ["Easy", "Medium", "Hard"];
 
-  return (
-    <View style={styles.container}>
-      <View>
-        <Text style={{ fontSize: 16 }}>Games</Text>
-        <GameSelector gameTitles={gameTitles} />
-      </View>
-    </View>
-  );
+    const [showSelectGame, setShowSelectGame] = useState(false);
+    const [selectedGame, setSelectedGame] = useState<string | null>(null);
+
+    const router = useRouter();
+
+    const handleSelectGame = (game: string) => {
+        setSelectedGame(game);
+        setShowSelectGame(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowSelectGame(false);
+    }
+
+    const confirmSelectGame = (title: string, difficulty: string) => {
+        handleCloseModal();
+        switch (title) {
+            case "Sudoku":
+                return router.push("/sudoku");
+            case "Dino Run":
+                return router.push("/dinorun");
+            case "Word Search":
+                return router.push("/wordSearch");
+            default:
+                return "";
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <View>
+                <Text style={{ fontSize: 16 }}>Games</Text>
+                <GameSelector gameTitles={gameTitles} handleSelectGame={handleSelectGame}/>
+            </View>
+            <SelectGame 
+                visible={showSelectGame} 
+                title={selectedGame} 
+                close={handleCloseModal}
+                difficulties={difficulties}
+                selectGame={confirmSelectGame}
+            />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 8,
-  },
+    container: {
+        flex: 1,
+        paddingVertical: 8,
+    },
 });
