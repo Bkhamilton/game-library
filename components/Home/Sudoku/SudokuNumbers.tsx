@@ -19,7 +19,10 @@ export default function SudokuNumbers({ selectNumber }: { selectNumber: (value: 
                     <Text>{index + 1}</Text>
                 </TouchableOpacity>
             ))}
-            <TouchableOpacity style={[styles.numberButton, { backgroundColor: primary }]}>
+            <TouchableOpacity 
+                style={[styles.numberButton, { backgroundColor: primary }]}
+                onPress={() => selectNumber(0)}    
+            >
                 <MaterialIcons name="backspace" size={17} color="black" />
             </TouchableOpacity>
         </View>
@@ -38,6 +41,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 16,
+        marginVertical: 4,
         marginHorizontal: 2,
+        borderRadius: 8,
     },
 });
