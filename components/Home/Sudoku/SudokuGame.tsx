@@ -4,10 +4,12 @@ import { View, Text } from '@/components/Themed';
 import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
 
 import SudokuBoard from './SudokuBoard';
+import SudokuNumbers from './SudokuNumbers';
 
 export default function SudokuGame() {
     const [difficulty, setDifficulty] = useState('Hard');
     const [board, setBoard] = useState(generateSudokuPuzzle(difficulty));
+    const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
     const handleInputChange = (row: number, col: number, value: string) => {
         const newBoard = [...board];
@@ -15,9 +17,14 @@ export default function SudokuGame() {
         setBoard(newBoard);
     };
 
+    const handleSelectNumber = (value: number) => {
+        setSelectedNumber(value);
+    };
+
     return (
         <View style={styles.container}>
-            <SudokuBoard board={board} handleInputChange={handleInputChange} />
+            <SudokuBoard board={board} handleInputChange={handleInputChange} selectedNumber={selectedNumber}/>
+            <SudokuNumbers selectNumber={handleSelectNumber} />
         </View>
     );
 }
