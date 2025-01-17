@@ -17,7 +17,6 @@ const GameSelector: React.FC<GameSelectorProps> = ({ gameTitles, handleSelectGam
 
     return (
         <ScrollView
-            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.scrollView}
         >
