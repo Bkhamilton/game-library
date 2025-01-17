@@ -1,9 +1,13 @@
+// Description: This file contains the functions to generate a complete Sudoku board and create a Sudoku puzzle with the given difficulty.
+
+// Generate a complete Sudoku board
 const generateCompleteBoard = () => {
     const board = Array.from({ length: 9 }, () => Array(9).fill(0));
     fillBoard(board);
     return board;
 };
 
+// Fill the board with a valid Sudoku solution
 const fillBoard = (board) => {
     const findEmpty = () => {
         for (let row = 0; row < 9; row++) {
@@ -41,6 +45,7 @@ const fillBoard = (board) => {
     return false;
 };
 
+// Create a Sudoku puzzle by removing numbers from the complete board
 const createPuzzle = (board, difficulty) => {
     const emptySpaces = difficulty === 'Easy' ? 30 : difficulty === 'Medium' ? 40 : difficulty === 'Hard' ? 60 : 65;
     const puzzle = board.map(row => row.slice());
@@ -57,6 +62,7 @@ const createPuzzle = (board, difficulty) => {
     return puzzle;
 };
 
+// Check if the Sudoku board is solvable
 const isSolvable = (board) => {
     const solve = (board) => {
         const findEmpty = () => {
@@ -99,6 +105,7 @@ const isSolvable = (board) => {
     return solve(boardCopy);
 };
 
+// Generate a Sudoku puzzle with the given difficulty
 export const generateSudokuPuzzle = (difficulty) => {
     let board;
     do {
@@ -107,3 +114,4 @@ export const generateSudokuPuzzle = (difficulty) => {
     } while (!isSolvable(board));
     return board;
 };
+
