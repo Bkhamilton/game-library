@@ -6,6 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
 import SudokuNumbers from './SudokuNumbers';
+import SudokuHeader from './SudokuHeader';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -40,6 +41,7 @@ export default function SudokuGame() {
 
     return (
         <View style={styles.container}>
+            <SudokuHeader />
             <SudokuBoard 
                 board={board} 
                 handleInputChange={handleInputChange} 
@@ -55,7 +57,8 @@ export default function SudokuGame() {
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 24,
+        
     },
 });
