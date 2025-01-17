@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
@@ -22,7 +22,11 @@ export default function SelectGame({ visible, close, title, difficulties, select
 
     const { primary, grayBackground } = useTheme();
 
-    const [selectedDifficulty, setSelectedDifficulty] = useState(difficulties[0]);
+    const [selectedDifficulty, setSelectedDifficulty] = useState('');
+
+    useEffect(() => {
+        setSelectedDifficulty(difficulties[0]);
+    }, [difficulties]);
 
     return (
         <Modal
