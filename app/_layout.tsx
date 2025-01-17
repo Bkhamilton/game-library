@@ -56,6 +56,7 @@ function RootLayoutNav() {
                 <Stack.Screen name="sudoku" options={{ title: 'Sudoku', headerBackTitle: 'Home' }} />
                 <Stack.Screen name="dinorun" options={{ title: 'Dino Run', headerBackTitle: 'Home' }} />
                 <Stack.Screen name="wordSearch" options={{ title: 'Word Search', headerBackTitle: 'Home' }} />
+                <Stack.Screen name="crossword" options={{ title: 'Crossword', headerBackTitle: 'Home' }} />
             </Stack>
         </ThemeProvider>
     );
