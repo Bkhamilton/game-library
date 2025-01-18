@@ -16,10 +16,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({ gameTitles, handleSelectGam
     };
 
     return (
-        <ScrollView
-            showsHorizontalScrollIndicator={false}
-            style={styles.scrollView}
-        >
+        <View style={styles.gameContainer}>
             {gameTitles.map((title, index) => (
                 <View key={index} style={styles.gameItem}>
                     <TouchableOpacity onPress={() => handleGamePress(title)}>
@@ -30,26 +27,34 @@ const GameSelector: React.FC<GameSelectorProps> = ({ gameTitles, handleSelectGam
                     </TouchableOpacity>
                 </View>
             ))}
-        </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    scrollView: {
+    scrollViewContent: {
         paddingVertical: 10,
+        paddingHorizontal: 10,
+    },
+    gameContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
     gameItem: {
+        width: '48%', // Adjust the width to fit two items per row with some spacing
         alignItems: "center",
-        marginHorizontal: 10,
+        marginVertical: 10,
     },
     gameIcon: {
         width: 100,
         height: 100,
         borderRadius: 10,
-        marginBottom: 5,
     },
     gameTitle: {
-        textAlign: "center",
+        marginTop: 10,
+        fontSize: 16,
+        textAlign: 'center',
     },
 });
 
