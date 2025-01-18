@@ -47,9 +47,7 @@ export default function SudokuGame() {
                 handleInputChange={handleInputChange} 
                 selectedNumber={selectedNumber} 
                 initialNumbers={initialNumbers}
-            />
-            <SudokuNumbers 
-                selectNumber={handleSelectNumber} 
+                selectNumber={handleSelectNumber}
             />
         </View>
     );
