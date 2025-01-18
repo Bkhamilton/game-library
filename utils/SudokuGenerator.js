@@ -107,11 +107,16 @@ const isSolvable = (board) => {
 
 // Generate a Sudoku puzzle with the given difficulty
 export const generateSudokuPuzzle = (difficulty) => {
-    let board;
+    let completeBoard;
+    let puzzleBoard;
     do {
-        board = generateCompleteBoard();
-        board = createPuzzle(board, difficulty);
-    } while (!isSolvable(board));
-    return board;
+        completeBoard = generateCompleteBoard();
+        puzzleBoard = createPuzzle(completeBoard, difficulty);
+    } while (!isSolvable(puzzleBoard));
+    return { completeBoard, puzzleBoard };
 };
 
+// Check if the move is valid
+export const checkMove = (solvedBoard, row, col, value) => {
+    return solvedBoard[row][col] === value;
+};

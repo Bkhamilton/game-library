@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
-export default function SudokuHeader() {
+export default function SudokuHeader({ wrongCount }: { wrongCount: number }) {
     const [seconds, setSeconds] = useState(0);
 
     useEffect(() => {
@@ -22,8 +22,14 @@ export default function SudokuHeader() {
 
     return (
         <View style={styles.container}>
-            <View>
+            <View style={styles.innerContainer}>
+                <View>
+
+                </View>
                 <Text style={{ fontSize: 16 }}>Time: {formatTime(seconds)}</Text>
+                <View>
+                    <Text style={{ fontSize: 16 }}>{wrongCount}/10</Text>
+                </View>
             </View>
         </View>
     );
@@ -34,5 +40,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingBottom: 16,
+    },
+    innerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: 16,
     },
 });

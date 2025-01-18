@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
-import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
+import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
 import { useLocalSearchParams } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
@@ -10,14 +10,22 @@ import SudokuHeader from './SudokuHeader';
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
     const [board, setBoard] = useState<number[][]>([]);
+    const [solvedBoard, setSolvedBoard] = useState<number[][]>([]);
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
+
+    const [wrongCount, setWrongCount] = useState(0);
 
     const handleInputChange = (row: number, col: number, value: string) => {
         if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
         const newBoard = [...board];
-        newBoard[row][col] = parseInt(value) || 0;
-        setBoard(newBoard);
+        const intValue = parseInt(value) || 0;
+        if (checkMove(solvedBoard, row, col, intValue)) {
+            newBoard[row][col] = intValue;
+            setBoard(newBoard);
+        } else {
+            setWrongCount(prevCount => prevCount + 1);
+        }
     };
 
     const handleSelectNumber = (value: number) => {
@@ -25,10 +33,11 @@ export default function SudokuGame() {
     };
 
     useEffect(() => {
-        const newBoard = generateSudokuPuzzle(difficulty);
-        setBoard(newBoard);
+        const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
+        setBoard(puzzleBoard);
+        setSolvedBoard(completeBoard);
         const initialNums: { [key: string]: boolean } = {};
-        newBoard.forEach((row: any[], rowIndex: any) => {
+        puzzleBoard.forEach((row: any[], rowIndex: any) => {
             row.forEach((cell: number, colIndex: any) => {
                 if (cell !== 0) {
                     initialNums[`${rowIndex}-${colIndex}`] = true;
@@ -40,7 +49,9 @@ export default function SudokuGame() {
 
     return (
         <View style={styles.container}>
-            <SudokuHeader />
+            <SudokuHeader 
+                wrongCount={wrongCount}
+            />
             <SudokuBoard 
                 board={board} 
                 handleInputChange={handleInputChange} 
