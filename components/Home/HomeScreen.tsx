@@ -5,15 +5,16 @@ import GameSelector from "./GameSelector/GameSelector";
 import SelectGame from '@/components/Modals/SelectGame';
 import { useRouter } from "expo-router";
 
-type GameTitle = "Sudoku" | "Dino Run" | "Word Search" | "Crossword";
+import { GameTitle, Difficulty } from "@/constants/Types";
 
 export default function HomeScreen() {
-    const gameTitles: GameTitle[] = ["Sudoku", "Dino Run", "Word Search", "Crossword"];
-    const gameDifficulties: Record<GameTitle, string[]> = {
+    const gameTitles: GameTitle[] = ["Sudoku", "Dino Run", "Word Search", "Crossword", "Minesweeper"];
+    const gameDifficulties: Record<GameTitle, Difficulty[]> = {
         "Sudoku": ["Easy", "Medium", "Hard", "Extreme"],
         "Dino Run": ["Easy", "Hard"],
         "Word Search": ["Easy", "Medium", "Hard"],
         "Crossword": ["Easy", "Medium", "Hard"],
+        "Minesweeper": ["Easy", "Medium", "Hard", "Extreme"],
     };
 
     const [showSelectGame, setShowSelectGame] = useState(false);
@@ -41,6 +42,8 @@ export default function HomeScreen() {
                 return router.push(`/wordSearch?difficulty=${difficulty}`);
             case "Crossword":
                 return router.push(`/crossword?difficulty=${difficulty}`);
+            case "Minesweeper":
+                return router.push(`/minesweeper?difficulty=${difficulty}`);
             default:
                 return "";
         }
