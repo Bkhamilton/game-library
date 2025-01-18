@@ -5,7 +5,6 @@ import { generateSudokuPuzzle } from '@/utils/SudokuGenerator';
 import { useLocalSearchParams } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
-import SudokuNumbers from './SudokuNumbers';
 import SudokuHeader from './SudokuHeader';
 
 export default function SudokuGame() {
