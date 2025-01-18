@@ -3,15 +3,17 @@ import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 
+import { GameTitle } from "@/constants/Types";
+
 interface GameSelectorProps {
-    gameTitles: string[];
-    handleSelectGame: (game: string) => void;
+    gameTitles: GameTitle[];
+    handleSelectGame: (game: GameTitle) => void;
 }
 
 const GameSelector: React.FC<GameSelectorProps> = ({ gameTitles, handleSelectGame }) => {
     const { grayBackground } = useTheme();
 
-    const handleGamePress = (title: string) => {
+    const handleGamePress = (title: GameTitle) => {
         handleSelectGame(title);
     };
 
