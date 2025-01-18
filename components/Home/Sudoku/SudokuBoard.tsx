@@ -18,7 +18,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         setSelectedTile({ row, col });
     };
 
-    const { primary, grayBackground } = useTheme();
+    const { primary, grayBackground, text } = useTheme();
 
     useEffect(() => {
         if (selectedTile && selectedNumber !== null) {
@@ -26,6 +26,18 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
             setSelectedTile(null); // Deselect the tile after updating
         }
     }, [selectedNumber]);
+
+    const getCellStyle = (rowIndex: number, colIndex: number) => {
+        const style = [styles.cell, { borderColor: primary }];
+        if (rowIndex % 3 === 0) style.push(styles.thickTopBorder);
+        if (colIndex % 3 === 0) style.push(styles.thickLeftBorder);
+        if (rowIndex === 8) style.push(styles.thickBottomBorder);
+        if (colIndex === 8) style.push(styles.thickRightBorder);
+        if (selectedTile?.row === rowIndex && selectedTile?.col === colIndex) {
+            style.push({ backgroundColor: grayBackground });
+        }
+        return style;
+    };
 
     return (
         <>
@@ -36,13 +48,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                             <TouchableWithoutFeedback key={colIndex} onPress={Keyboard.dismiss}>
                                 <TouchableOpacity
                                     key={colIndex}
-                                    style={[
-                                        styles.cell,
-                                        {
-                                            borderColor: primary,
-                                            backgroundColor: selectedTile?.row === rowIndex && selectedTile?.col === colIndex ? grayBackground : 'transparent'
-                                        }
-                                    ]}
+                                    style={getCellStyle(rowIndex, colIndex)}
                                     onPress={() => handleTilePress(rowIndex, colIndex)}
                                 >
                                     <Text style={[styles.cellText, initialNumbers[`${rowIndex}-${colIndex}`] ? styles.initialCellText : styles.placedCellText]}>
@@ -66,9 +72,9 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                 ))}
                 <TouchableOpacity 
                     style={[styles.numberButton, { backgroundColor: primary }]}
-                    onPress={() => selectNumber(0)}    
+                    onPress={() => selectNumber(-1)}    
                 >
-                    <MaterialIcons name="backspace" size={17} color="black" />
+                    <MaterialIcons name="backspace" size={17} color={text} />
                 </TouchableOpacity>
             </View>
         </>
@@ -80,7 +86,7 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 4,
+        borderWidth: 3,
         borderRadius: 2,
     },
     row: {
@@ -95,7 +101,7 @@ const styles = StyleSheet.create({
         color: 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-    },
+    } as any,
     cellText: {
         textAlign: 'center',
     },
@@ -119,5 +125,17 @@ const styles = StyleSheet.create({
         marginVertical: 4,
         marginHorizontal: 2,
         borderRadius: 8,
+    },
+    thickTopBorder: {
+        borderTopWidth: 3,
+    },
+    thickLeftBorder: {
+        borderLeftWidth: 3,
+    },
+    thickBottomBorder: {
+        borderBottomWidth: 3,
+    },
+    thickRightBorder: {
+        borderRightWidth: 3,
     },
 });
