@@ -16,7 +16,11 @@ export default function SudokuGame() {
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
+    const [lossModalVisible, setLossModalVisible] = useState(false);
+    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
+
     const [wrongCount, setWrongCount] = useState(0);
+    const [lossModalShown, setLossModalShown] = useState(false);
 
     const handleInputChange = (row: number, col: number, value: string) => {
         if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
@@ -27,6 +31,15 @@ export default function SudokuGame() {
             setBoard(newBoard);
         } else {
             setWrongCount(prevCount => prevCount + 1);
+        }
+        // Check if the board is solved
+        if (JSON.stringify(newBoard) === JSON.stringify(solvedBoard)) {
+            setVictoryModalVisible(true);
+        }
+        // Check if the board is lost
+        if (wrongCount >= 3 && !lossModalShown) {
+            setLossModalVisible(true);
+            setLossModalShown(true); // Set the flag to true to indicate the modal has been shown
         }
     };
 
@@ -48,6 +61,7 @@ export default function SudokuGame() {
         });
         setInitialNumbers(initialNums);
         setWrongCount(0);
+        setLossModalShown(false);
     };
 
     useEffect(() => {
@@ -78,16 +92,16 @@ export default function SudokuGame() {
                 selectNumber={handleSelectNumber}
             />
             <LossMessage 
-                visible={false}
-                close={() => setWrongCount(0)}
+                visible={lossModalVisible}
+                close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
-                difficulties={['easy', 'medium', 'hard']}
+                difficulties={['Easy', 'Medium', 'Hard']}
             />
             <VictoryMessage 
-                visible={false}
-                close={() => resetBoard()}
+                visible={victoryModalVisible}
+                close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
-                difficulties={['easy', 'medium', 'hard']}
+                difficulties={['Easy', 'Medium', 'Hard']}
             />
         </View>
     );
