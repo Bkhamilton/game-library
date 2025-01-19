@@ -41,8 +41,6 @@ export default function VictoryMessage({ visible, close, title, difficulties }) 
                         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{title}</Text>
                     </View>
                     <View style={[styles.gameBox, { borderColor: primary }]}>
-                        <Text>🎉🎉🎉🎉🎉🎉</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>🎉Victory!🎉</Text>
                         <Text style={{ fontSize: 16 }}>Play Again?</Text>
                     </View>
                     <View style={{ paddingTop: 16 }}>

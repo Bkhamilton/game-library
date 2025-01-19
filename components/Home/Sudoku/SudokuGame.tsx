@@ -6,6 +6,8 @@ import { useLocalSearchParams } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
+import VictoryMessage from '@/components/Modals/VictoryMessage'
+import LossMessage from '@/components/Modals/LossMessage'
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -30,6 +32,22 @@ export default function SudokuGame() {
 
     const handleSelectNumber = (value: number) => {
         setSelectedNumber(value);
+    };
+
+    const resetBoard = () => {
+        const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
+        setBoard(puzzleBoard);
+        setSolvedBoard(completeBoard);
+        const initialNums: { [key: string]: boolean } = {};
+        puzzleBoard.forEach((row: any[], rowIndex: any) => {
+            row.forEach((cell: number, colIndex: any) => {
+                if (cell !== 0) {
+                    initialNums[`${rowIndex}-${colIndex}`] = true;
+                }
+            });
+        });
+        setInitialNumbers(initialNums);
+        setWrongCount(0);
     };
 
     useEffect(() => {
@@ -58,6 +76,18 @@ export default function SudokuGame() {
                 selectedNumber={selectedNumber} 
                 initialNumbers={initialNumbers}
                 selectNumber={handleSelectNumber}
+            />
+            <LossMessage 
+                visible={false}
+                close={() => setWrongCount(0)}
+                title={"You Lost!"}
+                difficulties={['easy', 'medium', 'hard']}
+            />
+            <VictoryMessage 
+                visible={false}
+                close={() => resetBoard()}
+                title={"You Won!"}
+                difficulties={['easy', 'medium', 'hard']}
             />
         </View>
     );
