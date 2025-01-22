@@ -67,14 +67,14 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                         style={[styles.numberButton, { backgroundColor: primary }]}
                         onPress={() => selectNumber(index + 1)}    
                     >
-                        <Text>{index + 1}</Text>
+                        <Text style={styles.numberButtonText}>{index + 1}</Text>
                     </TouchableOpacity>
                 ))}
                 <TouchableOpacity 
                     style={[styles.numberButton, { backgroundColor: primary }]}
                     onPress={() => selectNumber(-1)}    
                 >
-                    <MaterialIcons name="backspace" size={17} color={text} />
+                    <MaterialIcons name="backspace" size={20} color={text} />
                 </TouchableOpacity>
             </View>
         </>
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     } as any,
     cellText: {
         textAlign: 'center',
+        fontSize: 19,
     },
     initialCellText: {
         fontWeight: '800',
@@ -137,5 +138,8 @@ const styles = StyleSheet.create({
     },
     thickRightBorder: {
         borderRightWidth: 3,
+    },
+    numberButtonText: {
+        fontSize: 16,
     },
 });
