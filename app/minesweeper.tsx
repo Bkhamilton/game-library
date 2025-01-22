@@ -5,10 +5,12 @@ import { Platform, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import CrosswordGame from '@/components/Home/Crossword/CrosswordGame';
 
+import MineSweeperGame from '@/components/Home/MineSweeper/MineSweeperGame';
+
 export default function MineSweeperScreen() {
     return (
         <View style={styles.container}>
-            <CrosswordGame />
+            <MineSweeperGame />
         </View>
     );
 }
