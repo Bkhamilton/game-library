@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Text } from '@/components/Themed';
+import { StyleSheet } from 'react-native';
+import { Text, TouchableOpacity } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
 interface CellProps {
@@ -29,7 +29,7 @@ const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPre
 
     return (
         <TouchableOpacity
-            style={[styles.cell, { width: size, height: size }, revealed && { backgroundColor: grayBackground }, flagged && { backgroundColor: primary }]}
+            style={[styles.cell, { width: size, height: size }, { borderColor: primary }, revealed && { backgroundColor: grayBackground }, flagged && { backgroundColor: primary }]}
             onPress={onPress}
             onLongPress={onLongPress}
         >
@@ -40,11 +40,9 @@ const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPre
 
 const styles = StyleSheet.create({
     cell: {
-        borderWidth: 1,
-        borderColor: '#ccc',
+        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
     },
     cellText: {
         fontSize: 20,
