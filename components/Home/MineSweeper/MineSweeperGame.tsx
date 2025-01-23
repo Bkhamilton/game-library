@@ -8,6 +8,7 @@ import MineSweeperHeader from './MineSweeperHeader';
 import VictoryMessage from '@/components/Modals/VictoryMessage'
 import LossMessage from '@/components/Modals/LossMessage'
 import useTheme from '@/hooks/useTheme';
+import Difficulties from '@/constants/Difficulties';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -124,13 +125,13 @@ const GameBoard: React.FC = () => {
                 visible={lossModalVisible}
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
-                difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
+                difficulties={Difficulties['MineSweeper']}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
-                difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
+                difficulties={Difficulties['MineSweeper']}
             />
         </View>
     );
