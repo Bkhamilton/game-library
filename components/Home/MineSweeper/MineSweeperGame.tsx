@@ -7,6 +7,7 @@ import Cell from './Cell';
 import MineSweeperHeader from './MineSweeperHeader';
 import VictoryMessage from '@/components/Modals/VictoryMessage'
 import LossMessage from '@/components/Modals/LossMessage'
+import useTheme from '@/hooks/useTheme';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -104,13 +105,15 @@ const GameBoard: React.FC = () => {
         );
     };
 
+    const { primary } = useTheme();
+
     return (
         <View style={styles.container}>
             <MineSweeperHeader
                 minesCount={minesCount}
                 gameState={gameState}
             />
-            <View style={styles.board}>
+            <View style={[styles.board, { borderColor: primary }]}>
                 {board.map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.row}>
                         {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
         paddingTop: '25%',
     },
     board: {
-        // Styles for the game board
+        borderWidth: 4,
     },
     row: {
         flexDirection: 'row',
