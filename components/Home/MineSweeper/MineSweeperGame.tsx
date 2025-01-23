@@ -4,7 +4,9 @@ import { View, Text } from '@/components/Themed';
 import { initializeBoard } from '@/utils/MineSweeperGenerator';
 import { useLocalSearchParams } from 'expo-router';
 import Cell from './Cell';
-import Timer from './Timer';
+import Timer from '../Helpers/Timer';
+import useTheme from '@/hooks/useTheme';
+import MineSweeperHeader from './MineSweeperHeader';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -37,6 +39,8 @@ const GameBoard: React.FC = () => {
     const [rows, setRows] = useState(10); // Example row count
     const [cols, setCols] = useState(10); // Example column count
 
+    const [isActive, setIsActive] = useState(true);
+
     useEffect(() => {
         const newBoard = initializeBoard(difficulty);
         setBoard(newBoard);
@@ -59,6 +63,7 @@ const GameBoard: React.FC = () => {
                 cell.isRevealed = true;
                 if (cell.isMine) {
                     setGameState('lost');
+                    setIsActive(false);
                 } else {
                     // Reveal adjacent cells if no adjacent mines
                     if (cell.adjacentMines === 0) {
@@ -67,6 +72,7 @@ const GameBoard: React.FC = () => {
                     // Check if the game is won
                     if (checkWin(newBoard)) {
                         setGameState('won');
+                        setIsActive(false);
                     }
                 }
             }
@@ -146,9 +152,14 @@ const GameBoard: React.FC = () => {
         );
     };
 
+    const { primary, grayBackground } = useTheme();
+
     return (
         <View style={styles.container}>
-            <Timer />
+            <MineSweeperHeader
+                minesCount={minesCount}
+                gameState={gameState}
+            />
             <View style={styles.board}>
                 {board.map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.row}>
@@ -164,7 +175,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        paddingTop: '25%',
     },
     board: {
         // Styles for the game board
