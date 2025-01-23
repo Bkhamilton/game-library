@@ -66,8 +66,8 @@ const GameBoard: React.FC = () => {
             if (!cell.isFlagged && !cell.isRevealed) {
                 if (cell.isMine) {
                     setGameState('lost');
-                    setIsActive(false);
                     setLossModalVisible(true);
+                    setIsActive(false);
                 } else {
                     // Reveal adjacent cells if no adjacent mines
                     if (cell.adjacentMines === 0) {
@@ -76,8 +76,8 @@ const GameBoard: React.FC = () => {
                     // Check if the game is won
                     if (checkWin(newBoard)) {
                         setGameState('won');
-                        setIsActive(false);
                         setVictoryModalVisible(true);
+                        setIsActive(false);
                     }
                 }
                 cell.isRevealed = true;
@@ -121,13 +121,13 @@ const GameBoard: React.FC = () => {
                 visible={lossModalVisible}
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
-                difficulties={['Easy', 'Medium', 'Hard']}
+                difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
-                difficulties={['Easy', 'Medium', 'Hard']}
+                difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
             />
         </View>
     );
