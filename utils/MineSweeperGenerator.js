@@ -11,19 +11,19 @@ export const initializeBoard = (difficulty) => {
             minesCount = 10;
             break;
         case 'Medium':
-            rows = 16;
+            rows = 12;
             cols = 12;
             minesCount = 40;
             break;
         case 'Hard':
-            rows = 24;
+            rows = 16;
             cols = 16;
             minesCount = 70;
             break;
         case 'Extreme':
-            rows = 25;
+            rows = 19;
             cols = 19;
-            minesCount = 140;
+            minesCount = 100;
             break;
         default:
             throw new Error('Invalid difficulty level');
