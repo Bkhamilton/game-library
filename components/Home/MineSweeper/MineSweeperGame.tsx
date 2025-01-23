@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { View, Text } from '@/components/Themed';
-import { initializeBoard } from '@/utils/MineSweeperGenerator';
+import { View } from '@/components/Themed';
+import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize } from '@/utils/MineSweeperGenerator';
 import { useLocalSearchParams } from 'expo-router';
 import Cell from './Cell';
-import Timer from '../Helpers/Timer';
-import useTheme from '@/hooks/useTheme';
 import MineSweeperHeader from './MineSweeperHeader';
+import VictoryMessage from '@/components/Modals/VictoryMessage'
+import LossMessage from '@/components/Modals/LossMessage'
 
 export interface CellProps {
     isRevealed: boolean;
@@ -35,15 +35,18 @@ const GameBoard: React.FC = () => {
     const { difficulty } = useLocalSearchParams();
     const [board, setBoard] = useState<CellProps[][]>([]);
     const [gameState, setGameState] = useState<string>('active');
-    const [minesCount, setMinesCount] = useState(10); // Example mine count
-    const [rows, setRows] = useState(10); // Example row count
-    const [cols, setCols] = useState(10); // Example column count
+    const [minesCount, setMinesCount] = useState(10);
+
+    const [lossModalVisible, setLossModalVisible] = useState(false);
+    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
 
     const [isActive, setIsActive] = useState(true);
 
     useEffect(() => {
         const newBoard = initializeBoard(difficulty);
+        const minesCount = getMineCount(difficulty);
         setBoard(newBoard);
+        setMinesCount(minesCount);
     }, []);
 
     const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
@@ -56,14 +59,15 @@ const GameBoard: React.FC = () => {
             // Toggle flag
             if (!cell.isRevealed) {
                 cell.isFlagged = !cell.isFlagged;
+                setMinesCount(prevCount => cell.isFlagged ? prevCount - 1 : prevCount + 1);
             }
         } else {
             // Reveal cell
             if (!cell.isFlagged && !cell.isRevealed) {
-                cell.isRevealed = true;
                 if (cell.isMine) {
                     setGameState('lost');
                     setIsActive(false);
+                    setLossModalVisible(true);
                 } else {
                     // Reveal adjacent cells if no adjacent mines
                     if (cell.adjacentMines === 0) {
@@ -73,67 +77,15 @@ const GameBoard: React.FC = () => {
                     if (checkWin(newBoard)) {
                         setGameState('won');
                         setIsActive(false);
+                        setVictoryModalVisible(true);
                     }
                 }
+                cell.isRevealed = true;
             }
         }
     
         setBoard(newBoard);
     };
-
-    const revealAdjacentCells = (board: CellProps[][], row: number, col: number) => {
-        const directions = [
-            [-1, -1], [-1, 0], [-1, 1],
-            [0, -1],         [0, 1],
-            [1, -1], [1, 0], [1, 1]
-        ];
-    
-        const stack = [[row, col]];
-    
-        while (stack.length > 0) {
-            const [currentRow, currentCol] = stack.pop()!;
-            const cell = board[currentRow][currentCol];
-    
-            if (!cell.isRevealed && !cell.isFlagged) {
-                cell.isRevealed = true;
-    
-                if (cell.adjacentMines === 0) {
-                    for (const [dx, dy] of directions) {
-                        const newRow = currentRow + dx;
-                        const newCol = currentCol + dy;
-    
-                        if (
-                            newRow >= 0 && newRow < rows &&
-                            newCol >= 0 && newCol < cols &&
-                            !board[newRow][newCol].isRevealed
-                        ) {
-                            stack.push([newRow, newCol]);
-                        }
-                    }
-                }
-            }
-        }
-    };
-    
-    const checkWin = (board: CellProps[][]): boolean => {
-        // Logic to check if the game is won
-        return false;
-    };
-
-    const setSize = (difficulty: string) => {
-        switch (difficulty) {
-            case 'Easy':
-                return 40;
-            case 'Medium':
-                return 32;
-            case 'Hard':
-                return 24;
-            case 'Extreme':
-                return 20;
-            default:
-                return 40;
-        }
-    }
 
     const renderCell = (row: number, col: number) => {
         const cell = board[row][col];
@@ -147,12 +99,10 @@ const GameBoard: React.FC = () => {
                 adjacentMines={cell.adjacentMines}
                 onPress={() => handleCellClick(row, col, false)}
                 onLongPress={() => handleCellClick(row, col, true)}
-                size={cellSize} // Pass cell size as prop
+                size={cellSize}
             />
         );
     };
-
-    const { primary, grayBackground } = useTheme();
 
     return (
         <View style={styles.container}>
@@ -167,6 +117,18 @@ const GameBoard: React.FC = () => {
                     </View>
                 ))}
             </View>
+            <LossMessage 
+                visible={lossModalVisible}
+                close={() => setLossModalVisible(false)}
+                title={"You Lost!"}
+                difficulties={['Easy', 'Medium', 'Hard']}
+            />
+            <VictoryMessage 
+                visible={victoryModalVisible}
+                close={() => setVictoryModalVisible(false)}
+                title={"You Won!"}
+                difficulties={['Easy', 'Medium', 'Hard']}
+            />
         </View>
     );
 };
