@@ -3,7 +3,7 @@ import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
-export default function VictoryMessage({ visible, close, title, difficulties }) {
+export default function VictoryMessage({ visible, close, title, difficulties, restartGame }) {
 
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
@@ -27,6 +27,12 @@ export default function VictoryMessage({ visible, close, title, difficulties }) 
     useEffect(() => {
         setSelectedDifficulty(difficulties[0]);
     }, [difficulties]);
+
+    const handleRestartGame = () => {
+        // if restartGame is passed as a prop, call it with selectedDifficulty
+        if (restartGame) restartGame(selectedDifficulty);
+        close();
+    }
 
     return (
         <Modal
@@ -52,6 +58,7 @@ export default function VictoryMessage({ visible, close, title, difficulties }) 
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: primary }]}
+                            onPress={handleRestartGame}
                         >
                             <Text>New Game</Text>
                         </TouchableOpacity>

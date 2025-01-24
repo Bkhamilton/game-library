@@ -9,6 +9,7 @@ import VictoryMessage from '@/components/Modals/VictoryMessage'
 import LossMessage from '@/components/Modals/LossMessage'
 import useTheme from '@/hooks/useTheme';
 import Difficulties from '@/constants/Difficulties';
+import { useRouter } from 'expo-router';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -106,6 +107,12 @@ const GameBoard: React.FC = () => {
         );
     };
 
+    const router = useRouter();
+
+    const restartGame = (difficulty: string) => {
+        return router.push(`/minesweeper?difficulty=${difficulty}`);
+    }
+
     const { primary } = useTheme();
 
     return (
@@ -126,12 +133,14 @@ const GameBoard: React.FC = () => {
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
                 difficulties={Difficulties['MineSweeper']}
+                restartGame={() => restartGame(difficulty)}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
                 difficulties={Difficulties['MineSweeper']}
+                restartGame={() => restartGame(difficulty)}
             />
         </View>
     );
