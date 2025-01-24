@@ -27,6 +27,12 @@ export default function SudokuGame() {
         if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
         const newBoard = [...board];
         const intValue = parseInt(value) || 0;
+        // If the value is -1, clear the cell
+        if (intValue === -1) {
+            newBoard[row][col] = 0;
+            setBoard(newBoard);
+            return;
+        }
         if (checkMove(solvedBoard, row, col, intValue)) {
             newBoard[row][col] = intValue;
             setBoard(newBoard);
