@@ -3,14 +3,19 @@ import { StyleSheet, Animated, Easing } from "react-native";
 import { TouchableOpacity, View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import DinoRunHeader from "./DinoRunHeader";
+import LossMessage from '@/components/Modals/LossMessage';
+import Difficulties from '@/constants/Difficulties';
 
 const DinoRunGame: React.FC = () => {
     const [isJumping, setIsJumping] = useState(false);
     const [isGameOver, setIsGameOver] = useState(false);
     const [score, setScore] = useState(0);
+    const [countdown, setCountdown] = useState(3);    
     const dinoY = useRef(new Animated.Value(0)).current;
     const cactusX = useRef(new Animated.Value(0)).current;
     const gameInterval = useRef<NodeJS.Timeout | null>(null);
+
+    const [lossModalVisible, setLossModalVisible] = useState(false);
 
     const handleJump = () => {
         if (!isJumping) {
@@ -39,7 +44,7 @@ const DinoRunGame: React.FC = () => {
     };
 
     useEffect(() => {
-        if (isGameOver) return;
+        if (isGameOver || countdown > 0) return;
 
         const interval = setInterval(() => {
             setScore((prevScore) => prevScore + 1);
@@ -51,72 +56,103 @@ const DinoRunGame: React.FC = () => {
         return () => {
             clearInterval(interval);
         };
-    }, [isJumping, isGameOver]);
+    }, [isJumping, isGameOver, countdown]);
 
     useEffect(() => {
-        if (!isGameOver) {
+        if (countdown > 0) {
+            const timer = setTimeout(() => {
+                setCountdown(countdown - 1);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [countdown]);
+
+    useEffect(() => {
+        if (!isGameOver && countdown === 0) {
+            cactusX.setValue(0); // Reset cactus position
             Animated.loop(
                 Animated.timing(cactusX, {
-                toValue: -410,
-                duration: 2200,
-                useNativeDriver: true,
-                easing: Easing.linear,
+                    toValue: -410,
+                    duration: 2200,
+                    useNativeDriver: true,
+                    easing: Easing.linear,
                 })
             ).start();
         } else {
             cactusX.stopAnimation();
         }
-    }, [isGameOver]);
+    }, [isGameOver, countdown]);
 
     const checkCollision = () => {
-        const dinoBottom = 50;
-        const cactusWidth = 20; 
-        const dinoWidth = 50;
+        const dinoBottom = 50; // Dino's bottom position
+        const cactusWidth = 20; // Cactus width
+        const dinoWidth = 50; // Dino width
 
         dinoY.addListener(({ value: dinoYValue }) => {
             cactusX.addListener(({ value: cactusXValue }) => {
                 if (
-                    dinoYValue >= dinoBottom - dinoWidth && // Check if dino is on the ground
-                    cactusXValue < dinoWidth && // Check if cactus is within dino's horizontal range
-                    cactusXValue > -cactusWidth // Check if cactus is not past the dino
+                    cactusXValue < dinoWidth &&
+                    cactusXValue + cactusWidth > 0 &&
+                    dinoYValue < dinoBottom
                 ) {
-                    setIsGameOver(true);
-                    if (gameInterval.current) {
-                        clearInterval(gameInterval.current);
-                    }
-                    cactusX.stopAnimation();
+                    endGame();
                 }
             });
         });
+    };
+
+    const endGame = () => {
+        setIsGameOver(true);
+        clearInterval(gameInterval.current!);
+        setLossModalVisible(true);
     };
 
     const restartGame = () => {
         setIsGameOver(false);
         setScore(0);
         cactusX.setValue(0);
+        setLossModalVisible(false);
     };
 
     const { primary } = useTheme();
 
     return (
         <View style={styles.gameContainer}>
-            <DinoRunHeader score={score} />
-            <Animated.View
-                style={[styles.dino, { transform: [{ translateY: dinoY }], backgroundColor: primary }]}
-            />
-            <Animated.View
-                style={[styles.cactus, { transform: [{ translateX: cactusX }], backgroundColor: 'green' }]}
-            />
-            {isGameOver && (
-                <View style={styles.gameOver}>
-                    <Text>Game Over</Text>
-                    <TouchableOpacity 
-                        onPress={restartGame}
-                    >
-                        <Text>Restart</Text>
-                    </TouchableOpacity>
+            { countdown > 0 && (
+                <View>
+                    <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>Get Ready!</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>{countdown}</Text>
                 </View>
             )}
+            <DinoRunHeader score={score} />
+            <View style={styles.gameArea} >
+                <Animated.View
+                    style={[
+                        styles.dino,
+                        {
+                            transform: [{ translateY: dinoY }],
+                            backgroundColor: primary,
+                        },
+                    ]}
+                />
+                <Animated.View
+                    style={[
+                        styles.cactus,
+                        {
+                            transform: [{ translateX: cactusX }],
+                            backgroundColor: 'green',
+                        },
+                    ]}
+                />
+                <View style={styles.ground} />
+            </View>
+            <LossMessage
+                visible={lossModalVisible}
+                close={() => setLossModalVisible(false)}
+                title={'You Lost!'}
+                difficulties={Difficulties['DinoRun']}
+                restartGame={restartGame}
+            />
             <TouchableOpacity 
                 style={styles.jumpButton} 
                 onPress={() => handleJump()}
@@ -130,23 +166,35 @@ const DinoRunGame: React.FC = () => {
 const styles = StyleSheet.create({
     gameContainer: {
         flex: 1,
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: 'flex-end',
+        paddingBottom: '90%',
     },
     dino: {
-        position: "absolute",
-        bottom: '40%',
-        left: 50,
         width: 50,
         height: 50,
         borderRadius: 8,
+        position: "absolute",
+        bottom: 0,
     },
     cactus: {
-        position: "absolute",
-        bottom: '40%',
-        right: 0,
         width: 20,
         height: 50,
+        position: "absolute",
+        bottom: 0,
+        right: 0,
+    },
+    gameArea: {
+        position: "relative",
+        width: '100%',
+        height: 200,
+    },
+    ground: {
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        height: 2,
+        backgroundColor: "#333",
     },
     gameOver: {
         position: "absolute",
