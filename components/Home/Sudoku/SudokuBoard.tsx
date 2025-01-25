@@ -19,7 +19,6 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
     };
 
     const handlePress = (value: number) => {
-        console.log(`Button ${value} pressed`);
         selectNumber(value);
     };
 
