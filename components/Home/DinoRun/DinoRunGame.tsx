@@ -118,12 +118,19 @@ const DinoRunGame: React.FC = () => {
 
     return (
         <View style={styles.gameContainer}>
-            { countdown > 0 && (
-                <View>
-                    <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>Get Ready!</Text>
-                    <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>{countdown}</Text>
-                </View>
-            )}
+            { 
+                countdown > 0 && (
+                    <View>
+                        <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>Get Ready!</Text>
+                        <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>{countdown}</Text>
+                    </View>
+                )
+            }
+            {
+                isGameOver && (
+                    <Text style={{ textAlign: 'center', fontSize: 24, fontWeight: '600' }}>Game Over</Text>
+                )
+            }
             <DinoRunHeader score={score} />
             <View style={styles.gameArea} >
                 <Animated.View
@@ -146,6 +153,12 @@ const DinoRunGame: React.FC = () => {
                 />
                 <View style={styles.ground} />
             </View>
+            <TouchableOpacity 
+                style={styles.jumpButton} 
+                onPress={() => handleJump()}
+            >
+                <Text>Jump</Text>
+            </TouchableOpacity>
             <LossMessage
                 visible={lossModalVisible}
                 close={() => setLossModalVisible(false)}
@@ -153,12 +166,6 @@ const DinoRunGame: React.FC = () => {
                 difficulties={Difficulties['DinoRun']}
                 restartGame={restartGame}
             />
-            <TouchableOpacity 
-                style={styles.jumpButton} 
-                onPress={() => handleJump()}
-            >
-                <Text>Jump</Text>
-            </TouchableOpacity>
         </View>
     );
 };
@@ -195,13 +202,6 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 2,
         backgroundColor: "#333",
-    },
-    gameOver: {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: [{ translateX: -50 }, { translateY: -50 }],
-        textAlign: "center",
     },
     jumpButton: {
         position: "absolute",
