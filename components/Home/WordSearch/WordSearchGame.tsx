@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
-import { View, Text } from '@/components/Themed';
-import { WORD_POOLS } from '@/data/wordSearchWords';
-import { initializeGrid } from '@/utils/WordSearchGenerator';
+import { View, Text } from "@/components/Themed";
+import { WORD_POOLS } from "@/data/wordSearchWords";
+import { initializeGrid } from "@/utils/WordSearchGenerator";
+import { useLocalSearchParams } from "expo-router";
 
 const GRID_SIZE = 8;
 const WORDS = ["REACT", "NATIVE", "APP", "CODE"];
@@ -21,13 +22,13 @@ interface GridSettings {
 type Difficulty = "easy" | "medium" | "hard";
 
 const DIFFICULTY_SETTINGS = {
-  easy: { wordCount: 5, gridSize: 6 },
-  medium: { wordCount: 6, gridSize: 8 },
-  hard: { wordCount: 8, gridSize: 10 }, // Increased grid size for longer words
+  Easy: { wordCount: 5, gridSize: 6 },
+  Medium: { wordCount: 6, gridSize: 8 },
+  Hard: { wordCount: 8, gridSize: 10 }, // Increased grid size for longer words
 };
 
 export default function WordSearchGame() {
-  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const { difficulty } = useLocalSearchParams();
   const [activeWords, setActiveWords] = useState<string[]>([]);
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -88,22 +89,6 @@ export default function WordSearchGame() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.difficultyContainer}>
-        {(["easy", "medium", "hard"] as Difficulty[]).map((diff) => (
-          <TouchableOpacity
-            key={diff}
-            style={[
-              styles.difficultyButton,
-              difficulty === diff && styles.selectedDifficulty,
-            ]}
-            onPress={() => setDifficulty(diff)}
-          >
-            <Text style={styles.difficultyText}>
-              {diff.charAt(0).toUpperCase() + diff.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
       <View style={styles.wordBank}>
         {wordBank.map((word) => (
           <Text
