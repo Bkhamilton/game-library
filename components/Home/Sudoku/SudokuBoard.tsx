@@ -49,17 +49,15 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                 {board.map((row: number[], rowIndex: number) => (
                     <View key={rowIndex} style={styles.row}>
                         {row.map((cell: number, colIndex: number) => (
-                            <TouchableWithoutFeedback key={colIndex} onPress={Keyboard.dismiss}>
-                                <TouchableOpacity
-                                    key={colIndex}
-                                    style={getCellStyle(rowIndex, colIndex)}
-                                    onPress={() => handleTilePress(rowIndex, colIndex)}
-                                >
-                                    <Text style={[styles.cellText, initialNumbers[`${rowIndex}-${colIndex}`] ? styles.initialCellText : styles.placedCellText]}>
-                                        {cell === 0 ? '' : cell.toString()}
-                                    </Text>
-                                </TouchableOpacity>
-                            </TouchableWithoutFeedback>
+                            <TouchableOpacity
+                                key={colIndex}
+                                style={getCellStyle(rowIndex, colIndex)}
+                                onPress={() => handleTilePress(rowIndex, colIndex)}
+                            >
+                                <Text style={[styles.cellText, initialNumbers[`${rowIndex}-${colIndex}`] ? styles.initialCellText : styles.placedCellText]}>
+                                    {cell === 0 ? '' : cell.toString()}
+                                </Text>
+                            </TouchableOpacity>
                         ))}
                     </View>
                 ))}
