@@ -4,6 +4,7 @@ import { View, Text } from "@/components/Themed";
 import { WORD_POOLS } from "@/data/wordSearchWords";
 import { initializeGrid } from "@/utils/WordSearchGenerator";
 import { useLocalSearchParams } from "expo-router";
+import useTheme from "@/hooks/useTheme";
 
 const GRID_SIZE = 8;
 const WORDS = ["REACT", "NATIVE", "APP", "CODE"];
@@ -33,6 +34,8 @@ export default function WordSearchGame() {
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [wordBank, setWordBank] = useState<string[]>([]);
+
+  const { primary, grayBackground, text } = useTheme();
 
   useEffect(() => {
     initializeGameWithDifficulty(difficulty);
@@ -88,7 +91,7 @@ export default function WordSearchGame() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <View style={styles.wordBank}>
         {wordBank.map((word) => (
           <Text
@@ -99,14 +102,18 @@ export default function WordSearchGame() {
           </Text>
         ))}
       </View>
-      <View style={styles.grid}>
+      <View style={[styles.grid, { borderWidth: 2, borderColor: primary }]}>
         {grid.map((row, i) => (
-          <View key={i} style={styles.row}>
+          <View
+            key={i}
+            style={[styles.row, { borderWidth: 1, borderColor: primary }]}
+          >
             {row.map((cell, j) => (
               <TouchableOpacity
                 key={`${i}-${j}`}
                 style={[
                   styles.cell,
+                  { borderWidth: 1, borderColor: primary },
                   cell.selected && styles.selectedCell,
                   cell.isFound && styles.foundCell,
                 ]}
