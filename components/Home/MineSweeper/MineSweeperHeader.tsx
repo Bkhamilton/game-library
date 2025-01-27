@@ -4,7 +4,16 @@ import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import Timer from '../Helpers/Timer';
 
-export default function SudokuHeader({ wrongCount }: { wrongCount: number }) {
+export default function MineSweeperHeader({ minesCount, gameState }: { minesCount: number, gameState: string }) {
+
+    const [isActive, setIsActive] = useState(true);
+
+    useEffect(() => {
+        if (gameState === 'lost' || gameState === 'won') {
+            setIsActive(false);
+        }
+    }, [gameState]);
+
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
@@ -12,10 +21,10 @@ export default function SudokuHeader({ wrongCount }: { wrongCount: number }) {
 
                 </View>
                 <Timer 
-                    isActive={true}
+                    isActive={isActive}
                 />
                 <View>
-                    <Text style={{ fontSize: 16 }}>{wrongCount}/10</Text>
+                    <Text style={{ fontSize: 16 }}>{minesCount}</Text>
                 </View>
             </View>
         </View>

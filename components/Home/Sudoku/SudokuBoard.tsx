@@ -18,6 +18,10 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         setSelectedTile({ row, col });
     };
 
+    const handlePress = (value: number) => {
+        selectNumber(value);
+    };
+
     const { primary, grayBackground, text } = useTheme();
 
     useEffect(() => {
@@ -65,16 +69,18 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                     <TouchableOpacity 
                         key={index} 
                         style={[styles.numberButton, { backgroundColor: primary }]}
-                        onPress={() => selectNumber(index + 1)}    
+                        onPress={() => handlePress(index + 1)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                        <Text>{index + 1}</Text>
+                        <Text style={styles.numberButtonText}>{index + 1}</Text>
                     </TouchableOpacity>
                 ))}
                 <TouchableOpacity 
                     style={[styles.numberButton, { backgroundColor: primary }]}
-                    onPress={() => selectNumber(-1)}    
+                    onPress={() => handlePress(-1)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}    
                 >
-                    <MaterialIcons name="backspace" size={17} color={text} />
+                    <MaterialIcons name="backspace" size={20} color={text} />
                 </TouchableOpacity>
             </View>
         </>
@@ -104,6 +110,7 @@ const styles = StyleSheet.create({
     } as any,
     cellText: {
         textAlign: 'center',
+        fontSize: 19,
     },
     initialCellText: {
         fontWeight: '800',
@@ -137,5 +144,8 @@ const styles = StyleSheet.create({
     },
     thickRightBorder: {
         borderRightWidth: 3,
+    },
+    numberButtonText: {
+        fontSize: 16,
     },
 });

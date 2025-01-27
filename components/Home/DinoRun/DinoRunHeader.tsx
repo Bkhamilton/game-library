@@ -4,18 +4,16 @@ import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import Timer from '../Helpers/Timer';
 
-export default function SudokuHeader({ wrongCount }: { wrongCount: number }) {
+export default function DinoRunHeader({ score }: { score: number }) {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
                 <View>
 
                 </View>
-                <Timer 
-                    isActive={true}
-                />
+                <Text>Score: {score}</Text>
                 <View>
-                    <Text style={{ fontSize: 16 }}>{wrongCount}/10</Text>
+                    
                 </View>
             </View>
         </View>

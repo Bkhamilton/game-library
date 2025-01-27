@@ -8,6 +8,7 @@ import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
 import VictoryMessage from '@/components/Modals/VictoryMessage'
 import LossMessage from '@/components/Modals/LossMessage'
+import Difficulties from '@/constants/Difficulties';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -26,6 +27,12 @@ export default function SudokuGame() {
         if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
         const newBoard = [...board];
         const intValue = parseInt(value) || 0;
+        // If the value is -1, clear the cell
+        if (intValue === -1) {
+            newBoard[row][col] = 0;
+            setBoard(newBoard);
+            return;
+        }
         if (checkMove(solvedBoard, row, col, intValue)) {
             newBoard[row][col] = intValue;
             setBoard(newBoard);
@@ -95,13 +102,13 @@ export default function SudokuGame() {
                 visible={lossModalVisible}
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
-                difficulties={['Easy', 'Medium', 'Hard']}
+                difficulties={Difficulties['Sudoku']}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
-                difficulties={['Easy', 'Medium', 'Hard']}
+                difficulties={Difficulties['Sudoku']}
             />
         </View>
     );
@@ -111,6 +118,5 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         paddingTop: 24,
-        
     },
 });
