@@ -69,9 +69,6 @@ export default function WordSearchGame() {
     const selectedCells = grid.flat().filter((cell) => cell.selected);
     const selectedWord = selectedCells.map((cell) => cell.letter).join("");
 
-    console.log("Selected Word:", selectedWord); // Debug log
-    console.log("Word Bank:", wordBank); // Debug log
-
     // Case-insensitive comparison
     const wordFound = wordBank.some(
       (word) => word.toUpperCase() === selectedWord.toUpperCase()
@@ -102,7 +99,7 @@ export default function WordSearchGame() {
           </Text>
         ))}
       </View>
-      <View style={[styles.grid, { borderWidth: 2, borderColor: primary }]}>
+      <View style={[styles.grid, { borderWidth: 5, borderColor: primary }]}>
         {grid.map((row, i) => (
           <View
             key={i}
@@ -125,12 +122,11 @@ export default function WordSearchGame() {
           </View>
         ))}
       </View>
-      <View>
+      <View style={[{ alignItems: "center" }]}>
         <TouchableOpacity
           onPress={() => {
             initializeGameWithDifficulty(difficulty);
             setFoundWords([]);
-            console.log("Reset Game");
           }}
         >
           <Text>Reset</Text>
@@ -142,7 +138,8 @@ export default function WordSearchGame() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    width: "auto",
+    height: "100%",
   },
   wordBank: {
     flexDirection: "row",
