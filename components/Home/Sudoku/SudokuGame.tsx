@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
@@ -54,23 +54,6 @@ export default function SudokuGame() {
         setSelectedNumber(value);
     };
 
-    const resetBoard = () => {
-        const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
-        setBoard(puzzleBoard);
-        setSolvedBoard(completeBoard);
-        const initialNums: { [key: string]: boolean } = {};
-        puzzleBoard.forEach((row: any[], rowIndex: any) => {
-            row.forEach((cell: number, colIndex: any) => {
-                if (cell !== 0) {
-                    initialNums[`${rowIndex}-${colIndex}`] = true;
-                }
-            });
-        });
-        setInitialNumbers(initialNums);
-        setWrongCount(0);
-        setLossModalShown(false);
-    };
-
     useEffect(() => {
         const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
         setBoard(puzzleBoard);
@@ -85,6 +68,12 @@ export default function SudokuGame() {
         });
         setInitialNumbers(initialNums);
     }, [difficulty]);
+
+    const router = useRouter();
+
+    const restartGame = (difficulty: string) => {
+        router.push(`/sudoku?difficulty=${difficulty}`);
+    }
 
     return (
         <View style={styles.container}>
@@ -103,12 +92,14 @@ export default function SudokuGame() {
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
                 difficulties={Difficulties['Sudoku']}
+                restartGame={restartGame}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
                 difficulties={Difficulties['Sudoku']}
+                restartGame={restartGame}
             />
         </View>
     );
