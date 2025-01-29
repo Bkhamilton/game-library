@@ -62,8 +62,8 @@ function RootLayoutNav() {
           options={{ title: "Sudoku", headerBackTitle: "Home" }}
         />
         <Stack.Screen
-          name="dinorun"
-          options={{ title: "Dino Run", headerBackTitle: "Home" }}
+          name="ostrichhaul"
+          options={{ title: "Ostrich Haul", headerBackTitle: "Home" }}
         />
         <Stack.Screen
           name="wordSearch"

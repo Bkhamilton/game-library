@@ -10,7 +10,7 @@ import { GameTitle, Difficulty } from "@/constants/Types";
 export default function HomeScreen() {
   const gameTitles: GameTitle[] = [
     "Sudoku",
-    "Dino Run",
+    "Ostrich Haul",
     "Word Search",
     "Crossword",
     "Minesweeper",
@@ -18,7 +18,7 @@ export default function HomeScreen() {
   ];
   const gameDifficulties: Record<GameTitle, Difficulty[]> = {
     Sudoku: ["Easy", "Medium", "Hard", "Extreme"],
-    "Dino Run": ["Easy", "Hard"],
+    "Ostrich Haul": ["Easy", "Medium", "Hard"],
     "Word Search": ["Easy", "Medium", "Hard"],
     Crossword: ["Easy", "Medium", "Hard"],
     Minesweeper: ["Easy", "Medium", "Hard", "Extreme"],
@@ -44,8 +44,8 @@ export default function HomeScreen() {
     switch (title) {
       case "Sudoku":
         return router.push(`/sudoku?difficulty=${difficulty}`);
-      case "Dino Run":
-        return router.push(`/dinorun?difficulty=${difficulty}`);
+      case "Ostrich Haul":
+        return router.push(`/ostrichhaul?difficulty=${difficulty}`);
       case "Word Search":
         return router.push(`/wordSearch?difficulty=${difficulty}`);
       case "Crossword":
