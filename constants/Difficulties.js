@@ -3,5 +3,6 @@ export default {
     'Crossword': ['Easy', 'Medium', 'Hard'],
     'WordSearch': ['Easy', 'Medium', 'Hard'],
     'MineSweeper': ['Easy', 'Medium', 'Hard', 'Extreme'],
-    'DinoRun': ['Easy', 'Hard']
+    'Ostrich Haul': ['Easy', 'Hard'],
+    'GoGoBird': ['Easy', 'Hard'],
 }
