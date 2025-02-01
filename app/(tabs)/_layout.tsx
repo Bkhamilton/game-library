@@ -29,11 +29,11 @@ export default function TabLayout() {
                 tabBarStyle: {
                     borderRadius: 32,
                     backgroundColor: Colors[colorScheme ?? 'light'].tabBar,
-                    position: "absolute",
-                    height: "6%",
+                    height: 60,
                     marginBottom: "5%",
                     width: "80%",
                     marginHorizontal: "10%",
+                    alignSelf: "center",
                   },
 
             }}>
