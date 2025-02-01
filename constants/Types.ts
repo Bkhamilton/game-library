@@ -1,3 +1,3 @@
-export type GameTitle = "Sudoku" | "Dino Run" | "Word Search" | "Crossword" | "Minesweeper";
+export type GameTitle = "Sudoku" | "Ostrich Haul" | "Word Search" | "Crossword" | "Minesweeper" | "GoGoBird";
 
 export type Difficulty = "Easy" | "Medium" | "Hard" | "Extreme";
