@@ -11,8 +11,8 @@ import { useLocalSearchParams } from "expo-router";
 
 const DIFFICULTY_SETTINGS = {
   Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
-  Medium: { obstacleSpeed: 4000, minSpawnRate: 1000, maxSpawnRate: 2000 },
-  Hard: { obstacleSpeed: 3000, minSpawnRate: 500, maxSpawnRate: 1500 },
+  Medium: { obstacleSpeed: 1500, minSpawnRate: 1000, maxSpawnRate: 2000 },
+  Hard: { obstacleSpeed: 1000, minSpawnRate: 1000, maxSpawnRate: 1500 },
 };
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -80,7 +80,7 @@ export default function OstrichHaulGame() {
             setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
           }
         });
-      }, 1000 / 60); // 60 FPS
+      }, 1000 / 120); // 60 FPS
 
       return () => clearInterval(gameLoop);
     }
