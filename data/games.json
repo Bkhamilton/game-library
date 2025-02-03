@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "title": "Sudoku",
+        "description": "A logic-based number placement puzzle."
+    },
+    {
+        "id": 2,
+        "title": "Ostrich Haul",
+        "description": "Be an Ostrich and jump over obstacles"
+    },
+    {
+        "id": 3,
+        "title": "Word Search",
+        "description": "A puzzle game where you find words hidden in a grid."
+    },
+    {
+        "id": 4,
+        "title": "Crossword",
+        "description": "A word puzzle that takes the form of a rectangular grid of white- and black-shaded squares."
+    },
+    {
+        "id": 5,
+        "title": "Minesweeper",
+        "description": "A puzzle game where you clear a board containing hidden mines."
+    },
+    {
+        "id": 6,
+        "title": "GoGoBird",
+        "description": "An action game where you control a bird to avoid obstacles."
+    }
+]

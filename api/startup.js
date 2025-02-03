@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import games from '@/data/games.json';
+import { insertGame } from '@/db/Games/Games';
 
 export const createTables = async (db) => {
     // Your table creation logic here
@@ -19,9 +21,19 @@ export const createTables = async (db) => {
     `);
 };
 
+export const syncData = async (db) => {
+    // Your data synchronization logic here
+    const gamesData = games;
+    for (const game of gamesData) {
+        await insertGame(db, game);
+    }
+}
+    
+
 export const setupDatabase = async (db) => {
     // Your database setup logic here
     await createTables(db);
+    await syncData(db);
 };
 
 export const initializeDatabase = async (db) => {
