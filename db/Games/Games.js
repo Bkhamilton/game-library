@@ -12,9 +12,9 @@ export const getGames = async (db) => {
 };
 
 // Function to insert a game
-export const insertGame = async (db, name, description) => {
+export const insertGame = async (db, game) => {
     try {
-        const result = await db.runAsync('INSERT INTO Games (name, description) VALUES (?, ?)', [name, description]);
+        const result = await db.runAsync('INSERT INTO Games (id, title, description) VALUES (?, ?, ?)', [game.id, game.title, game.description]);
         console.log(result);
         return result.lastInsertRowId;
     } catch (error) {
@@ -24,9 +24,9 @@ export const insertGame = async (db, name, description) => {
 };
 
 // Function to update a game
-export const updateGame = async (db, gameId, name, description) => {
+export const updateGame = async (db, gameId, title, description) => {
     try {
-        await db.runAsync('UPDATE Games SET name = ?, description = ? WHERE id = ?', [name, description, gameId]);
+        await db.runAsync('UPDATE Games SET title = ?, description = ? WHERE id = ?', [title, description, gameId]);
         console.log("Game updated");
     } catch (error) {
         console.error('Error updating game:', error);
