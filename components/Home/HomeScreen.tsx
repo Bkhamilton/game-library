@@ -6,8 +6,10 @@ import SelectGame from "@/components/Modals/SelectGame";
 import { useRouter } from "expo-router";
 
 import { GameTitle, Difficulty } from "@/constants/Types";
+import Difficulties from '@/constants/Difficulties';
 
 export default function HomeScreen() {
+
     const gameTitles: GameTitle[] = [
         "Sudoku",
         "Ostrich Haul",
@@ -16,14 +18,6 @@ export default function HomeScreen() {
         "Minesweeper",
         "GoGoBird",
     ];
-    const gameDifficulties: Record<GameTitle, Difficulty[]> = {
-        Sudoku: ["Easy", "Medium", "Hard", "Extreme"],
-        "Ostrich Haul": ["Easy", "Medium", "Hard"],
-        "Word Search": ["Easy", "Medium", "Hard"],
-        Crossword: ["Easy", "Medium", "Hard"],
-        Minesweeper: ["Easy", "Medium", "Hard", "Extreme"],
-        GoGoBird: ["Easy", "Medium", "Hard"],
-    };
 
     const [showSelectGame, setShowSelectGame] = useState(false);
     const [selectedGame, setSelectedGame] = useState<GameTitle | null>(null);
@@ -39,7 +33,7 @@ export default function HomeScreen() {
         setShowSelectGame(false);
     };
 
-    const confirmSelectGame = (title: string, difficulty: string) => {
+    const confirmSelectGame = (title: string, difficulty: Difficulty) => {
         handleCloseModal();
         switch (title) {
             case "Sudoku":
@@ -73,7 +67,7 @@ export default function HomeScreen() {
                     visible={showSelectGame}
                     title={selectedGame}
                     close={handleCloseModal}
-                    difficulties={gameDifficulties[selectedGame]}
+                    difficulties={Difficulties[selectedGame]}
                     selectGame={confirmSelectGame}
                 />
             )}
