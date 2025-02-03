@@ -7,7 +7,7 @@ export const createTables = async (db) => {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS Games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            title TEXT NOT NULL,
             description TEXT
         );
         CREATE TABLE IF NOT EXISTS Scores (
@@ -18,6 +18,14 @@ export const createTables = async (db) => {
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (gameId) REFERENCES Games(id)
         );  
+    `);
+};
+
+export const dropTables = async (db) => {
+    // Your table deletion logic here
+    await db.execAsync(`
+        DROP TABLE IF EXISTS Games;
+        DROP TABLE IF EXISTS Scores;
     `);
 };
 
