@@ -3,11 +3,11 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 
-import { GameTitle, Games } from "@/constants/Types";
+import { Games } from "@/constants/Types";
 
 interface GameSelectorProps {
     games: Games[];
-    handleSelectGame: (game: GameTitle) => void;
+    handleSelectGame: (game: Games) => void;
 }
 
 const GameSelector: React.FC<GameSelectorProps> = ({
@@ -16,7 +16,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({
 }) => {
     const { grayBackground } = useTheme();
 
-    const handleGamePress = (title: GameTitle) => {
+    const handleGamePress = (title: Games) => {
         handleSelectGame(title);
     };
 
@@ -25,7 +25,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({
             {
                 games.map((game, index) => (
                     <View key={index} style={styles.gameItem}>
-                        <TouchableOpacity onPress={() => handleGamePress(game.title as GameTitle)}>
+                        <TouchableOpacity onPress={() => handleGamePress(game)}>
                             <View
                                 style={[styles.gameIcon, { backgroundColor: grayBackground }]}
                             />

@@ -3,7 +3,7 @@ import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
-export default function SelectGame({ visible, close, title, difficulties, selectGame }) {
+export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
 
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
@@ -38,9 +38,12 @@ export default function SelectGame({ visible, close, title, difficulties, select
             <View style={styles.container}>
                 <View style={styles.innerContainer}>
                     <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 4 }}>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{title}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{game.title}</Text>
                     </View>
-                    <View style={[styles.gameBox, { borderColor: primary }]}/>
+                    <View style={[styles.gameBox, { borderColor: primary }]}>
+                        <View style={[styles.gameBoxIcon, { backgroundColor: primary }]} />
+                        <Text style={{ textAlign: 'center', padding: 8, fontSize: 10 }}>{game.description}</Text>
+                    </View>
                     <View style={{ paddingTop: 16 }}>
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: grayBackground }]}
@@ -55,7 +58,7 @@ export default function SelectGame({ visible, close, title, difficulties, select
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: primary }]}
-                            onPress={() => selectGame(title, selectedDifficulty)}
+                            onPress={() => selectGame(game.title, selectedDifficulty)}
                         >
                             <Text>New Game</Text>
                         </TouchableOpacity>
@@ -124,5 +127,13 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         width: 200,
         height: 200,
-    }
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    gameBoxIcon: {
+        width: 120,
+        height: 120,
+        borderRadius: 4,
+        margin: 4,
+    },
 });

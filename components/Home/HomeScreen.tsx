@@ -5,18 +5,18 @@ import GameSelector from "./GameSelector/GameSelector";
 import SelectGame from "@/components/Modals/SelectGame";
 import { useRouter } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
-import { GameTitle, Difficulty } from "@/constants/Types";
+import { GameTitle, Difficulty, Games } from "@/constants/Types";
 import Difficulties from '@/constants/Difficulties';
 
 export default function HomeScreen() {
 
     const [showSelectGame, setShowSelectGame] = useState(false);
-    const [selectedGame, setSelectedGame] = useState<GameTitle | null>(null);
+    const [selectedGame, setSelectedGame] = useState<Games | null>(null);
     const { games } = useContext(DBContext);
 
     const router = useRouter();
 
-    const handleSelectGame = (game: GameTitle) => {
+    const handleSelectGame = (game: Games) => {
         setSelectedGame(game);
         setShowSelectGame(true);
     };
@@ -57,9 +57,9 @@ export default function HomeScreen() {
             {selectedGame && (
                 <SelectGame
                     visible={showSelectGame}
-                    title={selectedGame}
+                    game={selectedGame}
                     close={handleCloseModal}
-                    difficulties={Difficulties[selectedGame]}
+                    difficulties={Difficulties[selectedGame.title as GameTitle]}
                     selectGame={confirmSelectGame}
                 />
             )}
