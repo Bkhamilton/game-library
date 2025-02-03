@@ -6,7 +6,7 @@ export const createTables = async (db) => {
         CREATE TABLE IF NOT EXISTS Games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            description TEXT,
+            description TEXT
         );
         CREATE TABLE IF NOT EXISTS Scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,8 +15,8 @@ export const createTables = async (db) => {
             metric TEXT NOT NULL,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (gameId) REFERENCES Games(id)
-        );   
-    `)
+        );  
+    `);
 };
 
 export const setupDatabase = async (db) => {
