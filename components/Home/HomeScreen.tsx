@@ -1,26 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View } from "@/components/Themed";
 import GameSelector from "./GameSelector/GameSelector";
 import SelectGame from "@/components/Modals/SelectGame";
 import { useRouter } from "expo-router";
-
+import { DBContext } from "@/contexts/DBContext";
 import { GameTitle, Difficulty } from "@/constants/Types";
 import Difficulties from '@/constants/Difficulties';
 
 export default function HomeScreen() {
 
-    const gameTitles: GameTitle[] = [
-        "Sudoku",
-        "Ostrich Haul",
-        "Word Search",
-        "Crossword",
-        "Minesweeper",
-        "GoGoBird",
-    ];
-
     const [showSelectGame, setShowSelectGame] = useState(false);
     const [selectedGame, setSelectedGame] = useState<GameTitle | null>(null);
+    const { games } = useContext(DBContext);
 
     const router = useRouter();
 
@@ -58,7 +50,7 @@ export default function HomeScreen() {
             <View>
                 <Text style={{ fontSize: 16 }}>Games</Text>
                 <GameSelector
-                    gameTitles={gameTitles}
+                    games={games}
                     handleSelectGame={handleSelectGame}
                 />
             </View>
