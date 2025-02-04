@@ -131,7 +131,11 @@ export default function OstrichHaulGame() {
   useEffect(() => {
     // Reduce ostrich gravity temporarily when jumping and velocity is in between 5 and -5
     if (isJumping && velocity > -5 && velocity < 5) {
-      setGravity(0.2);
+      if (difficulty === "Hard") {
+        setGravity(0.6);
+      } else {
+        setGravity(0.2);
+      }
     } else {
       setGravity(1);
     }
