@@ -1,164 +1,180 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  Easing,
+} from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 
 const DIFFICULTY_SETTINGS = {
-    Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
-    Medium: { obstacleSpeed: 1500, minSpawnRate: 1000, maxSpawnRate: 2000 },
-    Hard: { obstacleSpeed: 1000, minSpawnRate: 1000, maxSpawnRate: 1500 },
+  Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
+  Medium: { obstacleSpeed: 1500, minSpawnRate: 1000, maxSpawnRate: 2000 },
+  Hard: { obstacleSpeed: 1000, minSpawnRate: 1000, maxSpawnRate: 1500 },
 };
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 const groundLevel = screenHeight - 250; // Adjusted ground level to be at the bottom of the screen
-const gravity = 1;
+const gravity = 0.7;
 const jumpVelocity = -15; // Negative value to make the ostrich jump upwards
 
 export default function OstrichHaulGame() {
-    const { difficulty } = useLocalSearchParams();
-    const [ostrichY, setOstrichY] = useState(new Animated.Value(groundLevel - 10)); // Start at the top of the screen
-    const [ostrichX, setOstrichX] = useState(new Animated.Value(15)); // Initial horizontal position
-    const [velocity, setVelocity] = useState(0);
-    const [obstacles, setObstacles] = useState([]);
-    const [isGameRunning, setIsGameRunning] = useState(false);
-    const [score, setScore] = useState(0);
-    const [isJumping, setIsJumping] = useState(false); // Track if the ostrich is jumping
+  const { difficulty } = useLocalSearchParams();
+  const [ostrichY, setOstrichY] = useState(
+    new Animated.Value(groundLevel - 10)
+  ); // Start at the top of the screen
+  const [ostrichX, setOstrichX] = useState(new Animated.Value(15)); // Initial horizontal position
+  const [velocity, setVelocity] = useState(0);
+  const [obstacles, setObstacles] = useState([]);
+  const [isGameRunning, setIsGameRunning] = useState(false);
+  const [score, setScore] = useState(0);
+  const [isJumping, setIsJumping] = useState(false); // Track if the ostrich is jumping
 
-    const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
+  const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
-    const checkCollision = (obstacle) => {
-        const ostrichTop = ostrichY.__getValue();
-        const ostrichBottom = ostrichTop + 50; // Ostrich height
-        const ostrichLeft = ostrichX.__getValue();
-        const ostrichRight = ostrichLeft + 50; // Ostrich width
-        const obstacleLeft = obstacle.x.__getValue();
-        const obstacleRight = obstacleLeft + 50; // Obstacle width
-        const obstacleTop = obstacle.gapTop;
-        const obstacleBottom = groundLevel;
+  const checkCollision = (obstacle) => {
+    const ostrichTop = ostrichY.__getValue();
+    const ostrichBottom = ostrichTop + 50; // Ostrich height
+    const ostrichLeft = ostrichX.__getValue();
+    const ostrichRight = ostrichLeft + 50; // Ostrich width
+    const obstacleLeft = obstacle.x.__getValue();
+    const obstacleRight = obstacleLeft + 50; // Obstacle width
+    const obstacleTop = obstacle.gapTop;
+    const obstacleBottom = groundLevel;
 
-        if (
-            ostrichRight > obstacleLeft &&
-            ostrichLeft < obstacleRight &&
-            (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom)
-        ) {
-            return true;
-        }
-        return false;
-    };
+    if (
+      ostrichRight > obstacleLeft &&
+      ostrichLeft < obstacleRight &&
+      (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom)
+    ) {
+      return true;
+    }
+    return false;
+  };
 
-    useEffect(() => {
-        if (isGameRunning) {
-            const gameLoop = setInterval(() => {
-                setVelocity((prevVelocity) => prevVelocity + gravity);
-                setOstrichY((prevOstrichY) => {
-                    const newY = prevOstrichY.__getValue() + velocity;
-                    if (newY >= groundLevel) {
-                        setVelocity(0);
-                        setIsJumping(false); // Ostrich has landed, so it's no longer jumping
-                        return new Animated.Value(groundLevel);
-                    }
-                    return new Animated.Value(Math.max(newY, 0)); // Ensure the ostrich doesn't go above the top of the screen
-                });
+  useEffect(() => {
+    if (isGameRunning) {
+      const gameLoop = setInterval(() => {
+        setVelocity((prevVelocity) => prevVelocity + gravity);
+        setOstrichY((prevOstrichY) => {
+          const newY = prevOstrichY.__getValue() + velocity;
+          if (newY >= groundLevel) {
+            setVelocity(0);
+            setIsJumping(false); // Ostrich has landed, so it's no longer jumping
+            return new Animated.Value(groundLevel);
+          }
+          return new Animated.Value(Math.max(newY, 0)); // Ensure the ostrich doesn't go above the top of the screen
+        });
 
-                // Check for collisions with obstacles
-                obstacles.forEach((obstacle, index) => {
-                    if (checkCollision(obstacle)) {
-                        setIsGameRunning(false);
-                    } else if (ostrichX.__getValue() > obstacle.x.__getValue() + 50) {
-                        // Ostrich has passed the obstacle, update the score
-                        setScore((prevScore) => prevScore + 1);
-                        // Remove the obstacle from the array to avoid counting it again
-                        setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
-                    }
-                });
-            }, 1000 / 120); // 60 FPS
+        // Check for collisions with obstacles
+        obstacles.forEach((obstacle, index) => {
+          if (checkCollision(obstacle)) {
+            setIsGameRunning(false);
+          } else if (ostrichX.__getValue() > obstacle.x.__getValue() + 50) {
+            // Ostrich has passed the obstacle, update the score
+            setScore((prevScore) => prevScore + 1);
+            // Remove the obstacle from the array to avoid counting it again
+            setObstacles((prevObstacles) =>
+              prevObstacles.filter((_, i) => i !== index)
+            );
+          }
+        });
+      }, 1000 / 120); // 60 FPS
 
-            return () => clearInterval(gameLoop);
-        }
-    }, [isGameRunning, velocity, obstacles]);
+      return () => clearInterval(gameLoop);
+    }
+  }, [isGameRunning, velocity, obstacles]);
 
-    useEffect(() => {
-        if (isGameRunning) {
-            let spawnTimeout;
+  useEffect(() => {
+    if (isGameRunning) {
+      let spawnTimeout;
 
-            const spawnObstacle = () => {
-                const newObstacle = {
-                    key: Math.random().toString(),
-                    x: new Animated.Value(screenWidth),
-                };
-                setObstacles((prevObstacles) => [...prevObstacles, newObstacle]);
+      const spawnObstacle = () => {
+        const newObstacle = {
+          key: Math.random().toString(),
+          x: new Animated.Value(screenWidth),
+        };
+        setObstacles((prevObstacles) => [...prevObstacles, newObstacle]);
 
-                Animated.timing(newObstacle.x, {
-                    toValue: -50,
-                    duration: settings.obstacleSpeed,
-                    easing: Easing.linear,
-                    useNativeDriver: false,
-                }).start(({ finished }) => {
-                    if (finished) {
-                        setObstacles((prevObstacles) =>
-                        prevObstacles.filter((obstacle) => obstacle.key !== newObstacle.key)
-                        );
-                    }
-                });
+        Animated.timing(newObstacle.x, {
+          toValue: -50,
+          duration: settings.obstacleSpeed,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        }).start(({ finished }) => {
+          if (finished) {
+            setObstacles((prevObstacles) =>
+              prevObstacles.filter(
+                (obstacle) => obstacle.key !== newObstacle.key
+              )
+            );
+          }
+        });
 
-                // Schedule the next obstacle spawn with a random delay
-                const randomSpawnRate = Math.random() * (settings.maxSpawnRate - settings.minSpawnRate) + settings.minSpawnRate;
-                spawnTimeout = setTimeout(spawnObstacle, randomSpawnRate);
-            };
+        // Schedule the next obstacle spawn with a random delay
+        const randomSpawnRate =
+          Math.random() * (settings.maxSpawnRate - settings.minSpawnRate) +
+          settings.minSpawnRate;
+        spawnTimeout = setTimeout(spawnObstacle, randomSpawnRate);
+      };
 
-            // Start the first obstacle spawn
-            spawnObstacle();
+      // Start the first obstacle spawn
+      spawnObstacle();
 
-            return () => clearTimeout(spawnTimeout);
-        }
-    }, [isGameRunning]);
+      return () => clearTimeout(spawnTimeout);
+    }
+  }, [isGameRunning]);
 
-    const startGame = () => {
-        setIsGameRunning(true);
-        setOstrichY(new Animated.Value(groundLevel - 10)); // Start at the top of the screen
-        setVelocity(0);
-        setObstacles([]);
-        setScore(0);
-        setIsJumping(false); // Reset jumping state when the game starts
-    };
-    
-    const jump = () => {
-        if (!isJumping) {
-            setVelocity(jumpVelocity);
-            setIsJumping(true); // Set jumping state to true when the ostrich jumps
-        }
-    };
+  const startGame = () => {
+    setIsGameRunning(true);
+    setOstrichY(new Animated.Value(groundLevel - 10)); // Start at the top of the screen
+    setVelocity(0);
+    setObstacles([]);
+    setScore(0);
+    setIsJumping(false); // Reset jumping state when the game starts
+  };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.score}>Score: {score}</Text>
-            <View style={styles.sky} />
-            <View style={styles.ground} />
-            <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
-                <Animated.View style={[styles.ostrich, { top: ostrichY, left: ostrichX }]} />
-                {obstacles.map((obstacle) => (
-                    <React.Fragment key={obstacle.key}>
-                        <Animated.View
-                            style={[
-                                styles.obstacle,
-                                {
-                                left: obstacle.x,
-                                height: 50,
-                                top: groundLevel,
-                                },
-                            ]}
-                        />
-                    </React.Fragment>
-                ))}
-            </TouchableOpacity>
-            {!isGameRunning && (
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.startText}>Start</Text>
-                </TouchableOpacity>
-            )}
-        </View>
-    );
+  const jump = () => {
+    if (!isJumping) {
+      setVelocity(jumpVelocity);
+      setIsJumping(true); // Set jumping state to true when the ostrich jumps
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.score}>Score: {score}</Text>
+      <View style={styles.sky} />
+      <View style={styles.ground} />
+      <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
+        <Animated.View
+          style={[styles.ostrich, { top: ostrichY, left: ostrichX }]}
+        />
+        {obstacles.map((obstacle) => (
+          <React.Fragment key={obstacle.key}>
+            <Animated.View
+              style={[
+                styles.obstacle,
+                {
+                  left: obstacle.x,
+                  height: 50,
+                  top: groundLevel,
+                },
+              ]}
+            />
+          </React.Fragment>
+        ))}
+      </TouchableOpacity>
+      {!isGameRunning && (
+        <TouchableOpacity style={styles.startButton} onPress={startGame}>
+          <Text style={styles.startText}>Start</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
