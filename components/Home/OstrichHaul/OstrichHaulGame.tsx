@@ -122,8 +122,12 @@ export default function OstrichHaulGame() {
     useEffect(() => {
         if (isGameRunning) {
             const spriteAnimation = setInterval(() => {
-                setSpriteFrame((prevFrame) => (prevFrame + 1) % 4);
-            }, 100);
+                setSpriteFrame((prevFrame) => {
+                    const newFrame = (prevFrame + 1) % 3; // Loop through 3 frames
+                    console.log("Current Frame:", newFrame); // Debugging
+                    return newFrame;
+                });
+            }, 100); // Adjust the frame rate as needed
 
             return () => clearInterval(spriteAnimation);
         }
@@ -145,7 +149,7 @@ export default function OstrichHaulGame() {
         }
     };
 
-    const spriteOffset = spriteFrame * 50;
+    const spriteOffset = spriteFrame;
 
     return (
         <View style={styles.container}>
@@ -160,9 +164,11 @@ export default function OstrichHaulGame() {
                         {
                             top: ostrichY,
                             left: ostrichX,
-                            width: 200,
-                            height: 200,
-                            transform: [{ translateX: -spriteOffset }],
+                            width: 48, // Width of a single frame
+                            height: 57, // Height of a single frame
+                            transform: [
+                                { translateX: -spriteFrame * 48 }, // Shift to show the correct frame
+                            ],
                         },
                     ]}
                 />
@@ -219,9 +225,9 @@ const styles = StyleSheet.create({
     },
     ostrich: {
         position: "absolute",
-        width: 50,
-        height: 50,
-        resizeMode: "contain",
+        width: 144,
+        height: 557,
+        resizeMode: "cover",
     },
     obstacle: {
         position: "absolute",
