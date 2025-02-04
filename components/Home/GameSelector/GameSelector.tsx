@@ -1,19 +1,17 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 
 import { Games } from "@/constants/Types";
+import { GameLogos } from "@/constants/Types";
 
 interface GameSelectorProps {
     games: Games[];
     handleSelectGame: (game: Games) => void;
 }
 
-const GameSelector: React.FC<GameSelectorProps> = ({
-    games,
-    handleSelectGame,
-}) => {
+const GameSelector: React.FC<GameSelectorProps> = ({ games, handleSelectGame }) => {
     const { grayBackground } = useTheme();
 
     const handleGamePress = (title: Games) => {
@@ -22,18 +20,16 @@ const GameSelector: React.FC<GameSelectorProps> = ({
 
     return (
         <View style={styles.gameContainer}>
-            {
-                games.map((game, index) => (
-                    <View key={index} style={styles.gameItem}>
-                        <TouchableOpacity onPress={() => handleGamePress(game)}>
-                            <View
-                                style={[styles.gameIcon, { backgroundColor: grayBackground }]}
-                            />
-                            <Text style={styles.gameTitle}>{game.title}</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))
-            }
+            {games.map((game, index) => (
+                <View key={index} style={styles.gameItem}>
+                    <TouchableOpacity onPress={() => handleGamePress(game)}>
+                        <View style={[styles.gameIcon, { backgroundColor: grayBackground }]}>
+                            <Image source={GameLogos[game.title]} style={styles.gameLogo} />
+                        </View>
+                        <Text style={styles.gameTitle}>{game.title}</Text>
+                    </TouchableOpacity>
+                </View>
+            ))}
         </View>
     );
 };
@@ -42,6 +38,11 @@ const styles = StyleSheet.create({
     scrollViewContent: {
         paddingVertical: 10,
         paddingHorizontal: 10,
+    },
+    gameLogo: {
+        height: 100,
+        width: 100,
+        borderRadius: 8,
     },
     gameContainer: {
         flexDirection: "row",
