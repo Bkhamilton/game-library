@@ -18,7 +18,6 @@ const DIFFICULTY_SETTINGS = {
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 const groundLevel = screenHeight - 250; // Adjusted ground level to be at the bottom of the screen
-const gravity = 0.7;
 const jumpVelocity = -15; // Negative value to make the ostrich jump upwards
 
 export default function OstrichHaulGame() {
@@ -32,6 +31,7 @@ export default function OstrichHaulGame() {
   const [isGameRunning, setIsGameRunning] = useState(false);
   const [score, setScore] = useState(0);
   const [isJumping, setIsJumping] = useState(false); // Track if the ostrich is jumping
+  const [gravity, setGravity] = useState(1);
 
   const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
@@ -127,6 +127,15 @@ export default function OstrichHaulGame() {
       return () => clearTimeout(spawnTimeout);
     }
   }, [isGameRunning]);
+
+  useEffect(() => {
+    // Reduce ostrich gravity temporarily when jumping and velocity is in between 5 and -5
+    if (isJumping && velocity > -5 && velocity < 5) {
+      setGravity(0.2);
+    } else {
+      setGravity(1);
+    }
+  }, [isJumping, velocity]);
 
   const startGame = () => {
     setIsGameRunning(true);
