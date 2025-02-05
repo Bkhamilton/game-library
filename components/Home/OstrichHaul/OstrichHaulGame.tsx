@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 
 // Import the sprite image
 import ostrichSprite from "@/assets/images/ostrichHaul/ostrichSprite.png";
+import spikeSprite from "@/assets/images/ostrichHaul/spike.png";
 import { getRootURL } from "expo-router/build/link/linking";
 
 const DIFFICULTY_SETTINGS = {
@@ -174,13 +175,14 @@ export default function OstrichHaulGame() {
                 </View>
                 {obstacles.map((obstacle) => (
                     <React.Fragment key={obstacle.key}>
-                        <Animated.View
+                        <Animated.Image
+                            source={spikeSprite}
                             style={[
                                 styles.obstacle,
                                 {
                                     left: obstacle.x,
-                                    height: 50,
-                                    top: groundLevel,
+                                    height: 55,
+                                    top: groundLevel - 5,
                                 },
                             ]}
                         />
@@ -232,7 +234,6 @@ const styles = StyleSheet.create({
     obstacle: {
         position: "absolute",
         width: 50,
-        backgroundColor: "#228B22",
     },
     score: {
         position: "absolute",
