@@ -124,7 +124,6 @@ export default function OstrichHaulGame() {
             const spriteAnimation = setInterval(() => {
                 setSpriteFrame((prevFrame) => {
                     const newFrame = (prevFrame + 1) % 3; // Loop through 3 frames
-                    console.log("Current Frame:", newFrame); // Debugging
                     return newFrame;
                 });
             }, 100); // Adjust the frame rate as needed
