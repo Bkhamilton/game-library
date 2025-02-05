@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image } from "react-native";
-import { View, Text } from "@/components/Themed";
+import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
 // Import the sprite image
 import ostrichSprite from "@/assets/images/ostrichHaul/ostrichSprite.png";
+import { getRootURL } from "expo-router/build/link/linking";
 
 const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
@@ -156,21 +156,22 @@ export default function OstrichHaulGame() {
             <View style={styles.sky} />
             <View style={styles.ground} />
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
-                <Animated.Image
-                    source={ostrichSprite}
-                    style={[
-                        styles.ostrich,
-                        {
-                            top: ostrichY,
-                            left: ostrichX,
-                            width: 48, // Width of a single frame
-                            height: 57, // Height of a single frame
-                            transform: [
-                                { translateX: -spriteFrame * 48 }, // Shift to show the correct frame
-                            ],
-                        },
-                    ]}
-                />
+                <View style={{ width: 48, height: 57, position: "absolute", overflow: "hidden", top: ostrichY.__getValue(), left: ostrichX.__getValue() }}>
+                    <Animated.Image
+                        source={ostrichSprite}
+                        style={[
+                            styles.ostrich,
+                            {
+                                width: 144, // Width of a single frame
+                                height: 57, // Height of a single frame
+
+                                transform: [
+                                    { translateX: -spriteFrame * 48 }, // Shift to show the correct frame
+                                ],
+                            },
+                        ]}
+                    />
+                </View>
                 {obstacles.map((obstacle) => (
                     <React.Fragment key={obstacle.key}>
                         <Animated.View
