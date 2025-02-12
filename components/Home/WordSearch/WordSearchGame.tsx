@@ -6,11 +6,39 @@ import { initializeGrid } from "@/utils/WordSearchGenerator";
 import { useLocalSearchParams } from "expo-router";
 import useTheme from "@/hooks/useTheme";
 
+const getRandomColor = () => {
+    const colors = [
+        "#FF6B6B", // Red
+        "#4ECDC4", // Turquoise
+        "#45B7D1", // Light Blue
+        "#96CEB4", // Sage Green
+        "#D4A5A5", // Dusty Rose
+        "#9B59B6", // Purple
+        "#3498DB", // Blue
+        "#E67E22", // Orange
+        "#16A085", // Green
+        "#F39C12", // Yellow
+        "#D35400", // Pumpkin
+        "#8E44AD", // Dark Purple
+        "#2980B9", // Dark Blue
+        "#C0392B", // Dark Red
+        "#27AE60", // Dark Green
+        "#F1C40F", // Dark Yellow
+        "#7F8C8D", // Dark Gray
+        "#34495E", // Dark Blue Gray
+        "#2C3E50", // Dark Gray
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
+
 interface Cell {
     letter: string;
     selected: boolean;
     partOfWord: boolean;
     isFound: boolean;
+    partOfFoundWord: boolean;
+    wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left";
+    foundColor?: string; // Add this line
 }
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -27,6 +55,7 @@ export default function WordSearchGame() {
     const [grid, setGrid] = useState<Cell[][]>([]);
     const [foundWords, setFoundWords] = useState<string[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
+    const [wordColors, setWordColors] = useState<{ [key: string]: string }>({});
 
     const { primary, grayBackground, text } = useTheme();
 
@@ -39,9 +68,7 @@ export default function WordSearchGame() {
         const wordPool = WORD_POOLS[diff];
 
         // Randomly select words based on difficulty word count
-        const selectedWords = [...wordPool]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, settings.wordCount);
+        const selectedWords = [...wordPool].sort(() => Math.random() - 0.5).slice(0, settings.wordCount);
 
         // Clear previous state
         setFoundWords([]);
@@ -63,20 +90,69 @@ export default function WordSearchGame() {
         const selectedWord = selectedCells.map((cell) => cell.letter).join("");
 
         // Case-insensitive comparison
-        const wordFound = wordBank.some(
-            (word) => word.toUpperCase() === selectedWord.toUpperCase()
-        );
+        const wordFound = wordBank.some((word) => word.toUpperCase() === selectedWord.toUpperCase());
 
         if (wordFound) {
+            const color = getRandomColor();
+            setWordColors((prev) => ({ ...prev, [selectedWord]: color }));
             setFoundWords((prev) => [...prev, selectedWord]);
             const updatedGrid = grid.map((row) =>
                 row.map((cell) => ({
-                ...cell,
-                isFound: cell.selected ? true : cell.isFound,
-                selected: false,
+                    ...cell,
+                    isFound: cell.selected ? true : cell.isFound,
+                    partOfFoundWord: cell.selected ? true : cell.partOfFoundWord,
+                    selected: false,
+                    foundColor: cell.selected ? color : cell.foundColor, // Add this line
                 }))
             );
             setGrid(updatedGrid);
+        }
+    };
+
+    const getStrikethroughStyle = (direction?: string, color?: string) => {
+        const baseStyle = {
+            position: "absolute",
+            backgroundColor: color || "#4CAF50",
+            opacity: 0.7,
+        };
+
+        switch (direction) {
+            case "vertical":
+                return {
+                    ...baseStyle,
+                    width: 3,
+                    top: -5,
+                    bottom: -5,
+                    left: "50%",
+                    transform: [{ translateX: -1.5 }],
+                };
+            case "diagonal-right":
+                return {
+                    ...baseStyle,
+                    height: 3,
+                    width: "141%", // √2 * 100% to cover diagonal
+                    top: "50%",
+                    left: "-20%",
+                    transform: [{ translateY: -1.5 }, { rotate: "45deg" }],
+                };
+            case "diagonal-left":
+                return {
+                    ...baseStyle,
+                    height: 3,
+                    width: "141%", // √2 * 100% to cover diagonal
+                    top: "50%",
+                    left: "-20%",
+                    transform: [{ translateY: -1.5 }, { rotate: "-45deg" }],
+                };
+            default: // horizontal
+                return {
+                    ...baseStyle,
+                    height: 3,
+                    left: -5,
+                    right: -5,
+                    top: "50%",
+                    transform: [{ translateY: -1.5 }],
+                };
         }
     };
 
@@ -86,7 +162,13 @@ export default function WordSearchGame() {
                 {wordBank.map((word) => (
                     <Text
                         key={word}
-                        style={[styles.word, foundWords.includes(word) && styles.foundWord]}
+                        style={[
+                            styles.word,
+                            foundWords.includes(word) && {
+                                ...styles.foundWord,
+                                color: wordColors[word] || "green",
+                            },
+                        ]}
                     >
                         {word}
                     </Text>
@@ -94,10 +176,7 @@ export default function WordSearchGame() {
             </View>
             <View style={[styles.grid, { borderWidth: 5, borderColor: primary }]}>
                 {grid.map((row, i) => (
-                    <View
-                        key={i}
-                        style={[styles.row, { borderWidth: 1, borderColor: primary }]}
-                    >
+                    <View key={i} style={[styles.row, { borderWidth: 1, borderColor: primary }]}>
                         {row.map((cell, j) => (
                             <TouchableOpacity
                                 key={`${i}-${j}`}
@@ -105,11 +184,12 @@ export default function WordSearchGame() {
                                     styles.cell,
                                     { borderWidth: 1, borderColor: primary },
                                     cell.selected && styles.selectedCell,
-                                    cell.isFound && styles.foundCell,
+                                    cell.isFound && { backgroundColor: cell.foundColor + "40" }, // 40 adds transparency
                                 ]}
                                 onPress={() => handleCellPress(i, j)}
                             >
-                                <Text style={styles.letter}>{cell.letter}</Text>
+                                <Text style={[styles.letter, cell.partOfFoundWord && { color: cell.foundColor }]}>{cell.letter}</Text>
+                                {cell.partOfFoundWord && <View style={getStrikethroughStyle(cell.wordDirection, cell.foundColor)} />}
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -130,68 +210,83 @@ export default function WordSearchGame() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "auto",
-    height: "100%",
-  },
-  wordBank: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 20,
-    padding: 10,
-  },
-  foundCell: {
-    backgroundColor: "#90EE90", // Light green
-  },
-  grid: {
-    alignItems: "center",
-  },
-  row: {
-    flexDirection: "row",
-  },
-  cell: {
-    width: 40,
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectedCell: {
-    backgroundColor: "#e6e6e6",
-  },
-  letter: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  wordList: {
-    marginTop: 20,
-  },
-  word: {
-    fontSize: 18,
-    marginVertical: 5,
-    marginHorizontal: 5,
-  },
-  foundWord: {
-    textDecorationLine: "line-through",
-    color: "green",
-  },
-  difficultyContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  difficultyButton: {
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: "#ddd",
-  },
-  selectedDifficulty: {
-    backgroundColor: "#4CAF50",
-  },
-  difficultyText: {
-    color: "#000",
-    fontWeight: "bold",
-  },
+    container: {
+        width: "auto",
+        height: "100%",
+    },
+    wordBank: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginBottom: 20,
+        padding: 10,
+    },
+    foundCell: {
+        backgroundColor: "#90EE90", // Light green
+    },
+    foundLetter: {
+        color: "#4CAF50", // Green color for found letters
+        opacity: 0.7, // Slightly faded
+    },
+    strikethrough: {
+        position: "absolute",
+        left: -5, // Extend slightly beyond the cell
+        right: -5,
+        height: 3, // Thickness of the line
+        backgroundColor: "#4CAF50", // Match the letter color
+        opacity: 0.7,
+        top: "50%", // Center vertically
+        transform: [{ translateY: -1.5 }], // Adjust for line thickness
+    },
+    grid: {
+        alignItems: "center",
+    },
+    row: {
+        flexDirection: "row",
+    },
+    cell: {
+        width: 40,
+        height: 40,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+    },
+    selectedCell: {
+        backgroundColor: "#e6e6e6",
+    },
+    letter: {
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+    wordList: {
+        marginTop: 20,
+    },
+    word: {
+        fontSize: 18,
+        marginVertical: 5,
+        marginHorizontal: 5,
+    },
+    foundWord: {
+        textDecorationLine: "line-through",
+        color: "green",
+    },
+    difficultyContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginBottom: 20,
+    },
+    difficultyButton: {
+        padding: 10,
+        margin: 5,
+        borderRadius: 5,
+        backgroundColor: "#ddd",
+    },
+    selectedDifficulty: {
+        backgroundColor: "#4CAF50",
+    },
+    difficultyText: {
+        color: "#000",
+        fontWeight: "bold",
+    },
 });
