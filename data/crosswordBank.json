@@ -1,0 +1,252 @@
+[
+    {
+        "id": 1,
+        "clue": "A large body of salt water",
+        "word": "ocean"
+    },
+    {
+        "id": 2,
+        "clue": "A celestial body that orbits a planet",
+        "word": "moon"
+    },
+    {
+        "id": 3,
+        "clue": "A landmass smaller than a continent, surrounded by water",
+        "word": "island"
+    },
+    {
+        "id": 4,
+        "clue": "A large, heavy mammal with thick fur and a very short tail",
+        "word": "bear"
+    },
+    {
+        "id": 5,
+        "clue": "A sweet, crystalline substance obtained from various plants",
+        "word": "sugar"
+    },
+    {
+        "id": 6,
+        "clue": "A large, flightless bird native to Africa",
+        "word": "ostrich"
+    },
+    {
+        "id": 7,
+        "clue": "A small, round fruit with a pit, typically red or black",
+        "word": "cherry"
+    },
+    {
+        "id": 8,
+        "clue": "A large, predatory fish with sharp teeth",
+        "word": "shark"
+    },
+    {
+        "id": 9,
+        "clue": "A small, burrowing mammal with soft fur",
+        "word": "mole"
+    },
+    {
+        "id": 10,
+        "clue": "A large, powerful cat with a tawny coat",
+        "word": "lion"
+    },
+    {
+        "id": 11,
+        "clue": "A tropical fruit with a spiky exterior and sweet, juicy interior",
+        "word": "pineapple"
+    },
+    {
+        "id": 12,
+        "clue": "A small, round fruit with a pit, typically yellow or green",
+        "word": "plum"
+    },
+    {
+        "id": 13,
+        "clue": "A large, predatory mammal with sharp claws and teeth",
+        "word": "tiger"
+    },
+    {
+        "id": 14,
+        "clue": "A small, round fruit with a pit, typically orange or yellow",
+        "word": "apricot"
+    },
+    {
+        "id": 15,
+        "clue": "A large, flightless bird native to South America",
+        "word": "rhea"
+    },
+    {
+        "id": 16,
+        "clue": "A small, round fruit with a pit, typically purple or black",
+        "word": "blackberry"
+    },
+    {
+        "id": 17,
+        "clue": "A type of cured sausage made from pork and spices, often used in sandwiches",
+        "word": "salami"
+    },
+    {
+        "id": 18,
+        "clue": "A small, burrowing mammal with sharp claws and teeth",
+        "word": "ferret"
+    },
+    {
+        "id": 19,
+        "clue": "A large, powerful cat with a tawny coat and a mane",
+        "word": "tiger"
+    },
+    {
+        "id": 20,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "peach"
+    },
+    {
+        "id": 21,
+        "clue": "A large, flightless bird native to New Zealand",
+        "word": "kiwi"
+    },
+    {
+        "id": 22,
+        "clue": "A small, round fruit with a pit, typically green or yellow",
+        "word": "kiwi"
+    },
+    {
+        "id": 23,
+        "clue": "A large, predatory fish with a long, slender body and sharp teeth",
+        "word": "pike"
+    },
+    {
+        "id": 24,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "nectarine"
+    },
+    {
+        "id": 25,
+        "clue": "A large, powerful cat with a tawny coat and sharp claws",
+        "word": "leopard"
+    },
+    {
+        "id": 26,
+        "clue": "A small, round fruit with a pit, typically purple or black",
+        "word": "blueberry"
+    },
+    {
+        "id": 27,
+        "clue": "A large, flightless bird native to Madagascar",
+        "word": "elephant"
+    },
+    {
+        "id": 28,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "raspberry"
+    },
+    {
+        "id": 29,
+        "clue": "A large, predatory fish with a long, slender body and sharp teeth",
+        "word": "trout"
+    },
+    {
+        "id": 30,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "grapefruit"
+    },
+    {
+        "id": 31,
+        "clue": "A large, powerful cat with a tawny coat and sharp claws",
+        "word": "cougar"
+    },
+    {
+        "id": 32,
+        "clue": "A small, round fruit with a pit, typically purple or black",
+        "word": "currant"
+    },
+    {
+        "id": 33,
+        "clue": "A large, flightless bird native to Antarctica",
+        "word": "penguin"
+    },
+    {
+        "id": 34,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "tangerine"
+    },
+    {
+        "id": 35,
+        "clue": "A large, predatory fish with a long, slender body and sharp teeth",
+        "word": "barracuda"
+    },
+    {
+        "id": 36,
+        "clue": "A type of food made by placing ingredients between two slices of bread",
+        "word": "sandwich"
+    },
+    {
+        "id": 37,
+        "clue": "A large, flightless bird native to the Arctic",
+        "word": "albatross"
+    },
+    {
+        "id": 38,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "clementine"
+    },
+    {
+        "id": 39,
+        "clue": "A large, powerful cat with a tawny coat and sharp claws",
+        "word": "jaguar"
+    },
+    {
+        "id": 40,
+        "clue": "A hungry guy who eats his own",
+        "word": "carnivore"
+    },
+    {
+        "id": 41,
+        "clue": "A large, flightless bird native to the Galapagos Islands",
+        "word": "takahe"
+    },
+    {
+        "id": 42,
+        "clue": "A type of ancient weapon used to launch projectiles over long distances",
+        "word": "catapult"
+    },
+    {
+        "id": 43,
+        "clue": "A large, predatory fish with a long, slender body and sharp teeth",
+        "word": "swordfish"
+    },
+    {
+        "id": 44,
+        "clue": "A small, round fruit with a pit, typically purple or black",
+        "word": "damson"
+    },
+    {
+        "id": 45,
+        "clue": "Getting to know the world around you, often through travel and adventure",
+        "word": "exploration"
+    },
+    {
+        "id": 46,
+        "clue": "A small, round fruit with a pit, typically red or yellow",
+        "word": "apricot"
+    },
+    {
+        "id": 47,
+        "clue": "A large, powerful cat with a tawny coat and sharp claws",
+        "word": "lynx"
+    },
+    {
+        "id": 48,
+        "clue": "A small, round fruit with a pit, typically purple or black",
+        "word": "mulberry"
+    },
+    {
+        "id": 49,
+        "clue": "A large, flightless bird native to the Philippines",
+        "word": "kagu"
+    },
+    {
+        "id": 50,
+        "clue": "An ancient weapon used to launch projectiles over long distances, often using a counterweight",
+        "word": "trebuchet"
+    }
+]
