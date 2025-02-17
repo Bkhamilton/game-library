@@ -7,7 +7,7 @@ CROSSWORD PUZZLE ALGORITHM
 1. **Initialize Grid:** Create a 15x15 grid of empty strings.
 2. **Place First Word:**
    - Select a random long word from the word bank
-   - Place it horizontally/vertically near the center (to maximize expansion).
+   - Place it horizontally/vertically starting from a random position on the grid.
 3. **Iterative Placement:**
    - **Step A:** Identify all "viable" intersections on the board:
      - A character is viable if it has space in the perpendicular direction (e.g., for a horizontal word, check vertical space).
