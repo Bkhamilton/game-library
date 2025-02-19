@@ -1,16 +1,21 @@
 // Function to create the 2d array grid
 export const createGrid = (size) => {
+    console.log('Creating grid...');
     return Array.from({ length: size }, () => Array(size).fill(''));
 }
 
 // Function to place the first word in the grid
 export const placeFirstWord = (grid, word) => {
+    console.log('Placing first word...');
     let placed = false;
+    const size = grid.length;
+    const center = Math.floor(size / 2);
+    const innerRadius = 2; // 5x5 area around the center
 
     while (!placed) {
-        // Step 1: Select a random starting position for the first word
-        const row = Math.floor(Math.random() * grid.length);
-        const col = Math.floor(Math.random() * grid[0].length);
+        // Step 1: Select a random starting position within the inner 5x5 area
+        const row = center - innerRadius + Math.floor(Math.random() * (2 * innerRadius + 1));
+        const col = center - innerRadius + Math.floor(Math.random() * (2 * innerRadius + 1));
 
         // Step 2: Check if the word can be placed horizontally
         if (col + word.length <= grid[0].length) {
@@ -22,6 +27,7 @@ export const placeFirstWord = (grid, word) => {
                 }
             }
             if (canPlaceHorizontally) {
+                console.log('Placing word horizontally...');
                 for (let i = 0; i < word.length; i++) {
                     grid[row][col + i] = word[i];
                 }
@@ -39,6 +45,7 @@ export const placeFirstWord = (grid, word) => {
                 }
             }
             if (canPlaceVertically) {
+                console.log('Placing word vertically...');
                 for (let i = 0; i < word.length; i++) {
                     grid[row + i][col] = word[i];
                 }
@@ -82,6 +89,7 @@ const getViableWords = (wordBank, letter) => {
 export const placeSubsequentWords = (grid, wordBank) => {
     // Step 1: Choose a letter from the grid to intersect new word with
     const newCharacter = getViableLetter(grid);
+    console.log('Placing word with letter:', newCharacter.viableLetter);
 
     // Step 2: Grab all words from the wordbank that contain that letter
     const viableWords = getViableWords(wordBank, newCharacter.viableLetter);
@@ -98,6 +106,13 @@ export const placeSubsequentWords = (grid, wordBank) => {
                 if (grid[viableRow][viableCol - letterIndex + i] !== '' && grid[viableRow][viableCol - letterIndex + i] !== word[i]) {
                     canPlaceHorizontally = false;
                     break;
+                }
+            }
+            // Check the spaces to the immediate left and right
+            if (canPlaceHorizontally) {
+                if ((viableCol - letterIndex - 1 >= 0 && grid[viableRow][viableCol - letterIndex - 1] !== '') ||
+                    (viableCol - letterIndex + word.length < grid[0].length && grid[viableRow][viableCol - letterIndex + word.length] !== '')) {
+                    canPlaceHorizontally = false;
                 }
             }
             if (canPlaceHorizontally) {
@@ -117,6 +132,13 @@ export const placeSubsequentWords = (grid, wordBank) => {
                     break;
                 }
             }
+            // Check the spaces directly above and below
+            if (canPlaceVertically) {
+                if ((viableRow - letterIndex - 1 >= 0 && grid[viableRow - letterIndex - 1][viableCol] !== '') ||
+                    (viableRow - letterIndex + word.length < grid.length && grid[viableRow - letterIndex + word.length][viableCol] !== '')) {
+                    canPlaceVertically = false;
+                }
+            }
             if (canPlaceVertically) {
                 for (let i = 0; i < word.length; i++) {
                     grid[viableRow - letterIndex + i][viableCol] = word[i];
@@ -130,13 +152,15 @@ export const placeSubsequentWords = (grid, wordBank) => {
 }
 
 // Function to create the crossword puzzle
-export const createCrossword = (size, wordBank) => {
+export const createCrossword = (size, wordBank, numWords) => {
+    console.log('Creating crossword puzzle...');
     let grid = createGrid(size);
     const firstWord = wordBank.splice(Math.floor(Math.random() * wordBank.length), 1)[0];
+    console.log('First word:', firstWord);
     grid = placeFirstWord(grid, firstWord);
     const placedWords = [firstWord];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < numWords; i++) {
         const { grid: newGrid, placedWord } = placeSubsequentWords(grid, wordBank);
         grid = newGrid;
         if (placedWord) {

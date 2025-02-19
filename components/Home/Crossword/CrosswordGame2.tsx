@@ -3,9 +3,12 @@ import { StyleSheet, ActivityIndicator, Button } from 'react-native';
 import { TouchableOpacity, Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import crosswordBank from '@/data/crosswordBank.json';
+import wordsList from '@/data/wordsList.json';
 import CrosswordGrid from '@/components/Home/Crossword/Crossword2/CrosswordGrid';
 import { CrosswordGenerator } from '@/components/Home/Crossword/CrosswordGenerator';
 import { createGrid, placeFirstWord, placeSubsequentWords } from '@/utils/CrosswordGenerator';
+import { createCrossword } from '@/utils/Crossword2';
+import { useLocalSearchParams } from "expo-router";
 
 type Word = {
     id: number;
@@ -14,7 +17,7 @@ type Word = {
 }
 
 export default function CrosswordGame2() {
-
+    const { difficulty } = useLocalSearchParams();
     const [grid, setGrid] = useState<string[][]>([]);
     const [placedWords, setPlacedWords] = useState<Word[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -31,23 +34,33 @@ export default function CrosswordGame2() {
         }
         return array;
     }
+
+    const getWordCount = (difficulty: string) => {
+        switch (difficulty) {
+            case 'Easy':
+                return 5;
+            case 'Medium':
+                return 10;
+            case 'Hard':
+                return 15;
+            default:
+                return 5;
+        }
+    }
     
     const generateCrossword = () => {
         setIsLoading(true);
     
-        let updatedGrid = createGrid(15);
-        const shuffledWordBank = shuffle(crosswordBank);
-    
-        // Place the first word
-        const { grid: gridWithFirstWord } = placeFirstWord(updatedGrid, shuffledWordBank[0]);
-    
-        /*
-        // Place subsequent words
-        updatedGrid = placeSubsequentWords(gridWithFirstWord, shuffledWordBank.slice(1));
-        */
+        const size = 15;
 
-        setGrid(gridWithFirstWord);
-        setWordsToFind(shuffledWordBank);
+        const bank = crosswordBank;
+
+        const { grid, placedWords } = createCrossword(size, wordsList, getWordCount(difficulty));
+
+        setGrid(grid);
+        setPlacedWords(placedWords);
+        setWordsToFind(shuffle(placedWords));
+    
         setIsLoading(false);
     };
 
