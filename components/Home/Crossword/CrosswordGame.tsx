@@ -1,126 +1,99 @@
-import React, { useState } from 'react';
-import { TextInput, StyleSheet, ScrollView } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { TouchableOpacity, Text, View } from '@/components/Themed';
+import useTheme from '@/hooks/useTheme';
+import crosswordBank from '@/data/crosswordBank.json';
+import wordsList from '@/data/wordsList.json';
+import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
+import { createCrossword } from '@/utils/CrosswordGenerator';
+import { useLocalSearchParams } from "expo-router";
 
-interface CrosswordCell {
-    letter: string;
-    isActive: boolean;
-    number?: number;
+type Word = {
+    id: number;
+    word: string;
+    clue: string;
 }
 
-const CrosswordGame = () => {
-    // Sample crossword puzzle data
-    const puzzleData = [
-        ['', '', 'H', 'E', 'L', 'L', 'O', '', ''],
-        ['', '', '', 'X', '', '', '', '', ''],
-        ['', '', '', 'P', '', '', '', '', ''],
-        ['W', 'O', 'R', 'L', 'D', '', '', '', ''],
-        ['', '', '', 'O', '', '', '', '', ''],
-        ['', '', '', 'R', '', '', '', '', ''],
-        ['', '', '', 'E', '', '', '', '', ''],
-    ];
+export default function CrosswordGame2() {
+    const { difficulty } = useLocalSearchParams();
+    const [grid, setGrid] = useState<string[][]>([]);
+    const [placedWords, setPlacedWords] = useState<Word[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [wordsToFind, setWordsToFind] = useState<Word[]>([]);  
 
-    const [grid, setGrid] = useState<CrosswordCell[][]>(
-        puzzleData.map((row) =>
-            row.map((cell) => ({
-                letter: cell,
-                isActive: cell !== '',
-            }))
-        )
-    );
+    useEffect(() => {
+        generateCrossword();
+    }, []);
 
-    const handleCellChange = (rowIndex: number, colIndex: number, value: string) => {
-        const newGrid = [...grid];
-        newGrid[rowIndex][colIndex].letter = value.toUpperCase();
-        setGrid(newGrid);
+    const shuffle = (array: any[]) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    const getWordCount = (difficulty: string) => {
+        switch (difficulty) {
+            case 'Easy':
+                return 10;
+            case 'Medium':
+                return 15;
+            case 'Hard':
+                return 20;
+            default:
+                return 5;
+        }
+    }
+    
+    const generateCrossword = () => {
+        setIsLoading(true);
+    
+        const size = 15;
+
+        const bank = crosswordBank;
+
+        const { grid, placedWords } = createCrossword(size, wordsList, getWordCount(difficulty));
+
+        setGrid(grid);
+        setPlacedWords(placedWords);
+        setWordsToFind(shuffle(placedWords));
+    
+        setIsLoading(false);
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Crossword Puzzle</Text>
-            <View style={styles.grid}>
-                {grid.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                        {row.map((cell, colIndex) => (
-                            <View
-                                key={`${rowIndex}-${colIndex}`}
-                                style={[
-                                    styles.cell,
-                                    !cell.isActive && styles.inactiveCell,
-                                ]}
-                            >
-                                {cell.isActive && (
-                                    <TextInput
-                                        style={styles.input}
-                                        maxLength={1}
-                                        value={cell.letter}
-                                        onChangeText={(value) =>
-                                            handleCellChange(rowIndex, colIndex, value)
-                                        }
-                                    />
-                                )}
-                            </View>
+        <View>
+            {isLoading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <>
+                    <CrosswordGrid grid={grid} />
+                    <View>
+                        <Text>Words to Find:</Text>
+                        {wordsToFind.map((word, index) => (
+                            <Text key={index}>{word}</Text>
                         ))}
                     </View>
-                ))}
-            </View>
-            <View style={styles.clues}>
-                <Text style={styles.cluesTitle}>Clues:</Text>
-                <Text>Across:</Text>
-                <Text>1. Common greeting</Text>
-                <Text>2. Planet Earth</Text>
-                <Text>Down:</Text>
-                <Text>1. To investigate or discover</Text>
-            </View>
-        </ScrollView>
+                    <Button title="Regenerate" onPress={generateCrossword} />
+                </>
+            )}
+        </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    grid: {
-        borderWidth: 2,
-        borderColor: '#000',
+        flex: 1,
     },
     row: {
         flexDirection: 'row',
     },
     cell: {
-        width: 40,
-        height: 40,
-        borderWidth: 0.5,
-        borderColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-    inactiveCell: {
-        backgroundColor: '#000',
-    },
-    input: {
-        width: '100%',
-        height: '100%',
+        width: 20,
+        height: 20,
         textAlign: 'center',
-        fontSize: 20,
-        textTransform: 'uppercase',
-    },
-    clues: {
-        marginTop: 20,
-        alignSelf: 'flex-start',
-    },
-    cluesTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#000',
     },
 });
-
-export default CrosswordGame;

@@ -13,7 +13,7 @@ export default function CrosswordGrid({ grid }) {
             {grid.map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.row}>
                     {row.map((cell, colIndex) => (
-                        <View key={colIndex} style={[styles.cell, { backgroundColor: cell === '' ? text : background, borderColor: primary }]}>
+                        <View key={colIndex} style={[styles.cell, { backgroundColor: cell === '' ? '#000' : '#FFF', borderColor: cell === '' ? '#000' : '#FFF' }]}>
                             <MonoText style={styles.cellText}>{cell}</MonoText>
                         </View>
                     ))}
@@ -33,15 +33,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
       },
       cell: {
-        width: 20,
-        height: 20,
+        width: 24,
+        height: 24,
         borderWidth: 1,
         borderColor: '#000',
         alignItems: 'center',
         justifyContent: 'center',
       },
       cellText: {
-        fontSize: 15,
+        fontSize: 16,
         marginTop: -2,
+        color: '#000',
       },
 });
