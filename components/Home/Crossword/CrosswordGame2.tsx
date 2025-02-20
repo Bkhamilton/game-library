@@ -38,11 +38,11 @@ export default function CrosswordGame2() {
     const getWordCount = (difficulty: string) => {
         switch (difficulty) {
             case 'Easy':
-                return 5;
-            case 'Medium':
                 return 10;
-            case 'Hard':
+            case 'Medium':
                 return 15;
+            case 'Hard':
+                return 20;
             default:
                 return 5;
         }
@@ -74,7 +74,7 @@ export default function CrosswordGame2() {
                     <View>
                         <Text>Words to Find:</Text>
                         {wordsToFind.map((word, index) => (
-                            <Text key={index}>{word.word}</Text>
+                            <Text key={index}>{word}</Text>
                         ))}
                     </View>
                     <Button title="Regenerate" onPress={generateCrossword} />

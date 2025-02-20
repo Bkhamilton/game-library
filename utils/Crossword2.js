@@ -1,12 +1,10 @@
 // Function to create the 2d array grid
 export const createGrid = (size) => {
-    console.log('Creating grid...');
     return Array.from({ length: size }, () => Array(size).fill(''));
 }
 
 // Function to place the first word in the grid
 export const placeFirstWord = (grid, word) => {
-    console.log('Placing first word...');
     let placed = false;
     const size = grid.length;
     const center = Math.floor(size / 2);
@@ -27,7 +25,6 @@ export const placeFirstWord = (grid, word) => {
                 }
             }
             if (canPlaceHorizontally) {
-                console.log('Placing word horizontally...');
                 for (let i = 0; i < word.length; i++) {
                     grid[row][col + i] = word[i];
                 }
@@ -45,7 +42,6 @@ export const placeFirstWord = (grid, word) => {
                 }
             }
             if (canPlaceVertically) {
-                console.log('Placing word vertically...');
                 for (let i = 0; i < word.length; i++) {
                     grid[row + i][col] = word[i];
                 }
@@ -89,7 +85,6 @@ const getViableWords = (wordBank, letter) => {
 export const placeSubsequentWords = (grid, wordBank) => {
     // Step 1: Choose a letter from the grid to intersect new word with
     const newCharacter = getViableLetter(grid);
-    console.log('Placing word with letter:', newCharacter.viableLetter);
 
     // Step 2: Grab all words from the wordbank that contain that letter
     const viableWords = getViableWords(wordBank, newCharacter.viableLetter);
@@ -151,12 +146,39 @@ export const placeSubsequentWords = (grid, wordBank) => {
     return { grid, placedWord: null };
 }
 
+// Function to condense the grid to the smallest possible square size
+export const condenseGrid = (grid) => {
+    let minRow = grid.length, maxRow = 0, minCol = grid[0].length, maxCol = 0;
+
+    // Identify the smallest and largest rows and columns that contain letters
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[row].length; col++) {
+            if (grid[row][col] !== '') {
+                if (row < minRow) minRow = row;
+                if (row > maxRow) maxRow = row;
+                if (col < minCol) minCol = col;
+                if (col > maxCol) maxCol = col;
+            }
+        }
+    }
+
+    // Calculate the size of the smallest square that can contain all the letters
+    const size = Math.max(maxRow - minRow + 1, maxCol - minCol + 1);
+
+    // Extract the subgrid that contains all the letters
+    const condensedGrid = Array.from({ length: size }, (_, i) => 
+        Array.from({ length: size }, (_, j) => 
+            grid[minRow + i] && grid[minRow + i][minCol + j] !== undefined ? grid[minRow + i][minCol + j] : ''
+        )
+    );
+
+    return condensedGrid;
+}
+
 // Function to create the crossword puzzle
 export const createCrossword = (size, wordBank, numWords) => {
-    console.log('Creating crossword puzzle...');
     let grid = createGrid(size);
     const firstWord = wordBank.splice(Math.floor(Math.random() * wordBank.length), 1)[0];
-    console.log('First word:', firstWord);
     grid = placeFirstWord(grid, firstWord);
     const placedWords = [firstWord];
 
@@ -171,5 +193,8 @@ export const createCrossword = (size, wordBank, numWords) => {
             placedWords.push(placedWord);
         }
     }
+
+    grid = condenseGrid(grid);
+
     return { grid, placedWords };
 }
