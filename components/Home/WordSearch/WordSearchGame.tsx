@@ -56,6 +56,7 @@ export default function WordSearchGame() {
     const [foundWords, setFoundWords] = useState<string[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
     const [wordColors, setWordColors] = useState<{ [key: string]: string }>({});
+    const [isGameComplete, setIsGameComplete] = useState<boolean>(false);
 
     const { primary, grayBackground, text } = useTheme();
 
@@ -72,6 +73,7 @@ export default function WordSearchGame() {
 
         // Clear previous state
         setFoundWords([]);
+        setIsGameComplete(false);
         setWordBank(selectedWords);
         setActiveWords(selectedWords);
 
@@ -106,6 +108,11 @@ export default function WordSearchGame() {
                 }))
             );
             setGrid(updatedGrid);
+            // Check if all words are found
+            const updatedFoundWords = [...foundWords, selectedWord];
+            if (updatedFoundWords.length === wordBank.length) {
+                setIsGameComplete(true);
+            }
         }
     };
 
@@ -205,6 +212,22 @@ export default function WordSearchGame() {
                     <Text>Reset</Text>
                 </TouchableOpacity>
             </View>
+            {isGameComplete && (
+                <View style={[styles.victoryOverlay, { backgroundColor: "rgba(0, 0, 0, 0.7)" }]}>
+                    <View style={[styles.victoryModal, { backgroundColor: grayBackground }]}>
+                        <Text style={[styles.victoryText, { color: text }]}>Congratulations!{"\n"}You found all the words!</Text>
+                        <TouchableOpacity
+                            style={[styles.newGameButton, { backgroundColor: primary }]}
+                            onPress={() => {
+                                setIsGameComplete(false);
+                                initializeGameWithDifficulty(difficulty);
+                            }}
+                        >
+                            <Text style={styles.newGameButtonText}>Play Again</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
         </View>
     );
 }
@@ -287,6 +310,42 @@ const styles = StyleSheet.create({
     },
     difficultyText: {
         color: "#000",
+        fontWeight: "bold",
+    },
+    victoryOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    victoryModal: {
+        padding: 20,
+        borderRadius: 10,
+        alignItems: "center",
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    victoryText: {
+        fontSize: 24,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    newGameButton: {
+        padding: 10,
+        borderRadius: 5,
+        minWidth: 120,
+        alignItems: "center",
+    },
+    newGameButtonText: {
+        color: "white",
+        fontSize: 16,
         fontWeight: "bold",
     },
 });
