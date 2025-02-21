@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, } from "react-native";
+import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, ImageBackground } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 
@@ -8,6 +8,20 @@ const DIFFICULTY_SETTINGS = {
     Medium: { obstacleSpeed: 4000, gapSize: 300, spawnRate: 3000 },
     Hard: { obstacleSpeed: 3000, gapSize: 250, spawnRate: 2000 },
 };
+
+const BIRD_SPRITES = [
+    require("@/assets/images/GoGoBird/frame-1.png"),
+    require("@/assets/images/GoGoBird/frame-2.png"),
+    require("@/assets/images/GoGoBird/frame-3.png"),
+    require("@/assets/images/GoGoBird/frame-4.png"),
+    require("@/assets/images/GoGoBird/frame-5.png"),
+    require("@/assets/images/GoGoBird/frame-6.png"),
+    require("@/assets/images/GoGoBird/frame-7.png"),
+    require("@/assets/images/GoGoBird/frame-8.png"),
+];
+
+const BACKGROUND_IMAGE = require("@/assets/images/GoGoBird/bg.png");
+const PIPE_IMAGE = require("@/assets/images/GoGoBird/pipe.png");
 
 type Difficulty = "easy" | "medium" | "hard";
 
@@ -19,6 +33,7 @@ export default function FlappyBirdGame() {
     const [passedPipes, setPassedPipes] = useState([]); // New state for passed pipes
     const [score, setScore] = useState(0);
     const [isGameRunning, setIsGameRunning] = useState(false);
+    const [currentFrame, setCurrentFrame] = useState(0);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
     const gravity = 2; // Adjusted gravity for smoother experience
@@ -46,6 +61,16 @@ export default function FlappyBirdGame() {
         }
         return false;
     };
+
+    useEffect(() => {
+        if (isGameRunning) {
+            const spriteInterval = setInterval(() => {
+                setCurrentFrame((prevFrame) => (prevFrame + 1) % BIRD_SPRITES.length);
+            }, 100); // Change sprite every 100ms
+
+            return () => clearInterval(spriteInterval);
+        }
+    }, [isGameRunning]);
 
     useEffect(() => {
         if (isGameRunning) {
@@ -81,10 +106,7 @@ export default function FlappyBirdGame() {
                 const newPipe = {
                     key: Math.random().toString(),
                     x: new Animated.Value(screenWidth),
-                    gapTop: Math.max(
-                        minPipeHeight,
-                        Math.random() * (screenHeight - settings.gapSize - minPipeHeight)
-                    ),
+                    gapTop: Math.max(minPipeHeight, Math.random() * (screenHeight - settings.gapSize - minPipeHeight)),
                 };
                 setPipes((prevPipes) => [...prevPipes, newPipe]);
 
@@ -94,11 +116,9 @@ export default function FlappyBirdGame() {
                     easing: Easing.linear,
                     useNativeDriver: false,
                 }).start(({ finished }) => {
-                if (finished) {
-                    setPipes((prevPipes) =>
-                        prevPipes.filter((pipe) => pipe.key !== newPipe.key)
-                    );
-                }
+                    if (finished) {
+                        setPipes((prevPipes) => prevPipes.filter((pipe) => pipe.key !== newPipe.key));
+                    }
                 });
             }, settings.spawnRate);
 
@@ -120,23 +140,21 @@ export default function FlappyBirdGame() {
     };
 
     return (
-        <View style={styles.container}>
+        <ImageBackground source={BACKGROUND_IMAGE} style={styles.container} resizeMode="cover">
             <Text style={styles.score}>Score: {score}</Text>
-            <TouchableOpacity 
-                style={styles.screen} 
-                onPress={jump} 
-                activeOpacity={1}
-            >
-                <Animated.View style={[styles.bird, { top: birdY }]} />
+            <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
+                <Animated.View style={[styles.bird, { top: birdY }]}>
+                    <Image source={BIRD_SPRITES[currentFrame]} style={styles.birdImage} />
+                </Animated.View>
                 {pipes.map((pipe) => (
                     <React.Fragment key={pipe.key}>
                         <Animated.View
                             style={[
                                 styles.obstacle,
                                 {
-                                left: pipe.x,
-                                height: pipe.gapTop,
-                                top: 0,
+                                    left: pipe.x,
+                                    height: pipe.gapTop,
+                                    top: 0,
                                 },
                             ]}
                         />
@@ -144,9 +162,9 @@ export default function FlappyBirdGame() {
                             style={[
                                 styles.obstacle,
                                 {
-                                left: pipe.x,
-                                height: screenHeight - pipe.gapTop - settings.gapSize,
-                                top: pipe.gapTop + settings.gapSize,
+                                    left: pipe.x,
+                                    height: screenHeight - pipe.gapTop - settings.gapSize,
+                                    top: pipe.gapTop + settings.gapSize,
                                 },
                             ]}
                         />
@@ -154,61 +172,61 @@ export default function FlappyBirdGame() {
                 ))}
             </TouchableOpacity>
             {!isGameRunning && (
-                <TouchableOpacity 
-                    style={styles.startButton} 
-                    onPress={startGame}
-                >
+                <TouchableOpacity style={styles.startButton} onPress={startGame}>
                     <Text style={styles.startText}>Start</Text>
                 </TouchableOpacity>
             )}
-        </View>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#87CEEB",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    height: "100%",
-  },
-  screen: {
-    flex: 1,
-    width: "100%",
-    position: "relative",
-  },
-  bird: {
-    width: 50,
-    height: 50,
-    backgroundColor: "#FFA500",
-    position: "absolute",
-    left: 100,
-    borderRadius: 25,
-  },
-  obstacle: {
-    position: "absolute",
-    width: 50,
-    backgroundColor: "#228B22",
-  },
-  startButton: {
-    backgroundColor: "#4CAF50",
-    padding: "5%",
-    paddingHorizontal: "25%",
-    borderRadius: 10,
-    marginBottom: "15%",
-  },
-  startText: {
-    fontSize: 20,
-    color: "#FFF",
-    fontWeight: "bold",
-  },
-  score: {
-    position: "absolute",
-    top: 50,
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFF",
-  },
+    container: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+    },
+    screen: {
+        flex: 1,
+        width: "100%",
+        position: "relative",
+    },
+    bird: {
+        width: 50,
+        height: 50,
+        position: "absolute",
+        left: 100,
+        alignItems: "center",
+    },
+    birdImage: {
+        width: "150%",
+        height: "150%",
+        resizeMode: "contain",
+    },
+    obstacle: {
+        position: "absolute",
+        width: 50,
+        backgroundColor: "red",
+    },
+    startButton: {
+        backgroundColor: "#4CAF50",
+        padding: "5%",
+        paddingHorizontal: "25%",
+        borderRadius: 10,
+        marginBottom: "15%",
+    },
+    startText: {
+        fontSize: 20,
+        color: "#FFF",
+        fontWeight: "bold",
+    },
+    score: {
+        position: "absolute",
+        top: 50,
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#FFF",
+    },
 });
