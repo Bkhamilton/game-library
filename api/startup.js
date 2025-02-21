@@ -1,10 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import games from '@/data/games.json';
 import { insertGame } from '@/db/Games/Games';
+import { insertUser } from '@/db/Users/Users';
 
 export const createTables = async (db) => {
     // Your table creation logic here
     await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS Users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            name TEXT NOT NULL,
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
         CREATE TABLE IF NOT EXISTS Games (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -30,7 +37,13 @@ export const dropTables = async (db) => {
 };
 
 export const syncData = async (db) => {
-    // Your data synchronization logic here
+    // Add Users and Games data to the database
+    const user = {
+        username: 'john_doe',
+        name: 'John Doe'
+    };
+    await insertUser(db, user);
+
     const gamesData = games;
     for (const game of gamesData) {
         await insertGame(db, game);
