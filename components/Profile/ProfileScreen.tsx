@@ -6,24 +6,9 @@ import ProfileHeader from './ProfileHeader';
 import useTheme from '@/hooks/useTheme';
 import ProfileStats from './ProfileStats';
 import ProfileBadges from './ProfileBadges';
+import ProfileAchievements from './ProfileAchievements';
 
 export default function ProfilePage() {
-
-    const { text, primary, grayBorder } = useTheme();
-
-    const StatBox = ({ icon, title, stat }) => {
-        return (
-            <View style={[styles.statBox, { borderColor: grayBorder }]}>
-                <View style={{ height: '100%', justifyContent: 'flex-start', marginRight: 10 }}>
-                    {icon}
-                </View>
-                <View>
-                    <Text style={styles.statBoxTitle}>{title}</Text>
-                    <Text style={styles.statBoxStat}>{stat}</Text>
-                </View>
-            </View>
-        );
-    }
 
     return (
         <View style={styles.container}>
@@ -36,6 +21,8 @@ export default function ProfilePage() {
                 </View>
                 <ProfileStats />
                 <ProfileBadges />
+                <ProfileAchievements />
+                <View style={{ height: 100 }} />
             </ScrollView>
         </View>
     );
