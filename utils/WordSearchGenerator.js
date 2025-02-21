@@ -1,6 +1,13 @@
 // Description: Word search generator utility functions
 
-import { Cell } from "../components/Home/WordSearch/WordSearchGame";
+export type Cell = {
+    letter: string,
+    selected: boolean,
+    partOfWord: boolean,
+    isFound: boolean,
+    partOfFoundWord?: boolean,
+    wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left",
+};
 
 type Direction = {
     x: number,
