@@ -1,43 +1,42 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import ProfileHeader from './ProfileHeader';
+import useTheme from '@/hooks/useTheme';
+import ProfileStats from './ProfileStats';
+import ProfileBadges from './ProfileBadges';
 
 export default function ProfilePage() {
+
+    const { text, primary, grayBorder } = useTheme();
+
+    const StatBox = ({ icon, title, stat }) => {
+        return (
+            <View style={[styles.statBox, { borderColor: grayBorder }]}>
+                <View style={{ height: '100%', justifyContent: 'flex-start', marginRight: 10 }}>
+                    {icon}
+                </View>
+                <View>
+                    <Text style={styles.statBoxTitle}>{title}</Text>
+                    <Text style={styles.statBoxStat}>{stat}</Text>
+                </View>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
-            <View style={styles.image}> 
-                <FontAwesome name="user" size={80} />
-            </View>
-
-            <View>
-                <Text style={styles.username}>Username or First/Last</Text>
-            </View>
-
-            <View style={styles.friends}>
-                <Text> Friends </Text>
-                <Text> 3</Text>
-            </View>
-
-            <View style={styles.stats}>
-                <View style={styles.statBox}>
-                    <Text>Sudoku</Text>
-                    <Text>Wins</Text>
-                    <Text>0</Text>
+            <ProfileHeader />
+            <ScrollView>
+                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                    <View style={styles.profileIcon}/>
+                    <Text style={styles.profileName}>John Doe</Text>
+                    <Text>LEVEL 10</Text>
                 </View>
-
-                <View style={styles.statBox}>
-                    <Text>Dino Run</Text>
-                    <Text>Wins</Text>
-                    <Text>0</Text>
-                </View>
-
-                <View style={styles.statBox}>
-                    <Text style={{ fontSize: 12 }}>Word Search</Text>
-                    <Text>Wins</Text>
-                    <Text>0</Text>
-                </View>
-            </View>
+                <ProfileStats />
+                <ProfileBadges />
+            </ScrollView>
         </View>
     );
 }
@@ -45,43 +44,34 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'column',
         alignItems: 'center',
-      },
-      image: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginHorizontal: '35%',
-        borderWidth: 4,
-        borderRadius: 16,
-        borderColor: 'red',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        marginTop: '15%',
-      },
-      username: { 
+    },
+    profileIcon: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: 'gray',
+        marginBottom: 20,
+    },
+    profileName: {
         fontSize: 24,
-        textAlign: 'center',
-        marginTop: '10%',  
-      },
-      friends: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: '10%',
-      },
-      stats: {
+        fontWeight: '500',
+        marginBottom: 8,
+    },
+    statBox: {
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingVertical: 16,
+        paddingHorizontal: 10,
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: '10%',
-        width: '100%',
-      },
-      statBox: {
-        flex: 1,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderColor: 'black',
-        paddingHorizontal: '4%',
         alignItems: 'center',
-        justifyContent: 'center',
-      }
+    },
+    statBoxTitle: {
+        fontSize: 14,
+        opacity: 0.4,
+    },
+    statBoxStat: {
+        fontSize: 18,
+        fontWeight: '500',
+    },
 });
