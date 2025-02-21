@@ -107,6 +107,7 @@ export default function SudokuGame() {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         alignItems: 'center',
         paddingTop: 24,
     },
