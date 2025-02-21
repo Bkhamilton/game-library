@@ -6,6 +6,7 @@ import { Pressable } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import useTheme from '@/hooks/useTheme';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -18,22 +19,30 @@ function TabBarIcon(props: {
 export default function TabLayout() {
     const colorScheme = useColorScheme();
 
+    const { tint, primary } = useTheme();
+
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+                tabBarActiveTintColor: tint,
                 // Disable the static render of the header on web
                 // to prevent a hydration error in React Navigation v6.
                 headerShown: useClientOnlyValue(false, true),
-                tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+                tabBarInactiveTintColor: primary,
                 tabBarStyle: {
                     borderRadius: 32,
-                    backgroundColor: Colors[colorScheme ?? 'light'].tabBar,
-                    height: 60,
-                    marginBottom: "5%",
+                    backgroundColor: "gray",
+                    position: "absolute",
+                    height: "8%",
+                    paddingTop: "1%",
+                    marginBottom: "3%",
                     width: "80%",
                     marginHorizontal: "10%",
-                    alignSelf: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    shadowColor: "black",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
                   },
 
             }}>
@@ -61,8 +70,9 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="profile"
                 options={{
-                title: 'Profile',
-                tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+                    title: 'Profile',
+                    tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+                    headerShown: false,
                 }}
             />
         </Tabs>
