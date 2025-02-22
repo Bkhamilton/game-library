@@ -8,6 +8,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import "react-native-reanimated";
 import { initializeDatabase } from '@/api/startup'; 
 import { DBContextProvider } from "@/contexts/DBContext";
+import { UserContextProvider } from "@/contexts/UserContext";
 import { useColorScheme } from "@/components/useColorScheme";
 
 export {
@@ -47,7 +48,9 @@ export default function RootLayout() {
     return (
         <SQLiteProvider databaseName="gamelibrary.db" onInit={initializeDatabase} useSuspense>
             <DBContextProvider>
-                <RootLayoutNav />
+                <UserContextProvider>
+                    <RootLayoutNav />
+                </UserContextProvider>
             </DBContextProvider>
         </SQLiteProvider>
     );

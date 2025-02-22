@@ -11,6 +11,16 @@ export const getUsers = async (db) => {
     }
 };
 
+export const getUser = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Users LIMIT 1');
+        return allRows[0];
+    } catch (error) {
+        console.error('Error getting users:', error);
+        throw error;
+    }
+};
+
 // Function to insert a user
 export const insertUser = async (db, user) => {
     try {
