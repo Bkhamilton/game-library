@@ -45,20 +45,4 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginBottom: 8,
     },
-    statBox: {
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingVertical: 16,
-        paddingHorizontal: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statBoxTitle: {
-        fontSize: 14,
-        opacity: 0.4,
-    },
-    statBoxStat: {
-        fontSize: 18,
-        fontWeight: '500',
-    },
 });
