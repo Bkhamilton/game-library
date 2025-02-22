@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ProfileHeader from './ProfileHeader';
 import ProfileStats from './ProfileStats';
 import ProfileBadges from './ProfileBadges';
 import ProfileAchievements from './ProfileAchievements';
+import { UserContext } from '@/contexts/UserContext';
 
 export default function ProfileScreen() {
+
+    const { user } = useContext(UserContext);
 
     return (
         <View style={styles.container}>
@@ -14,8 +17,8 @@ export default function ProfileScreen() {
             <ScrollView>
                 <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                     <View style={styles.profileIcon}/>
-                    <Text style={styles.profileName}>John Doe</Text>
-                    <Text>LEVEL 10</Text>
+                    <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
+                    <Text>{ user ? user.username : '' }</Text>
                 </View>
                 <ProfileStats />
                 <ProfileBadges />

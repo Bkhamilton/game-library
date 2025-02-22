@@ -5,9 +5,15 @@ import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
 import ProgressBar from '@/components/Helpers/ProgressBar';
 
+interface AchievementBoxProps {
+    icon: JSX.Element;
+    title: string;
+    description: string;
+}
+
 export default function ProfileAchievements() {
 
-    const AchievementBox = ({ icon, title, description }) => {
+    const AchievementBox = ({ icon, title, description } : AchievementBoxProps) => {
         return (
             <View style={styles.achievementBox}>
                 <View style={styles.achievementIcon}>
@@ -16,11 +22,10 @@ export default function ProfileAchievements() {
                 <View style={{ flex: 1 }}>
                     <Text style={styles.achievementTitle}>{title}</Text>
                     <Text style={styles.achievementDescription}>{description}</Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10, }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, }}>
                         <ProgressBar segment={1} total={3} />
-                        <Text>1/3</Text>
+                        <Text style={{ paddingLeft: 12 }}>1/3</Text>
                     </View>
-                    
                 </View>
             </View>
         );
