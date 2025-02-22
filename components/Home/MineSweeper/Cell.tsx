@@ -15,7 +15,7 @@ interface CellProps {
 
 const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPress, adjacentMines, size }) => {
 
-    const { primary, grayBackground } = useTheme();
+    const { primary, grayBackground, secondary } = useTheme();
 
     const getCellContent = () => {
         if (flagged) {
@@ -29,7 +29,7 @@ const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPre
 
     return (
         <TouchableOpacity
-            style={[styles.cell, { width: size, height: size }, { borderColor: primary }, revealed && { backgroundColor: grayBackground }, flagged && { backgroundColor: primary }]}
+            style={[styles.cell, { width: size, height: size }, { borderColor: primary }, revealed && { backgroundColor: secondary }, flagged && { backgroundColor: primary }]}
             onPress={onPress}
             onLongPress={onLongPress}
         >

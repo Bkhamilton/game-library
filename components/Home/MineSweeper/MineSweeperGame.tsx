@@ -40,10 +40,17 @@ const GameBoard: React.FC = () => {
     const [gameState, setGameState] = useState<string>("active");
     const [minesCount, setMinesCount] = useState(10);
 
+    const [trigger, setTrigger] = useState(false);
+
     const [lossModalVisible, setLossModalVisible] = useState(false);
     const [victoryModalVisible, setVictoryModalVisible] = useState(false);
 
     const [isActive, setIsActive] = useState(true);
+
+    const restartGame = (difficulty: string) => {
+        router.push(`/minesweeper?difficulty=${difficulty}`);
+        setTrigger(!trigger);
+    };
 
     useEffect(() => {
         console.log("difficulty", difficulty);
@@ -52,7 +59,7 @@ const GameBoard: React.FC = () => {
         setGameState("active");
         setBoard(newBoard);
         setMinesCount(minesCount);
-    }, [difficulty]);
+    }, [difficulty, trigger]);
 
     const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
         if (gameState !== "active") return;
@@ -111,15 +118,14 @@ const GameBoard: React.FC = () => {
 
     const router = useRouter();
 
-    const restartGame = (difficulty: string) => {
-        router.push(`/minesweeper?difficulty=${difficulty}`);
-    };
-
     const { primary } = useTheme();
 
     return (
         <View style={styles.container}>
-            <MineSweeperHeader minesCount={minesCount} gameState={gameState} />
+            <MineSweeperHeader 
+                minesCount={minesCount} 
+                gameState={gameState} 
+            />
             <View style={[styles.board, { borderColor: primary }]}>
                 {board.map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.row}>
@@ -127,8 +133,20 @@ const GameBoard: React.FC = () => {
                     </View>
                 ))}
             </View>
-            <LossMessage visible={lossModalVisible} close={() => setLossModalVisible(false)} title={"You Lost!"} difficulties={Difficulties["Minesweeper"]} restartGame={restartGame} />
-            <VictoryMessage visible={victoryModalVisible} close={() => setVictoryModalVisible(false)} title={"You Won!"} difficulties={Difficulties["Minesweeper"]} restartGame={restartGame} />
+            <LossMessage 
+                visible={lossModalVisible} 
+                close={() => setLossModalVisible(false)} 
+                title={"You Lost!"} 
+                difficulties={Difficulties["Minesweeper"]} 
+                restartGame={restartGame} 
+            />
+            <VictoryMessage 
+                visible={victoryModalVisible} 
+                close={() => setVictoryModalVisible(false)} 
+                title={"You Won!"} 
+                difficulties={Difficulties["Minesweeper"]} 
+                restartGame={restartGame} 
+            />
         </View>
     );
 };

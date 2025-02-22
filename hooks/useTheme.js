@@ -12,6 +12,7 @@ export default function useTheme() {
         grayBackground: Colors[colorScheme].grayBackground,
         grayBorder: Colors[colorScheme].grayBorder,
         primary: Colors[colorScheme].primary,
+        secondary: Colors[colorScheme].secondary,
     }
 
     return themeColors;

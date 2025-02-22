@@ -12,6 +12,7 @@ export default {
         tabIconDefault: 'black',
         tabIconSelected: tintColorLight,
         primary: '#588157',
+        secondary: '#6db36b',
         tabBar: 'gray',
         activeBackground: 'green' 
     },
@@ -25,6 +26,7 @@ export default {
         tabIconDefault: '#ccc',
         tabIconSelected: tintColorDark,
         primary: '#19362d',
+        secondary: '#112921',
         tabBar: 'white',
         activeBackground: 'pink'
     },
