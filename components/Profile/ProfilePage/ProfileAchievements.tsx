@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { TouchableOpacity, Text, View } from '@/components/Themed';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
-import ProgressBar from '../Helpers/ProgressBar';
+import ProgressBar from '@/components/Helpers/ProgressBar';
 
 export default function ProfileAchievements() {
 
