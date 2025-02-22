@@ -1,14 +1,12 @@
 import React from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import ProfileHeader from './ProfileHeader';
-import useTheme from '@/hooks/useTheme';
 import ProfileStats from './ProfileStats';
 import ProfileBadges from './ProfileBadges';
 import ProfileAchievements from './ProfileAchievements';
 
-export default function ProfilePage() {
+export default function ProfileScreen() {
 
     return (
         <View style={styles.container}>

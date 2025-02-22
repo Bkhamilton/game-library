@@ -36,7 +36,9 @@ export default function ProfileHeader() {
                 </TouchableOpacity>
                 <Text style={{ fontSize: 22, fontWeight: '500', marginLeft: 14, }}>Profile</Text>
             </View>
-            <AntDesign name="setting" size={28} color={text} />
+            <TouchableOpacity>
+                <AntDesign name="setting" size={28} color={text} />
+            </TouchableOpacity>
         </View>
     );
 }
