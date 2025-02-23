@@ -3,7 +3,7 @@ import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
-export default function VictoryMessage({ visible, close, title, difficulties, restartGame }) {
+export default function VictoryMessage({ visible, close, title, difficulties, initialDifficulty, restartGame }) {
 
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
 
@@ -25,7 +25,7 @@ export default function VictoryMessage({ visible, close, title, difficulties, re
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
 
     useEffect(() => {
-        setSelectedDifficulty(difficulties[0]);
+        setSelectedDifficulty(initialDifficulty || difficulties[0]);
     }, [difficulties]);
 
     const handleRestartGame = () => {
