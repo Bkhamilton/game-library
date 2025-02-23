@@ -22,7 +22,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         selectNumber(value);
     };
 
-    const { primary, grayBackground, text } = useTheme();
+    const { primary, text, secondary } = useTheme();
 
     useEffect(() => {
         if (selectedTile && selectedNumber !== null) {
@@ -38,7 +38,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         if (rowIndex === 8) style.push(styles.thickBottomBorder);
         if (colIndex === 8) style.push(styles.thickRightBorder);
         if (selectedTile?.row === rowIndex && selectedTile?.col === colIndex) {
-            style.push({ backgroundColor: grayBackground });
+            style.push({ backgroundColor: secondary });
         }
         return style;
     };
