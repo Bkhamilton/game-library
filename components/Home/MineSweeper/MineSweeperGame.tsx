@@ -53,7 +53,6 @@ const GameBoard: React.FC = () => {
     };
 
     useEffect(() => {
-        console.log("difficulty", difficulty);
         const newBoard = initializeBoard(difficulty);
         const minesCount = getMineCount(difficulty);
         setGameState("active");
@@ -85,6 +84,7 @@ const GameBoard: React.FC = () => {
                     if (cell.adjacentMines === 0) {
                         revealAdjacentCells(newBoard, row, col);
                     }
+                    cell.isRevealed = true;
                     // Check if the game is won
                     if (checkWin(newBoard)) {
                         setGameState("won");
@@ -137,7 +137,8 @@ const GameBoard: React.FC = () => {
                 visible={lossModalVisible} 
                 close={() => setLossModalVisible(false)} 
                 title={"You Lost!"} 
-                difficulties={Difficulties["Minesweeper"]} 
+                difficulties={Difficulties["Minesweeper"]}
+                initialDifficulty={difficulty} 
                 restartGame={restartGame} 
             />
             <VictoryMessage 
@@ -145,6 +146,7 @@ const GameBoard: React.FC = () => {
                 close={() => setVictoryModalVisible(false)} 
                 title={"You Won!"} 
                 difficulties={Difficulties["Minesweeper"]} 
+                initialDifficulty={difficulty}
                 restartGame={restartGame} 
             />
         </View>
