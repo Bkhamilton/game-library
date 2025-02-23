@@ -1,10 +1,10 @@
 import React from 'react';
-import ProfileScreen from '@/components/Profile/ProfilePage/ProfileScreen';
+import SettingsScreen from '@/components/Profile/Settings/SettingsScreen';
 
-export default function ProfilePage() {
+export default function SettingsPage() {
     return (
         <>
-            <ProfileScreen />
+            <SettingsScreen />
         </>
     );
 }
