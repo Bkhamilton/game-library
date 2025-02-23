@@ -1,10 +1,10 @@
 import React from 'react';
-import ProfileScreen from '@/components/Profile/ProfilePage/ProfileScreen';
+import EditProfileScreen from '@/components/Profile/EditProfile/EditProfile';
 
-export default function ProfilePage() {
+export default function EditProfilePage() {
     return (
         <>
-            <ProfileScreen />
+            <EditProfileScreen />
         </>
     );
 }
