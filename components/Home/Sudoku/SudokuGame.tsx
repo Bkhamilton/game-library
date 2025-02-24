@@ -91,14 +91,18 @@ export default function SudokuGame() {
                 visible={lossModalVisible}
                 close={() => setLossModalVisible(false)}
                 title={"You Lost!"}
+                game={"Sudoku"}
                 difficulties={Difficulties['Sudoku']}
+                initialDifficulty={difficulty}
                 restartGame={restartGame}
             />
             <VictoryMessage 
                 visible={victoryModalVisible}
                 close={() => setVictoryModalVisible(false)}
                 title={"You Won!"}
+                game={"Sudoku"}
                 difficulties={Difficulties['Sudoku']}
+                initialDifficulty={difficulty}
                 restartGame={restartGame}
             />
         </View>

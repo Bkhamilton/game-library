@@ -136,7 +136,8 @@ const GameBoard: React.FC = () => {
             <LossMessage 
                 visible={lossModalVisible} 
                 close={() => setLossModalVisible(false)} 
-                title={"You Lost!"} 
+                title={"You Lost!"}
+                game={"Minesweeper"} 
                 difficulties={Difficulties["Minesweeper"]}
                 initialDifficulty={difficulty} 
                 restartGame={restartGame} 
@@ -145,6 +146,7 @@ const GameBoard: React.FC = () => {
                 visible={victoryModalVisible} 
                 close={() => setVictoryModalVisible(false)} 
                 title={"You Won!"} 
+                game={"Minesweeper"}
                 difficulties={Difficulties["Minesweeper"]} 
                 initialDifficulty={difficulty}
                 restartGame={restartGame} 
