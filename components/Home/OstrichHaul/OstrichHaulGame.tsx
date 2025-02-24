@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import { Ostrich } from "./Ostrich";
 
-// Import the sprite image
-import ostrichSprite from "@/assets/images/ostrichHaul/ostrichSprite.png";
+const OSTRICH_SPRITES = [
+    require("@/assets/images/ostrichHaul/ostrichSprite1.png"),
+    require("@/assets/images/ostrichHaul/ostrichSprite2.png"),
+    require("@/assets/images/ostrichHaul/ostrichSprite3.png"),
+];
+
 import spikeSprite from "@/assets/images/ostrichHaul/spike.png";
-import { getRootURL } from "expo-router/build/link/linking";
 
 const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
@@ -15,66 +19,83 @@ const DIFFICULTY_SETTINGS = {
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
-const groundLevel = screenHeight - 250;
+const groundLevel = screenHeight - 450;
 const jumpVelocity = -15;
+
+const OSTRICH_WIDTH = 100;
+const OSTRICH_HEIGHT = 121;
+const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the ground
+const COLLISION_ADJUST = 20; // Amount to reduce collision box size
 
 export default function OstrichHaulGame() {
     const { difficulty } = useLocalSearchParams();
-    const [ostrichY, setOstrichY] = useState(new Animated.Value(groundLevel - 10));
-    const [ostrichX, setOstrichX] = useState(new Animated.Value(15));
-    const [velocity, setVelocity] = useState(0);
+    const [position, setPosition] = useState({
+        y: new Animated.Value(groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET),
+        x: new Animated.Value(15),
+    });
+    const [gameState, setGameState] = useState({
+        velocity: 0,
+        isJumping: false,
+        gravity: 1,
+        spriteFrame: 0,
+    });
     const [obstacles, setObstacles] = useState([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
-    const [isJumping, setIsJumping] = useState(false);
-    const [gravity, setGravity] = useState(1);
-    const [spriteFrame, setSpriteFrame] = useState(0);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
     const checkCollision = (obstacle) => {
-        const ostrichTop = ostrichY.__getValue();
-        const ostrichBottom = ostrichTop + 50;
-        const ostrichLeft = ostrichX.__getValue();
-        const ostrichRight = ostrichLeft + 50;
+        const ostrichTop = position.y.__getValue() + COLLISION_ADJUST;
+        const ostrichBottom = ostrichTop + OSTRICH_HEIGHT - COLLISION_ADJUST * 2;
+        const ostrichLeft = position.x.__getValue() + COLLISION_ADJUST;
+        const ostrichRight = ostrichLeft + OSTRICH_WIDTH - COLLISION_ADJUST * 2;
+
         const obstacleLeft = obstacle.x.__getValue();
         const obstacleRight = obstacleLeft + 50;
         const obstacleTop = obstacle.gapTop;
         const obstacleBottom = groundLevel;
 
-        if (ostrichRight > obstacleLeft && ostrichLeft < obstacleRight && (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom)) {
-            return true;
-        }
-        return false;
+        return ostrichRight > obstacleLeft && ostrichLeft < obstacleRight && (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom);
     };
 
     useEffect(() => {
         if (isGameRunning) {
             const gameLoop = setInterval(() => {
-                setVelocity((prevVelocity) => prevVelocity + gravity);
-                setOstrichY((prevOstrichY) => {
-                    const newY = prevOstrichY.__getValue() + velocity;
-                    if (newY >= groundLevel) {
-                        setVelocity(0);
-                        setIsJumping(false);
-                        return new Animated.Value(groundLevel);
+                setGameState((prev) => {
+                    const newVelocity = prev.velocity + prev.gravity;
+                    const newY = position.y.__getValue() + newVelocity;
+                    const groundCollisionPoint = groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET;
+
+                    if (newY >= groundCollisionPoint) {
+                        position.y.setValue(groundCollisionPoint);
+                        return {
+                            ...prev,
+                            velocity: 0,
+                            isJumping: false,
+                        };
                     }
-                    return new Animated.Value(Math.max(newY, 0));
+
+                    position.y.setValue(Math.max(newY, 0));
+                    return {
+                        ...prev,
+                        velocity: newVelocity,
+                    };
                 });
 
                 obstacles.forEach((obstacle, index) => {
                     if (checkCollision(obstacle)) {
                         setIsGameRunning(false);
-                    } else if (ostrichX.__getValue() > obstacle.x.__getValue() + 50) {
+                    } else if (position.x.__getValue() > obstacle.x.__getValue() + 50) {
                         setScore((prevScore) => prevScore + 1);
                         setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
                     }
                 });
-            }, 1000 / 120);
+            }, 1000 / 60);
 
             return () => clearInterval(gameLoop);
         }
-    }, [isGameRunning, velocity, obstacles]);
+    }, [isGameRunning, obstacles]);
 
     useEffect(() => {
         if (isGameRunning) {
@@ -109,47 +130,64 @@ export default function OstrichHaulGame() {
     }, [isGameRunning]);
 
     useEffect(() => {
-        if (isJumping && velocity > -5 && velocity < 5) {
+        if (gameState.isJumping && gameState.velocity > -5 && gameState.velocity < 5) {
             if (difficulty === "Hard") {
-                setGravity(0.6);
+                setGameState((prev) => ({
+                    ...prev,
+                    gravity: 0.6,
+                }));
             } else {
-                setGravity(0.2);
+                setGameState((prev) => ({
+                    ...prev,
+                    gravity: 0.2,
+                }));
             }
         } else {
-            setGravity(1);
+            setGameState((prev) => ({
+                ...prev,
+                gravity: 1,
+            }));
         }
-    }, [isJumping, velocity]);
+    }, [gameState.isJumping, gameState.velocity]);
 
     useEffect(() => {
         if (isGameRunning) {
-            const spriteAnimation = setInterval(() => {
-                setSpriteFrame((prevFrame) => {
-                    const newFrame = (prevFrame + 1) % 3; // Loop through 3 frames
-                    return newFrame;
-                });
-            }, 100); // Adjust the frame rate as needed
+            const spriteInterval = setInterval(() => {
+                setGameState((prev) => ({
+                    ...prev,
+                    spriteFrame: (prev.spriteFrame + 1) % OSTRICH_SPRITES.length,
+                }));
+            }, 70); // Change sprite every 100ms
 
-            return () => clearInterval(spriteAnimation);
+            return () => clearInterval(spriteInterval);
         }
     }, [isGameRunning]);
 
     const startGame = () => {
         setIsGameRunning(true);
-        setOstrichY(new Animated.Value(groundLevel - 10));
-        setVelocity(0);
+        setPosition({
+            y: new Animated.Value(groundLevel - OSTRICH_HEIGHT),
+            x: new Animated.Value(15),
+        });
+        setGameState({
+            velocity: 0,
+            isJumping: false,
+            gravity: 1,
+            spriteFrame: 0,
+        });
         setObstacles([]);
         setScore(0);
-        setIsJumping(false);
     };
 
     const jump = () => {
-        if (!isJumping) {
-            setVelocity(jumpVelocity);
-            setIsJumping(true);
+        if (!gameState.isJumping) {
+            setGameState((prev) => ({
+                ...prev,
+                velocity: jumpVelocity,
+                isJumping: true,
+            }));
         }
     };
-
-    const spriteOffset = spriteFrame;
 
     return (
         <View style={styles.container}>
@@ -157,22 +195,7 @@ export default function OstrichHaulGame() {
             <View style={styles.sky} />
             <View style={styles.ground} />
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
-                <View style={{ width: 48, height: 57, position: "absolute", overflow: "hidden", top: ostrichY.__getValue(), left: ostrichX.__getValue() }}>
-                    <Animated.Image
-                        source={ostrichSprite}
-                        style={[
-                            styles.ostrich,
-                            {
-                                width: 144, // Width of a single frame
-                                height: 57, // Height of a single frame
-
-                                transform: [
-                                    { translateX: -spriteFrame * 48 }, // Shift to show the correct frame
-                                ],
-                            },
-                        ]}
-                    />
-                </View>
+                <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
                 {obstacles.map((obstacle) => (
                     <React.Fragment key={obstacle.key}>
                         <Animated.Image
@@ -181,8 +204,8 @@ export default function OstrichHaulGame() {
                                 styles.obstacle,
                                 {
                                     left: obstacle.x,
-                                    height: 55,
-                                    top: groundLevel - 5,
+                                    height: 100,
+                                    top: groundLevel - 50,
                                 },
                             ]}
                         />
@@ -201,7 +224,7 @@ export default function OstrichHaulGame() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#87CEEB",
+        backgroundColor: "#33a5ff",
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
@@ -211,12 +234,12 @@ const styles = StyleSheet.create({
         position: "absolute",
         width: "100%",
         height: "70%",
-        backgroundColor: "#87CEEB",
+        backgroundColor: "#33a5ff",
     },
     ground: {
         position: "absolute",
         width: "100%",
-        top: screenHeight - 200,
+        top: screenHeight - 400,
         backgroundColor: "#8B4513",
         bottom: 0,
     },
@@ -227,8 +250,6 @@ const styles = StyleSheet.create({
     },
     ostrich: {
         position: "absolute",
-        width: 144,
-        height: 557,
         resizeMode: "cover",
     },
     obstacle: {
