@@ -141,7 +141,7 @@ export default function FlappyBirdGame() {
 
     return (
         <ImageBackground source={BACKGROUND_IMAGE} style={styles.container} resizeMode="cover">
-            <Text style={styles.score}>Score: {score}</Text>
+            <Text style={styles.score}>{score}</Text>
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
                 <Animated.View style={[styles.bird, { top: birdY }]}>
                     <Image source={BIRD_SPRITES[currentFrame]} style={styles.birdImage} />
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         backgroundColor: "red",
     },
     startButton: {
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#33a5ff",
         padding: "5%",
         paddingHorizontal: "25%",
         borderRadius: 10,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     score: {
         position: "absolute",
         top: 50,
-        fontSize: 24,
+        fontSize: 64,
         fontWeight: "bold",
         color: "#FFF",
     },

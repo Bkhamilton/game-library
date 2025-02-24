@@ -153,7 +153,7 @@ export default function OstrichHaulGame() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.score}>Score: {score}</Text>
+            <Text style={styles.score}>{score}</Text>
             <View style={styles.sky} />
             <View style={styles.ground} />
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     score: {
         position: "absolute",
         top: 50,
-        fontSize: 24,
+        fontSize: 64,
         fontWeight: "bold",
         color: "white",
     },
