@@ -4,7 +4,15 @@ import { View, Text } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function SudokuBoard({ board, handleInputChange, selectedNumber, initialNumbers, selectNumber }: { board: number[][], handleInputChange: (row: number, col: number, value: string) => void, selectedNumber: number | null, initialNumbers: { [key: string]: boolean }, selectNumber: (value: number) => void }) {
+interface SudokuBoardProps {
+    board: number[][],
+    handleInputChange: (row: number, col: number, value: string) => void,
+    selectedNumber: number | null,
+    initialNumbers: { [key: string]: boolean },
+    selectNumber: (value: number) => void,
+}
+
+export default function SudokuBoard({ board, handleInputChange, selectedNumber, initialNumbers, selectNumber }: SudokuBoardProps) {
     const [selectedTile, setSelectedTile] = useState<{ row: number, col: number } | null>(null);
 
     const handleTilePress = (row: number, col: number) => {

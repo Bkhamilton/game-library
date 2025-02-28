@@ -4,7 +4,11 @@ import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import Timer from '../Helpers/Timer';
 
-export default function SudokuHeader({ wrongCount }: { wrongCount: number }) {
+interface SudokuHeaderProps {
+    wrongCount: number;
+}
+
+export default function SudokuHeader({ wrongCount }: SudokuHeaderProps) {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>

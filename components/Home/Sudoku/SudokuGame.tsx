@@ -23,6 +23,15 @@ export default function SudokuGame() {
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
 
+    const handleWin = () => {
+        setVictoryModalVisible(true);
+    }
+
+    const handleLoss = () => {
+        setLossModalVisible(true);
+        setLossModalShown(true);
+    }
+
     const handleInputChange = (row: number, col: number, value: string) => {
         if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
         const newBoard = [...board];
@@ -41,12 +50,11 @@ export default function SudokuGame() {
         }
         // Check if the board is solved
         if (JSON.stringify(newBoard) === JSON.stringify(solvedBoard)) {
-            setVictoryModalVisible(true);
+            handleWin();
         }
         // Check if the board is lost
         if (wrongCount >= 3 && !lossModalShown) {
-            setLossModalVisible(true);
-            setLossModalShown(true); // Set the flag to true to indicate the modal has been shown
+            handleLoss();
         }
     };
 
