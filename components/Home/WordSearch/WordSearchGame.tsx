@@ -67,6 +67,8 @@ export default function WordSearchGame() {
     const restartGame = (difficulty: string) => {
         router.push(`/wordSearch?difficulty=${difficulty}`);
         setTrigger(!trigger);
+        initializeGameWithDifficulty(difficulty);
+        setFoundWords([]);
     };
 
     const { primary, grayBackground, text } = useTheme();
@@ -102,23 +104,25 @@ export default function WordSearchGame() {
         const selectedCells = grid.flat().filter((cell) => cell.selected);
         const selectedWord = selectedCells.map((cell) => cell.letter).join("");
 
-        // Case-insensitive comparison
         const wordFound = wordBank.some((word) => word.toUpperCase() === selectedWord.toUpperCase());
 
         if (wordFound) {
             const color = getRandomColor();
             setWordColors((prev) => ({ ...prev, [selectedWord]: color }));
             setFoundWords((prev) => [...prev, selectedWord]);
+
             const updatedGrid = grid.map((row) =>
                 row.map((cell) => ({
                     ...cell,
                     isFound: cell.selected ? true : cell.isFound,
                     partOfFoundWord: cell.selected ? true : cell.partOfFoundWord,
                     selected: false,
-                    foundColor: cell.selected ? color : cell.foundColor, // Add this line
+                    // Change color to black if the cell is part of multiple found words
+                    foundColor: cell.selected ? (cell.partOfFoundWord ? "#000000" : color) : cell.foundColor,
                 }))
             );
             setGrid(updatedGrid);
+
             // Check if all words are found
             const updatedFoundWords = [...foundWords, selectedWord];
             if (updatedFoundWords.length === wordBank.length) {
