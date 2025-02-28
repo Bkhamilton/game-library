@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ostrich } from "./Ostrich";
+import { useRouter } from "expo-router";
+import Difficulties from "@/constants/Difficulties";
+import LossMessage from "@/components/Modals/LossMessage";
 
 const OSTRICH_SPRITES = [
     require("@/assets/images/ostrichHaul/ostrichSprite1.png"),
@@ -28,6 +31,7 @@ const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the ground
 const COLLISION_ADJUST = 20; // Amount to reduce collision box size
 
 export default function OstrichHaulGame() {
+    const router = useRouter();
     const { difficulty } = useLocalSearchParams();
     const [position, setPosition] = useState({
         y: new Animated.Value(groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET),
@@ -42,6 +46,8 @@ export default function OstrichHaulGame() {
     const [obstacles, setObstacles] = useState([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
+    const [lossModalVisible, setLossModalVisible] = useState(false);
+    const [trigger, setTrigger] = useState(false);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
@@ -57,6 +63,11 @@ export default function OstrichHaulGame() {
         const obstacleBottom = groundLevel;
 
         return ostrichRight > obstacleLeft && ostrichLeft < obstacleRight && (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom);
+    };
+
+    const restartGame = (difficulty: string) => {
+        router.push(`/ostrichhaul?difficulty=${difficulty}`);
+        setTrigger(!trigger);
     };
 
     useEffect(() => {
@@ -86,6 +97,7 @@ export default function OstrichHaulGame() {
                 obstacles.forEach((obstacle, index) => {
                     if (checkCollision(obstacle)) {
                         setIsGameRunning(false);
+                        setLossModalVisible(true);
                     } else if (position.x.__getValue() > obstacle.x.__getValue() + 50) {
                         setScore((prevScore) => prevScore + 1);
                         setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
@@ -217,6 +229,15 @@ export default function OstrichHaulGame() {
                     <Text style={styles.startText}>Start</Text>
                 </TouchableOpacity>
             )}
+            <LossMessage
+                visible={lossModalVisible}
+                close={() => setLossModalVisible(false)}
+                title={"You Lost!"}
+                game={"Minesweeper"}
+                difficulties={Difficulties["Minesweeper"]}
+                initialDifficulty={difficulty}
+                restartGame={restartGame}
+            />
         </View>
     );
 }
