@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, ImageBackground } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
+import Difficulties from "@/constants/Difficulties";
+import LossMessage from "@/components/Modals/LossMessage";
 
 const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 5000, gapSize: 400, spawnRate: 4000 },
@@ -22,10 +25,12 @@ const BIRD_SPRITES = [
 
 const BACKGROUND_IMAGE = require("@/assets/images/GoGoBird/bg.png");
 const PIPE_IMAGE = require("@/assets/images/GoGoBird/pipe.png");
+const PIPE_BASE_IMAGE = require("@/assets/images/GoGoBird/pipeBase.png");
 
 type Difficulty = "easy" | "medium" | "hard";
 
 export default function FlappyBirdGame() {
+    const router = useRouter();
     const { difficulty } = useLocalSearchParams();
     const [birdY, setBirdY] = useState(new Animated.Value(300));
     const [velocity, setVelocity] = useState(0); // New state for velocity
@@ -34,6 +39,8 @@ export default function FlappyBirdGame() {
     const [score, setScore] = useState(0);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [currentFrame, setCurrentFrame] = useState(0);
+    const [trigger, setTrigger] = useState(false);
+    const [lossModalVisible, setLossModalVisible] = useState(false);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
     const gravity = 2; // Adjusted gravity for smoother experience
@@ -44,6 +51,13 @@ export default function FlappyBirdGame() {
     const birdHeight = 50;
     const minPipeHeight = 50;
 
+    const restartGame = (difficulty: string) => {
+        router.push(`/gogobird?difficulty=${difficulty}`);
+        setTrigger(!trigger);
+        setScore(0);
+        setBirdY(new Animated.Value(300));
+    };
+
     const checkCollision = (pipe) => {
         const birdTop = birdY.__getValue();
         const birdBottom = birdTop + birdHeight;
@@ -52,11 +66,10 @@ export default function FlappyBirdGame() {
         const pipeTop = pipe.gapTop;
         const pipeBottom = pipe.gapTop + settings.gapSize;
 
-        if (
-            (birdTop < pipeTop || birdBottom > pipeBottom) &&
-            pipeLeft < 150 && // Bird's left position + width
-            pipeRight > 100 // Bird's left position
-        ) {
+        // Add small collision tolerance
+        const collisionTolerance = 5;
+
+        if ((birdTop + collisionTolerance < pipeTop || birdBottom - collisionTolerance > pipeBottom) && pipeLeft < 150 && pipeRight > 100) {
             return true;
         }
         return false;
@@ -92,6 +105,7 @@ export default function FlappyBirdGame() {
                     // Check for collision
                     if (checkCollision(pipe)) {
                         setIsGameRunning(false);
+                        setLossModalVisible(true);
                     }
                 });
             }, 15);
@@ -148,26 +162,61 @@ export default function FlappyBirdGame() {
                 </Animated.View>
                 {pipes.map((pipe) => (
                     <React.Fragment key={pipe.key}>
+                        {/* Top pipe */}
                         <Animated.View
                             style={[
-                                styles.obstacle,
+                                styles.pipeContainer,
                                 {
                                     left: pipe.x,
                                     height: pipe.gapTop,
-                                    top: 0,
+                                    top: -10,
                                 },
                             ]}
-                        />
+                        >
+                            <Image
+                                source={PIPE_BASE_IMAGE}
+                                style={[
+                                    styles.pipeBase,
+                                    {
+                                        height: Math.max(0, pipe.gapTop - 48), // Adjusted to match pipe head
+                                        transform: [{ rotate: "180deg" }],
+                                    },
+                                ]}
+                            />
+                            <Image
+                                source={PIPE_IMAGE}
+                                style={[
+                                    styles.pipeHead,
+                                    {
+                                        transform: [{ rotate: "180deg" }],
+                                        marginBottom: -1, // Remove gap between head and base
+                                    },
+                                ]}
+                            />
+                        </Animated.View>
+
+                        {/* Bottom pipe */}
                         <Animated.View
                             style={[
-                                styles.obstacle,
+                                styles.pipeContainer,
                                 {
                                     left: pipe.x,
-                                    height: screenHeight - pipe.gapTop - settings.gapSize,
+                                    height: screenHeight - pipe.gapTop - settings.gapSize + 1, // Extend slightly
                                     top: pipe.gapTop + settings.gapSize,
                                 },
                             ]}
-                        />
+                        >
+                            <Image source={PIPE_IMAGE} style={[styles.pipeHead]} />
+                            <Image
+                                source={PIPE_BASE_IMAGE}
+                                style={[
+                                    styles.pipeBase,
+                                    {
+                                        height: "100%",
+                                    },
+                                ]}
+                            />
+                        </Animated.View>
                     </React.Fragment>
                 ))}
             </TouchableOpacity>
@@ -176,6 +225,15 @@ export default function FlappyBirdGame() {
                     <Text style={styles.startText}>Start</Text>
                 </TouchableOpacity>
             )}
+            <LossMessage
+                visible={lossModalVisible}
+                close={() => setLossModalVisible(false)}
+                title={"You Lost!"}
+                game={"Minesweeper"}
+                difficulties={Difficulties["Minesweeper"]}
+                initialDifficulty={difficulty}
+                restartGame={restartGame}
+            />
         </ImageBackground>
     );
 }
@@ -204,6 +262,20 @@ const styles = StyleSheet.create({
         width: "150%",
         height: "150%",
         resizeMode: "contain",
+    },
+    pipeContainer: {
+        position: "absolute",
+        width: 52, // Slightly wider to prevent edge gaps
+        alignItems: "center",
+    },
+    pipeHead: {
+        width: 52, // Slightly wider to prevent edge gaps
+        height: 50,
+        resizeMode: "stretch",
+    },
+    pipeBase: {
+        width: 52, // Slightly wider to prevent edge gaps
+        resizeMode: "stretch",
     },
     obstacle: {
         position: "absolute",
