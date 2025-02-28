@@ -5,6 +5,9 @@ import { WORD_POOLS } from "@/data/wordSearchWords";
 import { initializeGrid } from "@/utils/WordSearchGenerator";
 import { useLocalSearchParams } from "expo-router";
 import useTheme from "@/hooks/useTheme";
+import { useRouter } from "expo-router";
+import Difficulties from "@/constants/Difficulties";
+import VictoryMessage from "@/components/Modals/VictoryMessage";
 
 const getRandomColor = () => {
     const colors = [
@@ -57,6 +60,14 @@ export default function WordSearchGame() {
     const [wordBank, setWordBank] = useState<string[]>([]);
     const [wordColors, setWordColors] = useState<{ [key: string]: string }>({});
     const [isGameComplete, setIsGameComplete] = useState<boolean>(false);
+    const [trigger, setTrigger] = useState(false);
+    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
+    const router = useRouter();
+
+    const restartGame = (difficulty: string) => {
+        router.push(`/wordSearch?difficulty=${difficulty}`);
+        setTrigger(!trigger);
+    };
 
     const { primary, grayBackground, text } = useTheme();
 
@@ -112,6 +123,7 @@ export default function WordSearchGame() {
             const updatedFoundWords = [...foundWords, selectedWord];
             if (updatedFoundWords.length === wordBank.length) {
                 setIsGameComplete(true);
+                setVictoryModalVisible(true);
             }
         }
     };
@@ -212,22 +224,15 @@ export default function WordSearchGame() {
                     <Text>Reset</Text>
                 </TouchableOpacity>
             </View>
-            {isGameComplete && (
-                <View style={[styles.victoryOverlay, { backgroundColor: "rgba(0, 0, 0, 0.7)" }]}>
-                    <View style={[styles.victoryModal, { backgroundColor: grayBackground }]}>
-                        <Text style={[styles.victoryText, { color: text }]}>Congratulations!{"\n"}You found all the words!</Text>
-                        <TouchableOpacity
-                            style={[styles.newGameButton, { backgroundColor: primary }]}
-                            onPress={() => {
-                                setIsGameComplete(false);
-                                initializeGameWithDifficulty(difficulty);
-                            }}
-                        >
-                            <Text style={styles.newGameButtonText}>Play Again</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )}
+            <VictoryMessage
+                visible={victoryModalVisible}
+                close={() => setVictoryModalVisible(false)}
+                title={"You Won!"}
+                game={"Minesweeper"}
+                difficulties={Difficulties["Minesweeper"]}
+                initialDifficulty={difficulty}
+                restartGame={restartGame}
+            />
         </View>
     );
 }
