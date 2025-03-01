@@ -12,9 +12,9 @@ export const getScores = async (db) => {
 };
 
 // Function to insert a score
-export const insertScore = async (db, gameId, score, metric) => {
+export const insertScore = async (db, gameId, score, metric, difficulty) => {
     try {
-        const result = await db.runAsync('INSERT INTO Scores (gameId, score, metric) VALUES (?, ?, ?)', [gameId, score, metric]);
+        const result = await db.runAsync('INSERT INTO Scores (gameId, score, metric, difficulty) VALUES (?, ?, ?, ?)', [gameId, score, metric, difficulty]);
         return result.lastInsertRowId;
     } catch (error) {
         console.error('Error inserting score:', error);
@@ -23,10 +23,10 @@ export const insertScore = async (db, gameId, score, metric) => {
 };
 
 // Function to insert a high score
-export const insertHighScore = async (db, gameId, score) => {
+export const insertHighScore = async (db, gameId, score, difficulty) => {
     try {
         const metric = 'highScore';
-        await insertScore(db, gameId, score, metric);
+        await insertScore(db, gameId, score, metric, difficulty);
     } catch (error) {
         console.error('Error inserting high score:', error);
         throw error;
@@ -34,10 +34,10 @@ export const insertHighScore = async (db, gameId, score) => {
 };
 
 // Function to insert a result (win or loss)
-export const insertResult = async (db, gameId, result) => {
+export const insertResult = async (db, gameId, result, difficulty) => {
     try {
         const metric = 'result';
-        await insertScore(db, gameId, result, metric);
+        await insertScore(db, gameId, result, metric, difficulty);
     } catch (error) {
         console.error('Error inserting result:', error);
         throw error;
@@ -45,13 +45,13 @@ export const insertResult = async (db, gameId, result) => {
 };
 
 // Function to insert a win
-export const insertWin = async (db, gameId) => {
-    await insertResult(db, gameId, 1);
+export const insertWin = async (db, gameId, difficulty) => {
+    await insertResult(db, gameId, 1, difficulty);
 }
 
 // Function to insert a loss
-export const insertLoss = async (db, gameId) => {
-    await insertResult(db, gameId, 0);
+export const insertLoss = async (db, gameId, difficulty) => {
+    await insertResult(db, gameId, 0, difficulty);
 }
 
 // Function to update a score

@@ -22,6 +22,7 @@ export const createTables = async (db) => {
             gameId INTEGER NOT NULL,
             score INTEGER NOT NULL,
             metric TEXT NOT NULL,
+            difficulty TEXT NOT NULL,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (gameId) REFERENCES Games(id)
         );  
