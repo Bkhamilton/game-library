@@ -11,11 +11,21 @@ export const getGames = async (db) => {
     }
 };
 
+// Function to get gameId by title
+export const getGameIdByTitle = async (db, title) => {
+    try {
+        const result = await db.getAsync('SELECT id FROM Games WHERE title = ?', [title]);
+        return result;
+    } catch (error) {
+        console.error('Error getting game id by title:', error);
+        throw error;
+    }
+};
+
 // Function to insert a game
 export const insertGame = async (db, game) => {
     try {
         const result = await db.runAsync('INSERT INTO Games (id, title, description) VALUES (?, ?, ?)', [game.id, game.title, game.description]);
-        console.log(result);
         return result.lastInsertRowId;
     } catch (error) {
         console.error('Error inserting game:', error);
@@ -27,7 +37,6 @@ export const insertGame = async (db, game) => {
 export const updateGame = async (db, gameId, title, description) => {
     try {
         await db.runAsync('UPDATE Games SET title = ?, description = ? WHERE id = ?', [title, description, gameId]);
-        console.log("Game updated");
     } catch (error) {
         console.error('Error updating game:', error);
         throw error;
