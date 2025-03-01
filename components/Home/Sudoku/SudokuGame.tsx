@@ -24,10 +24,12 @@ export default function SudokuGame() {
     const [lossModalShown, setLossModalShown] = useState(false);
 
     const handleWin = () => {
+        // insertWin(db, 'Sudoku', difficulty);
         setVictoryModalVisible(true);
     }
 
     const handleLoss = () => {
+        // insertLoss(db, 'Sudoku', difficulty);
         setLossModalVisible(true);
         setLossModalShown(true);
     }

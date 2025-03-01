@@ -60,6 +60,20 @@ const GameBoard: React.FC = () => {
         setMinesCount(minesCount);
     }, [difficulty, trigger]);
 
+    const handleWin = () => {
+        // insertWin(db, 'Minesweeper', difficulty);
+        setGameState("won");
+        setVictoryModalVisible(true);
+        setIsActive(false);
+    }
+
+    const handleLoss = () => {
+        // insertLoss(db, 'Minesweeper', difficulty);
+        setGameState("lost");
+        setLossModalVisible(true);
+        setIsActive(false);
+    }
+
     const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
         if (gameState !== "active") return;
 
@@ -76,9 +90,7 @@ const GameBoard: React.FC = () => {
             // Reveal cell
             if (!cell.isFlagged && !cell.isRevealed) {
                 if (cell.isMine) {
-                    setGameState("lost");
-                    setLossModalVisible(true);
-                    setIsActive(false);
+                    handleLoss();
                 } else {
                     // Reveal adjacent cells if no adjacent mines
                     if (cell.adjacentMines === 0) {
@@ -87,9 +99,7 @@ const GameBoard: React.FC = () => {
                     cell.isRevealed = true;
                     // Check if the game is won
                     if (checkWin(newBoard)) {
-                        setGameState("won");
-                        setVictoryModalVisible(true);
-                        setIsActive(false);
+                        handleWin();
                     }
                 }
                 cell.isRevealed = true;
