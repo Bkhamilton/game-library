@@ -4,7 +4,13 @@ import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import Timer from '../Helpers/Timer';
 
-export default function MineSweeperHeader({ minesCount, gameState }: { minesCount: number, gameState: string }) {
+interface MineSweeperHeaderProps {
+    minesCount: number;
+    gameState: string;
+    trigger: boolean;
+}
+
+export default function MineSweeperHeader({ minesCount, gameState, trigger }: MineSweeperHeaderProps) {
 
     const [isActive, setIsActive] = useState(true);
 
@@ -22,6 +28,7 @@ export default function MineSweeperHeader({ minesCount, gameState }: { minesCoun
                 </View>
                 <Timer 
                     isActive={isActive}
+                    reset={trigger}
                 />
                 <View>
                     <Text style={{ fontSize: 16 }}>{minesCount}</Text>
