@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
@@ -6,9 +6,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
-import VictoryMessage from '@/components/Modals/VictoryMessage'
-import LossMessage from '@/components/Modals/LossMessage'
-import Difficulties from '@/constants/Difficulties';
+import EndGameMessage from '@/components/Modals/EndGameMessage';
+import { DBContext } from '@/contexts/DBContext';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -17,20 +16,25 @@ export default function SudokuGame() {
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
 
-    const [lossModalVisible, setLossModalVisible] = useState(false);
-    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+    const [endGameResult, setEndGameResult] = useState<boolean>(false);
 
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
 
+    const { games } = useContext(DBContext);
+    const curGame = games.find((game) => game.title === "Sudoku");
+
     const handleWin = () => {
         // insertWin(db, 'Sudoku', difficulty);
-        setVictoryModalVisible(true);
+        setEndGameResult(true);
+        setEndGameModalVisible(true);
     }
 
     const handleLoss = () => {
         // insertLoss(db, 'Sudoku', difficulty);
-        setLossModalVisible(true);
+        setEndGameResult(false);
+        setEndGameModalVisible(true);
         setLossModalShown(true);
     }
 
@@ -82,6 +86,8 @@ export default function SudokuGame() {
     const router = useRouter();
 
     const restartGame = (difficulty: string) => {
+        setWrongCount(0);
+        setLossModalShown(false);
         router.push(`/sudoku?difficulty=${difficulty}`);
     }
 
@@ -97,22 +103,12 @@ export default function SudokuGame() {
                 initialNumbers={initialNumbers}
                 selectNumber={handleSelectNumber}
             />
-            <LossMessage 
-                visible={lossModalVisible}
-                close={() => setLossModalVisible(false)}
-                title={"You Lost!"}
-                game={"Sudoku"}
-                difficulties={Difficulties['Sudoku']}
-                initialDifficulty={difficulty}
-                restartGame={restartGame}
-            />
-            <VictoryMessage 
-                visible={victoryModalVisible}
-                close={() => setVictoryModalVisible(false)}
-                title={"You Won!"}
-                game={"Sudoku"}
-                difficulties={Difficulties['Sudoku']}
-                initialDifficulty={difficulty}
+            <EndGameMessage 
+                visible={endGameModalVisible} 
+                close={() => setEndGameModalVisible(false)} 
+                win={endGameResult} 
+                game={curGame} 
+                initialDifficulty={difficulty} 
                 restartGame={restartGame}
             />
         </View>

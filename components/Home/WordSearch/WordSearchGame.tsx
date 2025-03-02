@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { WORD_POOLS } from "@/data/wordSearchWords";
@@ -6,8 +6,8 @@ import { initializeGrid } from "@/utils/WordSearchGenerator";
 import { useLocalSearchParams } from "expo-router";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
-import Difficulties from "@/constants/Difficulties";
-import VictoryMessage from "@/components/Modals/VictoryMessage";
+import EndGameMessage from "@/components/Modals/EndGameMessage";
+import { DBContext } from "@/contexts/DBContext";
 
 const getRandomColor = () => {
     const colors = [
@@ -61,7 +61,11 @@ export default function WordSearchGame() {
     const [wordColors, setWordColors] = useState<{ [key: string]: string }>({});
     const [isGameComplete, setIsGameComplete] = useState<boolean>(false);
     const [trigger, setTrigger] = useState(false);
-    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+
+    const { games } = useContext(DBContext);
+    const curGame = games.find((game) => game.title === "Word Search");
+
     const router = useRouter();
 
     const restartGame = (difficulty: string) => {
@@ -127,7 +131,7 @@ export default function WordSearchGame() {
             const updatedFoundWords = [...foundWords, selectedWord];
             if (updatedFoundWords.length === wordBank.length) {
                 setIsGameComplete(true);
-                setVictoryModalVisible(true);
+                setEndGameModalVisible(true);
             }
         }
     };
@@ -228,12 +232,11 @@ export default function WordSearchGame() {
                     <Text>Reset</Text>
                 </TouchableOpacity>
             </View>
-            <VictoryMessage
-                visible={victoryModalVisible}
-                close={() => setVictoryModalVisible(false)}
-                title={"You Won!"}
-                game={"Minesweeper"}
-                difficulties={Difficulties["Minesweeper"]}
+            <EndGameMessage
+                visible={endGameModalVisible}
+                close={() => setEndGameModalVisible(false)}
+                win={true}
+                game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
             />

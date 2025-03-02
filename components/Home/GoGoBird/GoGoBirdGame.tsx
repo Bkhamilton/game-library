@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, ImageBackground } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
-import Difficulties from "@/constants/Difficulties";
-import LossMessage from "@/components/Modals/LossMessage";
+import EndGameMessage from "@/components/Modals/EndGameMessage";
+import { DBContext } from "@/contexts/DBContext";
 
 const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 5000, gapSize: 400, spawnRate: 4000 },
@@ -40,7 +40,10 @@ export default function FlappyBirdGame() {
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [trigger, setTrigger] = useState(false);
-    const [lossModalVisible, setLossModalVisible] = useState(false);
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+
+    const { games } = useContext(DBContext);
+    const curGame = games.find((game) => game.title === "GoGoBird");
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
     const gravity = 2; // Adjusted gravity for smoother experience
@@ -105,7 +108,7 @@ export default function FlappyBirdGame() {
                     // Check for collision
                     if (checkCollision(pipe)) {
                         setIsGameRunning(false);
-                        setLossModalVisible(true);
+                        setEndGameModalVisible(true);
                     }
                 });
             }, 15);
@@ -225,12 +228,11 @@ export default function FlappyBirdGame() {
                     <Text style={styles.startText}>Start</Text>
                 </TouchableOpacity>
             )}
-            <LossMessage
-                visible={lossModalVisible}
-                close={() => setLossModalVisible(false)}
-                title={"You Lost!"}
-                game={"Minesweeper"}
-                difficulties={Difficulties["Minesweeper"]}
+            <EndGameMessage
+                visible={endGameModalVisible}
+                close={() => setEndGameModalVisible(false)}
+                win={false}
+                game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
             />

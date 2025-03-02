@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "@/components/Themed";
 import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize } from "@/utils/MineSweeperGenerator";
 import { useLocalSearchParams } from "expo-router";
+import { DBContext } from "@/contexts/DBContext";
 import Cell from "./Cell";
 import MineSweeperHeader from "./MineSweeperHeader";
 import VictoryMessage from "@/components/Modals/VictoryMessage";
 import LossMessage from "@/components/Modals/LossMessage";
+import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import Difficulties from "@/constants/Difficulties";
 import { useRouter } from "expo-router";
@@ -42,8 +44,11 @@ const GameBoard: React.FC = () => {
 
     const [trigger, setTrigger] = useState(false);
 
-    const [lossModalVisible, setLossModalVisible] = useState(false);
-    const [victoryModalVisible, setVictoryModalVisible] = useState(false);
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+    const [endGameResult, setEndGameResult] = useState<boolean>(false);
+
+    const { games } = useContext(DBContext);
+    const curGame = games.find((game) => game.title === "Minesweeper");
 
     const [isActive, setIsActive] = useState(true);
 
@@ -63,14 +68,16 @@ const GameBoard: React.FC = () => {
     const handleWin = () => {
         // insertWin(db, 'Minesweeper', difficulty);
         setGameState("won");
-        setVictoryModalVisible(true);
+        setEndGameResult(true);
+        setEndGameModalVisible(true);
         setIsActive(false);
     }
 
     const handleLoss = () => {
         // insertLoss(db, 'Minesweeper', difficulty);
         setGameState("lost");
-        setLossModalVisible(true);
+        setEndGameResult(false);
+        setEndGameModalVisible(true);
         setIsActive(false);
     }
 
@@ -135,6 +142,7 @@ const GameBoard: React.FC = () => {
             <MineSweeperHeader 
                 minesCount={minesCount} 
                 gameState={gameState} 
+                trigger={trigger}
             />
             <View style={[styles.board, { borderColor: primary }]}>
                 {board.map((row, rowIndex) => (
@@ -143,23 +151,13 @@ const GameBoard: React.FC = () => {
                     </View>
                 ))}
             </View>
-            <LossMessage 
-                visible={lossModalVisible} 
-                close={() => setLossModalVisible(false)} 
-                title={"You Lost!"}
-                game={"Minesweeper"} 
-                difficulties={Difficulties["Minesweeper"]}
+            <EndGameMessage 
+                visible={endGameModalVisible} 
+                close={() => setEndGameModalVisible(false)} 
+                win={endGameResult} 
+                game={curGame} 
                 initialDifficulty={difficulty} 
-                restartGame={restartGame} 
-            />
-            <VictoryMessage 
-                visible={victoryModalVisible} 
-                close={() => setVictoryModalVisible(false)} 
-                title={"You Won!"} 
-                game={"Minesweeper"}
-                difficulties={Difficulties["Minesweeper"]} 
-                initialDifficulty={difficulty}
-                restartGame={restartGame} 
+                restartGame={restartGame}
             />
         </View>
     );

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ostrich } from "./Ostrich";
 import { useRouter } from "expo-router";
-import Difficulties from "@/constants/Difficulties";
-import LossMessage from "@/components/Modals/LossMessage";
+import EndGameMessage from "@/components/Modals/EndGameMessage";
+import { DBContext } from "@/contexts/DBContext";
 
 const OSTRICH_SPRITES = [
     require("@/assets/images/ostrichHaul/ostrichSprite1.png"),
@@ -46,8 +46,11 @@ export default function OstrichHaulGame() {
     const [obstacles, setObstacles] = useState([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
-    const [lossModalVisible, setLossModalVisible] = useState(false);
     const [trigger, setTrigger] = useState(false);
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+
+    const { games } = useContext(DBContext);
+    const curGame = games.find((game) => game.title === "Ostrich Haul");
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
@@ -97,7 +100,7 @@ export default function OstrichHaulGame() {
                 obstacles.forEach((obstacle, index) => {
                     if (checkCollision(obstacle)) {
                         setIsGameRunning(false);
-                        setLossModalVisible(true);
+                        setEndGameModalVisible(true);
                     } else if (position.x.__getValue() > obstacle.x.__getValue() + 50) {
                         setScore((prevScore) => prevScore + 1);
                         setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
@@ -229,12 +232,11 @@ export default function OstrichHaulGame() {
                     <Text style={styles.startText}>Start</Text>
                 </TouchableOpacity>
             )}
-            <LossMessage
-                visible={lossModalVisible}
-                close={() => setLossModalVisible(false)}
-                title={"You Lost!"}
-                game={"Minesweeper"}
-                difficulties={Difficulties["Minesweeper"]}
+            <EndGameMessage
+                visible={endGameModalVisible}
+                close={() => setEndGameModalVisible(false)}
+                win={false}
+                game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
             />
