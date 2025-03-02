@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { Text, View, ClearView } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
 export default function VictoryMessage({ visible, close, title, game, difficulties, initialDifficulty, restartGame }) {
@@ -34,6 +34,31 @@ export default function VictoryMessage({ visible, close, title, game, difficulti
         close();
     }
 
+    const typeAGames = ['Sudoku', 'Minesweeper', 'Word Search', 'Crossword'];
+    const typeBGames = ['GoGoBird', 'Ostrich Haul'];
+    
+    const handleGameBoxInfo = () => {
+        if (typeAGames.includes(game)) {
+            return (
+                <>
+                    <Text style={{ fontSize: 16 }}>Win Streak: 0</Text>
+                    <Text style={{ fontSize: 12, opacity: 0.6 }}>Total Wins: 100</Text>
+                </>
+            );
+        } else if (typeBGames.includes(game)) {
+            return (
+                <>
+                    <Text style={{ fontSize: 16 }}>High Scores</Text>
+                    <Text style={{ fontSize: 12, opacity: 0.6 }}>1. 1000</Text>
+                    <Text style={{ fontSize: 12, opacity: 0.6 }}>2. 900</Text>
+                    <Text style={{ fontSize: 12, opacity: 0.6 }}>3. 800</Text>
+                </>
+            );
+        } else {
+            return null;
+        }
+    }
+
     return (
         <Modal
             animationType="slide"
@@ -44,12 +69,16 @@ export default function VictoryMessage({ visible, close, title, game, difficulti
             <View style={styles.container}>
                 <View style={styles.innerContainer}>
                     <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 4 }}>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{title}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>🎉{title}🎉</Text>
                     </View>
                     <View style={[styles.gameBox, { borderColor: primary }]}>
-                        <Text>🎉🎉🎉🎉🎉🎉</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>🎉Victory!🎉</Text>
-                        <Text style={{ fontSize: 16 }}>Play Again?</Text>
+                        <ClearView style={{ paddingVertical: 4 }}>
+                            <Text style={{ fontSize: 16 }}>🎮{game}🎮</Text>
+                        </ClearView>
+                        <ClearView style={styles.gameBoxInfo}>
+                            {handleGameBoxInfo()}
+                        </ClearView>
+                        <Text style={{ fontSize: 14, fontWeight: '500', opacity: 0.7 }}>Play Again?</Text>
                     </View>
                     <View style={{ paddingTop: 16 }}>
                         <TouchableOpacity
@@ -129,5 +158,13 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         width: 200,
         height: 200,
+        alignItems: 'center',
+    },
+    gameBoxInfo: {
+        flex: 1,
+        paddingVertical: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
     }
 });
