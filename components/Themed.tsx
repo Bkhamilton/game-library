@@ -3,7 +3,13 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView, TouchableOpacity as DefaultTouchableOpacity } from 'react-native';
+import { 
+  Text as DefaultText, 
+  View as DefaultView, 
+  TouchableOpacity as DefaultTouchableOpacity,
+  ScrollView as DefaultScrollView,
+  TextInput as DefaultTextInput,
+} from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
@@ -16,6 +22,8 @@ type ThemeProps = {
 export type TextProps = ThemeProps & DefaultText['props'];
 export type ViewProps = ThemeProps & DefaultView['props'];
 export type TouchableOpacityProps = ThemeProps & DefaultTouchableOpacity['props'];
+export type ScrollViewProps = ThemeProps & DefaultScrollView['props'];
+export type TextInputProps = ThemeProps & DefaultTextInput['props'];
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -55,4 +63,18 @@ export function TouchableOpacity(props: TouchableOpacityProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <DefaultTouchableOpacity style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function ScrollView(props: ScrollViewProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+
+  return <DefaultScrollView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function TextInput(props: TextInputProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+
+  return <DefaultTextInput style={[{ color }, style]} {...otherProps} />;
 }
