@@ -43,7 +43,7 @@ export default function OstrichHaulGame() {
         gravity: 1,
         spriteFrame: 0,
     });
-    const [obstacles, setObstacles] = useState([]);
+    const [obstacles, setObstacles] = useState<{ key: string; x: Animated.Value }[]>([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
     const [trigger, setTrigger] = useState(false);
@@ -53,7 +53,7 @@ export default function OstrichHaulGame() {
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
-    const checkCollision = (obstacle) => {
+    const checkCollision = (obstacle: any) => {
         const ostrichTop = position.y.__getValue() + COLLISION_ADJUST;
         const ostrichBottom = ostrichTop + OSTRICH_HEIGHT - COLLISION_ADJUST * 2;
         const ostrichLeft = position.x.__getValue() + COLLISION_ADJUST;
@@ -113,7 +113,7 @@ export default function OstrichHaulGame() {
 
     useEffect(() => {
         if (isGameRunning) {
-            let spawnTimeout;
+            let spawnTimeout: NodeJS.Timeout;
 
             const spawnObstacle = () => {
                 const newObstacle = {

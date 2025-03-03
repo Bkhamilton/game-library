@@ -6,11 +6,8 @@ import { useLocalSearchParams } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
 import Cell from "./Cell";
 import MineSweeperHeader from "./MineSweeperHeader";
-import VictoryMessage from "@/components/Modals/VictoryMessage";
-import LossMessage from "@/components/Modals/LossMessage";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
-import Difficulties from "@/constants/Difficulties";
 import { useRouter } from "expo-router";
 
 export interface CellProps {
@@ -18,8 +15,6 @@ export interface CellProps {
     isFlagged: boolean;
     isMine: boolean;
     adjacentMines: number;
-    onClick: () => void;
-    onLongPress: () => void;
 }
 
 export interface GameState {
