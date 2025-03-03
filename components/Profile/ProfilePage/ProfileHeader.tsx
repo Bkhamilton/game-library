@@ -38,7 +38,9 @@ export default function ProfileHeader() {
     return (
         <View style={styles.container}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                >
                     <FontAwesome5 name="chevron-left" size={24} color={text} />
                 </TouchableOpacity>
                 <Text style={{ fontSize: 22, fontWeight: '500', marginLeft: 14, }}>Profile</Text>

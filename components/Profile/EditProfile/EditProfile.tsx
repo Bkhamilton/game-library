@@ -1,18 +1,76 @@
-import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import React, { useState, useContext } from 'react';
+import { StyleSheet } from 'react-native';
+import { UserContext } from '@/contexts/UserContext';
+import { TouchableOpacity, Text, View, ScrollView, TextInput, ClearView } from '@/components/Themed';
+import useTheme from '@/hooks/useTheme';
+import { FontAwesome6 } from '@expo/vector-icons';
 
-export default function EditProfileScreen() {
+export default function EditProfileInfo() {
+
+    const { text, grayBackground, grayBorder, background } = useTheme();
+    
+    const { user } = useContext(UserContext);
+
+    const [name, setName] = useState(user ? user.name : '');
+    const [username, setUsername] = useState(user ? user.username : '');
+
+    const buildNewUser = () => {
+        if (!user) {
+            return null;
+        }
+        return {
+            id: user.id,
+            name: name ? name : user.name,
+            username: username ? username : user.username,
+        };
+    };
+
+    const handleSaveChanges = () => {
+        alert('Changes saved');
+    };
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                    <View style={styles.profileIcon}/>
-                    <Text style={styles.profileName}>Edit Profile</Text>
+            <ScrollView style={{ flex: 1, paddingHorizontal: 12 }}>
+                {/* Image Change */}
+                <View style={{ alignItems: 'center', paddingVertical: 12 }}>
+                    <View style={{ marginTop: 20, height: 100, width: 100, borderRadius: 50, borderWidth: 1, justifyContent: 'flex-end', alignItems: 'center', overflow: 'hidden' }}>
+                        <FontAwesome6 name="user-large" size={80} color={text} />
+                    </View>
                 </View>
-                <View style={{ height: 100 }} />
+                <View style={[styles.editOptionsContainer, { backgroundColor: grayBackground }]}>
+                    {/* Name */}
+                    <ClearView style={{ padding: 8 }}>
+                        <Text>Name</Text>
+                        <TextInput
+                            style={[styles.editComponentInput, { borderColor: background, backgroundColor: grayBorder }]}
+                            placeholder={'Enter your name'}
+                            autoCorrect={false}
+                            value={name}
+                            onChangeText={setName}
+                        />
+                    </ClearView>
+                    {/* Username */}
+                    <ClearView style={{ padding: 8 }}>
+                        <Text>Username</Text>
+                        <TextInput
+                            style={[styles.editComponentInput, { borderColor: background, backgroundColor: grayBorder }]}
+                            placeholder={'Enter your username'}
+                            autoCorrect={false}
+                            value={username}
+                            onChangeText={setUsername}
+                        />
+                    </ClearView>                                
+                </View>
             </ScrollView>
+            <View style={{ paddingVertical: 16, paddingHorizontal: 8 }}>
+                <TouchableOpacity 
+                    style={styles.saveButton}
+                    onPress={handleSaveChanges}    
+                >
+                    <Text>Save Changes</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -20,18 +78,44 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    saveButton: {
+        backgroundColor: '#00A86B',
         alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+        borderRadius: 4,
+    },
+    profileIconContainer: {
+        position: 'relative',
+        alignItems: 'center',
+        paddingTop: 12,
     },
     profileIcon: {
         width: 100,
         height: 100,
+        borderRadius: '50%',
+        backgroundColor: '#ccc',
+    },
+    editButton: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        padding: 8,
+        backgroundColor: '#00A86B',
         borderRadius: 50,
-        backgroundColor: 'gray',
-        marginBottom: 20,
     },
-    profileName: {
-        fontSize: 24,
-        fontWeight: '500',
-        marginBottom: 8,
+    editOptionsContainer: {
+        paddingVertical: 10,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        marginVertical: 40,
     },
+    editComponentInput: {
+        padding: 12, 
+        borderRadius: 16, 
+        borderWidth: 1, 
+        opacity: 0.8,
+        marginTop: 8,
+    }
 });

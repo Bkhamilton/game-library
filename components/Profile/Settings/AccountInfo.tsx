@@ -4,6 +4,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { Text, View, TouchableOpacity, ClearView } from '@/components/Themed';
 import { UserContext } from '@/contexts/UserContext';
 import useTheme from '@/hooks/useTheme';
+import { useRouter } from 'expo-router';
 
 export default function AccountInfo() {
 
@@ -11,6 +12,12 @@ export default function AccountInfo() {
 
     const { text, grayBackground } = useTheme();
     
+    const router = useRouter();
+
+    const handleEditProfile = () => {
+        router.navigate('/profile/editProfile');
+    }
+
     return (
         <View style={[styles.accountContainer, { backgroundColor: grayBackground }]}>
             <ClearView style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
@@ -19,6 +26,7 @@ export default function AccountInfo() {
                     <Text style={{ fontWeight: '500', fontSize: 18 }}>{user ? user.username : ''}</Text>
                     <TouchableOpacity
                         style={{ backgroundColor: 'transparent' }}
+                        onPress={handleEditProfile}
                     >
                         <Text>Profile Settings</Text>
                     </TouchableOpacity>
