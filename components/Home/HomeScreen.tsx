@@ -12,7 +12,7 @@ export default function HomeScreen() {
 
     const [showSelectGame, setShowSelectGame] = useState(false);
     const [selectedGame, setSelectedGame] = useState<Games | null>(null);
-    const { games } = useContext(DBContext);
+    const { games, handleCurGame } = useContext(DBContext);
 
     const router = useRouter();
 
@@ -27,6 +27,7 @@ export default function HomeScreen() {
 
     const confirmSelectGame = (title: string, difficulty: Difficulty) => {
         handleCloseModal();
+        handleCurGame(title);
         switch (title) {
             case "Sudoku":
                 return router.push(`/sudoku?difficulty=${difficulty}`);

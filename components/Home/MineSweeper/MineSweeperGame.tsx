@@ -47,8 +47,7 @@ const GameBoard: React.FC = () => {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [endGameResult, setEndGameResult] = useState<boolean>(false);
 
-    const { games } = useContext(DBContext);
-    const curGame = games.find((game) => game.title === "Minesweeper");
+    const { curGame } = useContext(DBContext);
 
     const [isActive, setIsActive] = useState(true);
 

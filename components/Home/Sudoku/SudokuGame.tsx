@@ -22,8 +22,7 @@ export default function SudokuGame() {
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
 
-    const { games } = useContext(DBContext);
-    const curGame = games.find((game) => game.title === "Sudoku");
+    const { curGame } = useContext(DBContext);
 
     const handleWin = () => {
         // insertWin(db, 'Sudoku', difficulty);

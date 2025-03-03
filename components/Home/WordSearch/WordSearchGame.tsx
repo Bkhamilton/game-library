@@ -63,8 +63,7 @@ export default function WordSearchGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
-    const { games } = useContext(DBContext);
-    const curGame = games.find((game) => game.title === "Word Search");
+    const { curGame } = useContext(DBContext);
 
     const router = useRouter();
 

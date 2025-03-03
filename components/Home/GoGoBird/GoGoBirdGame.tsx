@@ -42,8 +42,7 @@ export default function FlappyBirdGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
-    const { games } = useContext(DBContext);
-    const curGame = games.find((game) => game.title === "GoGoBird");
+    const { curGame } = useContext(DBContext);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
     const gravity = 2; // Adjusted gravity for smoother experience
