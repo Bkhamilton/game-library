@@ -12,7 +12,7 @@ export default function HomeScreen() {
 
     const [showSelectGame, setShowSelectGame] = useState(false);
     const [selectedGame, setSelectedGame] = useState<Games | null>(null);
-    const { games, handleCurGame } = useContext(DBContext);
+    const { handleCurGame } = useContext(DBContext);
 
     const router = useRouter();
 
@@ -48,13 +48,9 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            <View>
-                <Text style={{ fontSize: 16 }}>Games</Text>
-                <GameSelector
-                    games={games}
-                    handleSelectGame={handleSelectGame}
-                />
-            </View>
+            <GameSelector
+                handleSelectGame={handleSelectGame}
+            />
             {selectedGame && (
                 <SelectGame
                     visible={showSelectGame}
