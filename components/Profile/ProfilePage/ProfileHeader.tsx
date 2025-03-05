@@ -21,18 +21,19 @@ export default function ProfileHeader() {
 
     const onPress = async () => {
         await db.execAsync(`
-            CREATE TABLE IF NOT EXISTS Users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
-                name TEXT NOT NULL,
-                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
+            DROP TABLE Scores;
         `);
-        const user = {
-            name: 'John Doe',
-            username: 'johndoe',
-        }
-        await insertUser(db, user);
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS Scores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                gameId INTEGER NOT NULL,
+                score INTEGER NOT NULL,
+                metric TEXT NOT NULL,
+                difficulty TEXT NOT NULL,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (gameId) REFERENCES Games(id)
+            ); 
+        `);
     }
 
     return (
