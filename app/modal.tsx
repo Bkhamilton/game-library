@@ -10,9 +10,10 @@ export default function InfoScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Info</Text>
-            <Text style={styles.separator} />
-            <ScrollView>
+            <View style={{ width: "100%", padding: 20, alignItems: "center" }}>
+                <Text style={styles.title}>Info</Text>
+            </View>
+            <ScrollView style={{ flex: 1, width: "100%" }}>
                 <Text>Info content</Text>
             </ScrollView>
             <TouchableOpacity onPress={() => router.back()}>
