@@ -60,6 +60,12 @@ export default function FlappyBirdGame() {
         setBirdY(new Animated.Value(300));
     };
 
+    const handleLoss = () => {
+        // insertHighScore(db, curGame.id, score, difficulty);
+        setIsGameRunning(false);
+        setEndGameModalVisible(true);        
+    }
+
     const checkCollision = (pipe) => {
         const birdTop = birdY.__getValue();
         const birdBottom = birdTop + birdHeight;
@@ -94,7 +100,7 @@ export default function FlappyBirdGame() {
                 const newBirdY = birdY.__getValue() + velocity;
                 if (newBirdY > screenHeight - 50) {
                     // 50 is the bird's height
-                    setIsGameRunning(false);
+                    handleLoss();
                 } else {
                     birdY.setValue(newBirdY);
                 }
@@ -106,8 +112,7 @@ export default function FlappyBirdGame() {
                     }
                     // Check for collision
                     if (checkCollision(pipe)) {
-                        setIsGameRunning(false);
-                        setEndGameModalVisible(true);
+                        handleLoss();
                     }
                 });
             }, 15);

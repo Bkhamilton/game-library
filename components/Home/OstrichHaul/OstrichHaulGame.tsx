@@ -72,6 +72,12 @@ export default function OstrichHaulGame() {
         setTrigger(!trigger);
     };
 
+    const handleLoss = () => {
+        // insertHighScore(db, curGame.id, score, difficulty);
+        setIsGameRunning(false);
+        setEndGameModalVisible(true);
+    };
+
     useEffect(() => {
         if (isGameRunning) {
             const gameLoop = setInterval(() => {
@@ -98,8 +104,7 @@ export default function OstrichHaulGame() {
 
                 obstacles.forEach((obstacle, index) => {
                     if (checkCollision(obstacle)) {
-                        setIsGameRunning(false);
-                        setEndGameModalVisible(true);
+                        handleLoss();
                     } else if (position.x.__getValue() > obstacle.x.__getValue() + 50) {
                         setScore((prevScore) => prevScore + 1);
                         setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));

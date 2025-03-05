@@ -25,13 +25,13 @@ export default function SudokuGame() {
     const { curGame } = useContext(DBContext);
 
     const handleWin = () => {
-        // insertWin(db, 'Sudoku', difficulty);
+        // insertWin(db, curGame.id, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
 
     const handleLoss = () => {
-        // insertLoss(db, 'Sudoku', difficulty);
+        // insertLoss(db, curGame.id, difficulty);
         setEndGameResult(false);
         setEndGameModalVisible(true);
         setLossModalShown(true);

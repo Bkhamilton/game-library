@@ -60,7 +60,7 @@ const GameBoard: React.FC = () => {
     }, [difficulty, trigger]);
 
     const handleWin = () => {
-        // insertWin(db, 'Minesweeper', difficulty);
+        // insertWin(db, curGame.id, difficulty);
         setGameState("won");
         setEndGameResult(true);
         setEndGameModalVisible(true);
@@ -68,7 +68,7 @@ const GameBoard: React.FC = () => {
     }
 
     const handleLoss = () => {
-        // insertLoss(db, 'Minesweeper', difficulty);
+        // insertLoss(db, curGame.id, difficulty);
         setGameState("lost");
         setEndGameResult(false);
         setEndGameModalVisible(true);

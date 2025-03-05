@@ -74,6 +74,12 @@ export default function WordSearchGame() {
         setFoundWords([]);
     };
 
+    const handleWin = () => {
+        // insertWin(db, curGame.id, difficulty);
+        setIsGameComplete(true);
+        setEndGameModalVisible(true);        
+    }
+
     const { primary, grayBackground, text } = useTheme();
 
     useEffect(() => {
@@ -129,8 +135,7 @@ export default function WordSearchGame() {
             // Check if all words are found
             const updatedFoundWords = [...foundWords, selectedWord];
             if (updatedFoundWords.length === wordBank.length) {
-                setIsGameComplete(true);
-                setEndGameModalVisible(true);
+                handleWin();
             }
         }
     };
