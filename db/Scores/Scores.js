@@ -1,5 +1,4 @@
 import * as SQLite from 'expo-sqlite';
-import { getGameIdByTitle } from '@/db/Games/Games';
 
 // Function to get all scores
 export const getScores = async (db) => {
@@ -46,14 +45,12 @@ export const insertResult = async (db, gameId, result, difficulty) => {
 };
 
 // Function to insert a win
-export const insertWin = async (db, game, difficulty) => {
-    const gameId = await getGameIdByTitle(db, game);
+export const insertWin = async (db, gameId, difficulty) => {
     await insertResult(db, gameId, 1, difficulty);
 }
 
 // Function to insert a loss
-export const insertLoss = async (db, game, difficulty) => {
-    const gameId = await getGameIdByTitle(db, game);
+export const insertLoss = async (db, gameId, difficulty) => {
     await insertResult(db, gameId, 0, difficulty);
 }
 
