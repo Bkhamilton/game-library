@@ -55,7 +55,7 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
                     headerRight: () => (
                         <Link href="/modal" asChild>
-                            <Pressable>{({ pressed }) => <FontAwesome name="info-circle" size={25} color={Colors[colorScheme ?? "light"].text} style={{ opacity: pressed ? 0.5 : 1 }} />}</Pressable>
+                            <Pressable style={{ paddingHorizontal: 8,}}>{({ pressed }) => <FontAwesome name="info-circle" size={25} color={Colors[colorScheme ?? "light"].text} style={{ opacity: pressed ? 0.5 : 1 }} />}</Pressable>
                         </Link>
                     ),
                 }}
