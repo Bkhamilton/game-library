@@ -4,6 +4,7 @@ import { UserContext } from '@/contexts/UserContext';
 import { TouchableOpacity, Text, View, ScrollView, TextInput, ClearView } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import { FontAwesome6 } from '@expo/vector-icons';
+import EditProfileHeader from './EditProfileHeader';
 
 export default function EditProfileInfo() {
 
@@ -31,6 +32,7 @@ export default function EditProfileInfo() {
 
     return (
         <View style={styles.container}>
+            <EditProfileHeader />
             <ScrollView style={{ flex: 1, paddingHorizontal: 12 }}>
                 {/* Image Change */}
                 <View style={{ alignItems: 'center', paddingVertical: 12 }}>
