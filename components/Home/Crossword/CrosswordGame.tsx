@@ -19,7 +19,7 @@ export default function CrosswordGame2() {
     const [grid, setGrid] = useState<string[][]>([]);
     const [placedWords, setPlacedWords] = useState<Word[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [wordsToFind, setWordsToFind] = useState<Word[]>([]);  
+    const [wordsToFind, setWordsToFind] = useState<string[]>([]);  
 
     useEffect(() => {
         generateCrossword();
@@ -53,7 +53,7 @@ export default function CrosswordGame2() {
 
         const bank = crosswordBank;
 
-        const { grid, placedWords } = createCrossword(size, wordsList, getWordCount(difficulty));
+        const { grid, placedWords } = createCrossword(size, wordsList, getWordCount(difficulty as string));
 
         setGrid(grid);
         setPlacedWords(placedWords);

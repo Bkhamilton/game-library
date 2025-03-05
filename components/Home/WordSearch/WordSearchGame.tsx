@@ -70,7 +70,7 @@ export default function WordSearchGame() {
     const restartGame = (difficulty: string) => {
         router.push(`/wordSearch?difficulty=${difficulty}`);
         setTrigger(!trigger);
-        initializeGameWithDifficulty(difficulty);
+        initializeGameWithDifficulty(difficulty as Difficulty);
         setFoundWords([]);
     };
 
@@ -83,7 +83,7 @@ export default function WordSearchGame() {
     const { primary, grayBackground, text } = useTheme();
 
     useEffect(() => {
-        initializeGameWithDifficulty(difficulty);
+        initializeGameWithDifficulty(difficulty as Difficulty);
     }, [difficulty]);
 
     const initializeGameWithDifficulty = (diff: Difficulty) => {
@@ -229,7 +229,7 @@ export default function WordSearchGame() {
             <View style={[{ alignItems: "center" }]}>
                 <TouchableOpacity
                     onPress={() => {
-                        initializeGameWithDifficulty(difficulty);
+                        initializeGameWithDifficulty(difficulty as Difficulty);
                         setFoundWords([]);
                     }}
                 >
