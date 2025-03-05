@@ -58,12 +58,12 @@ export default function SudokuGame() {
             handleWin();
         }
         // Check if the board is lost
-        if (wrongCount >= 3 && !lossModalShown) {
+        if (wrongCount >= 4 && !lossModalShown) {
             handleLoss();
         }
     };
 
-    const handleSelectNumber = (value: number) => {
+    const handleSelectNumber = (value: any) => {
         setSelectedNumber(value);
     };
 

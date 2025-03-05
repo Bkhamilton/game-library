@@ -19,7 +19,7 @@ export default function SudokuHeader({ wrongCount }: SudokuHeaderProps) {
                     isActive={true}
                 />
                 <View>
-                    <Text style={{ fontSize: 16 }}>{wrongCount}/10</Text>
+                    <Text style={{ fontSize: 16 }}>{wrongCount}/4</Text>
                 </View>
             </View>
         </View>

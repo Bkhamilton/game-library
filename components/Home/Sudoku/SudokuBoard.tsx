@@ -36,6 +36,7 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         if (selectedTile && selectedNumber !== null) {
             handleInputChange(selectedTile.row, selectedTile.col, selectedNumber.toString());
             setSelectedTile(null); // Deselect the tile after updating
+            selectNumber(null); // Deselect the number after updating
         }
     }, [selectedNumber]);
 
