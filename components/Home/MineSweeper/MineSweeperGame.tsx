@@ -9,6 +9,7 @@ import MineSweeperHeader from "./MineSweeperHeader";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
+import { insertWin, insertLoss } from '@/db/Scores/Scores';
 
 export interface CellProps {
     isRevealed: boolean;

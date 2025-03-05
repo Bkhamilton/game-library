@@ -5,6 +5,7 @@ import { Ostrich } from "./Ostrich";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import { insertHighScore } from '@/db/Scores/Scores';
 
 const OSTRICH_SPRITES = [
     require("@/assets/images/ostrichHaul/ostrichSprite1.png"),

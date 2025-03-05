@@ -5,6 +5,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import { insertHighScore } from '@/db/Scores/Scores';
 
 const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 5000, gapSize: 400, spawnRate: 4000 },

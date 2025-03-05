@@ -8,6 +8,7 @@ import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import { insertWin, insertLoss } from '@/db/Scores/Scores';
 
 const getRandomColor = () => {
     const colors = [

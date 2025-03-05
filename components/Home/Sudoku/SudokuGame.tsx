@@ -3,11 +3,11 @@ import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
 import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
+import { insertWin, insertLoss } from '@/db/Scores/Scores';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
