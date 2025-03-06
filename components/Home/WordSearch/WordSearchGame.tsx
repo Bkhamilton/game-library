@@ -64,7 +64,7 @@ export default function WordSearchGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
-    const { curGame } = useContext(DBContext);
+    const { db, curGame } = useContext(DBContext);
 
     const router = useRouter();
 
@@ -76,7 +76,7 @@ export default function WordSearchGame() {
     };
 
     const handleWin = () => {
-        // insertWin(db, curGame.id, difficulty);
+        insertWin(db, curGame && curGame.id, difficulty);
         setIsGameComplete(true);
         setEndGameModalVisible(true);        
     }

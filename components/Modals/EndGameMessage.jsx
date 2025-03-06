@@ -58,12 +58,16 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                 </>
             );
         } else if (typeBGames.includes(game.title)) {
+            const topScores = gameStats.slice(0, 3);
+
             return (
                 <>
                     <Text style={{ fontSize: 16 }}>High Scores</Text>
-                    <Text style={{ fontSize: 12, opacity: 0.6 }}>1. 1000</Text>
-                    <Text style={{ fontSize: 12, opacity: 0.6 }}>2. 900</Text>
-                    <Text style={{ fontSize: 12, opacity: 0.6 }}>3. 800</Text>
+                    {topScores.map((score, index) => (
+                        <Text key={index} style={{ fontSize: 12, opacity: 0.6 }}>
+                            {index + 1}. {score.score}
+                        </Text>
+                    ))}
                 </>
             );
         } else {

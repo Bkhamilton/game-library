@@ -50,7 +50,7 @@ export default function OstrichHaulGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
-    const { curGame } = useContext(DBContext);
+    const { db, curGame } = useContext(DBContext);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
@@ -74,7 +74,7 @@ export default function OstrichHaulGame() {
     };
 
     const handleLoss = () => {
-        // insertHighScore(db, curGame.id, score, difficulty);
+        insertHighScore(db, curGame && curGame.id, score, difficulty);
         setIsGameRunning(false);
         setEndGameModalVisible(true);
     };

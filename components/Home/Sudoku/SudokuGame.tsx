@@ -22,16 +22,16 @@ export default function SudokuGame() {
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
 
-    const { curGame } = useContext(DBContext);
+    const { db, curGame } = useContext(DBContext);
 
     const handleWin = () => {
-        // insertWin(db, curGame.id, difficulty);
+        insertWin(db, curGame && curGame.id, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
 
     const handleLoss = () => {
-        // insertLoss(db, curGame.id, difficulty);
+        insertLoss(db, curGame && curGame.id, difficulty);
         setEndGameResult(false);
         setEndGameModalVisible(true);
         setLossModalShown(true);

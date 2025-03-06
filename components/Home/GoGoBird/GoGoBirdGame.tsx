@@ -43,7 +43,7 @@ export default function FlappyBirdGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
-    const { curGame } = useContext(DBContext);
+    const { db, curGame } = useContext(DBContext);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
     const gravity = 2; // Adjusted gravity for smoother experience
@@ -62,7 +62,7 @@ export default function FlappyBirdGame() {
     };
 
     const handleLoss = () => {
-        // insertHighScore(db, curGame.id, score, difficulty);
+        insertHighScore(db, curGame && curGame.id, score, difficulty);
         setIsGameRunning(false);
         setEndGameModalVisible(true);        
     }
