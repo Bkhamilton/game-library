@@ -83,6 +83,19 @@ export const initializeBoard = (difficulty) => {
     return newBoard;
 };
 
+// Function to initialize a new board making sure the first click is safe
+export const initializeBoardWithFirstClick = (difficulty, row, col) => {
+    let board = initializeBoard(difficulty);
+
+    while (board[row][col].isMine) {
+        board = initializeBoard(difficulty);
+    }
+
+    revealAdjacentCells(board, row, col);
+
+    return board;
+};
+
 // Function to reveal all adjacent cells when a cell with 0 adjacent mines is clicked
 export const revealAdjacentCells = (board, row, col) => {
     const directions = [
