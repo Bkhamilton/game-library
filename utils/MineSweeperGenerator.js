@@ -1,5 +1,49 @@
 // This is the file that holds my MineSweeper Utility functions
 
+// Function to create an empty board based on difficulty
+export const createBoard = (difficulty) => {
+    let rows, cols;
+
+    switch (difficulty) {
+        case 'Easy':
+            rows = 8;
+            cols = 8;
+            break;
+        case 'Medium':
+            rows = 12;
+            cols = 12;
+            break;
+        case 'Hard':
+            rows = 16;
+            cols = 16;
+            break;
+        case 'Extreme':
+            rows = 19;
+            cols = 19;
+            break;
+        default:
+            throw new Error('Invalid difficulty level');
+    }
+
+    const newBoard = [];
+    for (let row = 0; row < rows; row++) {
+        const newRow = [];
+        for (let col = 0; col < cols; col++) {
+            newRow.push({
+                row,
+                col,
+                isMine: false,
+                isRevealed: false,
+                isFlagged: false,
+                adjacentMines: 0,
+            });
+        }
+        newBoard.push(newRow);
+    }
+
+    return newBoard;
+}
+
 // Function to initialize the board with mines and adjacent mines count
 export const initializeBoard = (difficulty) => {
     let rows, cols, minesCount;
@@ -13,17 +57,17 @@ export const initializeBoard = (difficulty) => {
         case 'Medium':
             rows = 12;
             cols = 12;
-            minesCount = 40;
+            minesCount = 35;
             break;
         case 'Hard':
             rows = 16;
             cols = 16;
-            minesCount = 70;
+            minesCount = 60;
             break;
         case 'Extreme':
             rows = 19;
             cols = 19;
-            minesCount = 100;
+            minesCount = 90;
             break;
         default:
             throw new Error('Invalid difficulty level');
