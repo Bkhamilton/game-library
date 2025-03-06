@@ -34,6 +34,7 @@ export default function ProfileHeader() {
                 FOREIGN KEY (gameId) REFERENCES Games(id)
             ); 
         `);
+        console.log('Scores table created');
     }
 
     return (
