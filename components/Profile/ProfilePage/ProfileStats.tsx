@@ -1,32 +1,38 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { TouchableOpacity, Text, View } from '@/components/Themed';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { TouchableOpacity, Text, View, ClearView } from '@/components/Themed';
+import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
+
+interface StatBoxProps {
+    icon: JSX.Element;
+    title: string;
+    stat: string;
+}
 
 export default function ProfileStats() {
 
-    const { primary, grayBorder } = useTheme();
+    const { primary, grayBorder, grayBackground } = useTheme();
 
-    const StatBox = ({ icon, title, stat }) => {
+    const StatBox = ({ icon, title, stat } : StatBoxProps) => {
         return (
-            <View style={[styles.statBox, { borderColor: grayBorder }]}>
-                <View style={{ height: '100%', justifyContent: 'flex-start', marginRight: 10 }}>
+            <View style={[styles.statBox, { borderColor: grayBorder, backgroundColor: grayBackground }]}>
+                <ClearView style={{ height: '100%', justifyContent: 'flex-start', marginRight: 10 }}>
                     {icon}
-                </View>
-                <View>
+                </ClearView>
+                <ClearView>
                     <Text style={styles.statBoxTitle}>{title}</Text>
                     <Text style={styles.statBoxStat}>{stat}</Text>
-                </View>
+                </ClearView>
             </View>
         );
     }
 
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', paddingVertical: 14 }}>
-            <StatBox icon={<FontAwesome5 name="coins" size={24} color={primary} />} title="Coins" stat="1000" />
-            <StatBox icon={<FontAwesome5 name="trophy" size={24} color={primary} />} title="Trophies" stat="100" />
-            <StatBox icon={<FontAwesome5 name="medal" size={24} color={primary} />} title="Wins" stat="50" />
+            <StatBox icon={<FontAwesome5 name="trophy" size={24} color={'gold'} />} title="Wins" stat="1000" />
+            <StatBox icon={<MaterialCommunityIcons name="clock-fast" size={24} color={primary} />} title="Fastest Time" stat="1:14" />
+            <StatBox icon={<FontAwesome5 name="fire-alt" size={24} color={'red'} />} title="Streak" stat="50" />
         </View>
     );
 }
