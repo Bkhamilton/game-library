@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "name": "First Sudoku Win",
+        "description": "Win your first game of Sudoku",
+        "criteria": {
+            "game": "Sudoku",
+            "metric" : "result",
+            "threshold": 1
+        }
+    },
+    {
+        "id": 2,
+        "name": "First Minesweeper Win",
+        "description": "Win your first game of Minesweeper",
+        "criteria": {
+            "game": "Minesweeper",
+            "metric" : "result",
+            "threshold": 1
+        }
+    },
+    {
+        "id": 3,
+        "name": "First Word Search Win",
+        "description": "Win your first game of Word Search",
+        "criteria": {
+            "game": "Word Search",
+            "metric" : "result",
+            "threshold": 1
+        }
+    },
+    {
+        "id": 4,
+        "name": "Score a 10 in Ostrich Haul",
+        "description": "Score a 10 in Ostrich Haul",
+        "criteria": {
+            "game": "Ostrich Haul",
+            "metric" : "highScore",
+            "threshold": 10
+        }
+    },
+    {
+        "id": 5,
+        "name": "Score a 10 in GoGoBird",
+        "description": "Score a 10 in GoGoBird",
+        "criteria": {
+            "game": "GoGoBird",
+            "metric" : "highScore",
+            "threshold": 10
+        }
+    }
+]
