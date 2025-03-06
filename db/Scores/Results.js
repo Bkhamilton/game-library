@@ -23,7 +23,7 @@ export const getGameScores = async (db, gameId) => {
 // Function to get all high scores
 export const getHighScores = async (db) => {
     try {
-        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "highScore"');
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "highScore" ORDER BY score DESC"');
         return allRows;
     } catch (error) {
         console.error('Error getting high scores:', error);
@@ -34,7 +34,7 @@ export const getHighScores = async (db) => {
 // Function to get high scores by game
 export const getHighScoreByGame = async (db, gameId) => {
     try {
-        const allRows = await db.getAllAsync(`SELECT * FROM Scores WHERE metric = "highScore" AND gameId = "${gameId}"`);
+        const allRows = await db.getAllAsync(`SELECT * FROM Scores WHERE metric = "highScore" AND gameId = "${gameId}" ORDER BY SCORE DESC LIMIT 5`);
         return allRows;
     } catch (error) {
         console.error('Error getting high scores:', error);
