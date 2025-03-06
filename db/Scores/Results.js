@@ -9,6 +9,17 @@ export const getScores = async (db) => {
     }
 };
 
+// Function to get scores by game
+export const getGameScores = async (db, gameId) => {
+    try {
+        const allRows = await db.getAllAsync(`SELECT * FROM Scores WHERE gameId = "${gameId}"`);
+        return allRows;
+    } catch (error) {
+        console.error('Error getting scores:', error);
+        throw error;
+    }
+}
+
 // Function to get all high scores
 export const getHighScores = async (db) => {
     try {
@@ -45,7 +56,7 @@ export const getResults = async (db) => {
 // Function to get count of wins and losses from results
 export const getWinLossCount = async (db) => {
     try {
-        const allRows = await db.getAllAsync('SELECT result, COUNT(*) as count FROM Scores WHERE metric = "result" GROUP BY result');
+        const allRows = await db.getAllAsync('SELECT score AS result, COUNT(*) as count FROM Scores WHERE metric = "result" GROUP BY result');
         return allRows;
     } catch (error) {
         console.error('Error getting win loss count:', error);
@@ -56,7 +67,7 @@ export const getWinLossCount = async (db) => {
 // Function to get win loss count by game
 export const getWinLossCountByGame = async (db, gameId) => {
     try {
-        const allRows = await db.getAllAsync(`SELECT result, COUNT(*) as count FROM Scores WHERE metric = "result" AND gameId = "${gameId}" GROUP BY result`);
+        const allRows = await db.getAllAsync(`SELECT score, COUNT(*) as count FROM Scores WHERE metric = "result" AND gameId = "${gameId}" GROUP BY score`);
         return allRows;
     } catch (error) {
         console.error('Error getting win loss count:', error);

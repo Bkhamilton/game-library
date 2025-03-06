@@ -43,7 +43,7 @@ const GameBoard: React.FC = () => {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [endGameResult, setEndGameResult] = useState<boolean>(false);
 
-    const { curGame } = useContext(DBContext);
+    const { db, curGame } = useContext(DBContext);
 
     const [isActive, setIsActive] = useState(true);
 
@@ -61,7 +61,7 @@ const GameBoard: React.FC = () => {
     }, [difficulty, trigger]);
 
     const handleWin = () => {
-        // insertWin(db, curGame.id, difficulty);
+        insertWin(db, curGame && curGame.id, difficulty);
         setGameState("won");
         setEndGameResult(true);
         setEndGameModalVisible(true);
@@ -69,7 +69,7 @@ const GameBoard: React.FC = () => {
     }
 
     const handleLoss = () => {
-        // insertLoss(db, curGame.id, difficulty);
+        insertLoss(db, curGame && curGame.id, difficulty);
         setGameState("lost");
         setEndGameResult(false);
         setEndGameModalVisible(true);

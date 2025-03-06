@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Text, View, ClearView } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
+import { DBContext } from '@/contexts/DBContext';
 import Difficulties from '@/constants/Difficulties';
+import { getGameScores, getHighScoreByGame, getWinLossCountByGame } from '@/db/Scores/Results';
 
 export default function EndGameMessage({ visible, close, win, game, initialDifficulty, restartGame }) {
 
@@ -25,6 +27,10 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
 
     const { primary, grayBackground } = useTheme();
 
+    const { db } = useContext(DBContext);
+
+    const [gameStats, setGameStats] = useState([]);
+
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
 
     useEffect(() => {
@@ -42,10 +48,13 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
     
     const handleGameBoxInfo = () => {
         if (typeAGames.includes(game.title)) {
+            const totalGames = gameStats.reduce((acc, stat) => acc + stat.count, 0);
+            const totalWins = gameStats.find(stat => stat.score === 1)?.count || 0;
+    
             return (
                 <>
-                    <Text style={{ fontSize: 16 }}>Win Streak: 0</Text>
-                    <Text style={{ fontSize: 12, opacity: 0.6 }}>Total Wins: 100</Text>
+                    <Text style={{ fontSize: 16 }}>Total Games: {totalGames}</Text>
+                    <Text style={{ fontSize: 16 }}>Total Wins: {totalWins}</Text>
                 </>
             );
         } else if (typeBGames.includes(game.title)) {
@@ -61,6 +70,25 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
             return null;
         }
     }
+
+    useEffect(() => {
+        const getGameInfo = async () => {
+            try {
+                if (typeAGames.includes(game.title)) {
+                    const stats = await getWinLossCountByGame(db, game.id);
+                    setGameStats(stats);
+                } else if (typeBGames.includes(game.title)) {
+                    const highScores = await getHighScoreByGame(db, game.id);
+                    setGameStats(highScores);
+                } else {
+                    setGameStats({});
+                }
+            } catch (error) {
+                console.error('Error getting game stats:', error);
+            }
+        }
+        getGameInfo();
+    }, [db, game.id, visible]);
 
     return (
         <Modal
@@ -79,7 +107,7 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                             <Text style={{ fontSize: 16 }}>🎮{game.title}🎮</Text>
                         </ClearView>
                         <ClearView style={styles.gameBoxInfo}>
-                            {handleGameBoxInfo()}
+                            {gameStats.length > 0 && handleGameBoxInfo()}
                         </ClearView>
                         <Text style={{ fontSize: 14, fontWeight: '500', opacity: 0.7 }}>Play Again?</Text>
                     </View>
