@@ -45,7 +45,7 @@ interface Cell {
     foundColor?: string; // Add this line
 }
 
-type Difficulty = "easy" | "medium" | "hard";
+type Difficulty = "Easy" | "Medium" | "Hard";
 
 const DIFFICULTY_SETTINGS = {
     Easy: { wordCount: 5, gridSize: 6 },
