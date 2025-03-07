@@ -34,15 +34,15 @@ export const insertUser = async (db, user) => {
 };
 
 // Function to update a user
-export const updateUser = async (db, userId, username, name) => {
+export const updateUser = async (db, user) => {
     try {
-        await db.runAsync('UPDATE Users SET username = ?, name = ? WHERE id = ?', [username, name, userId]);
+        await db.runAsync('UPDATE Users SET username = ?, name = ? WHERE id = ?', [user.username, user.name, user.id]);
         console.log("User updated");
     } catch (error) {
         console.error('Error updating user:', error);
         throw error;
     }
-};
+}
 
 // Function to delete a user
 export const deleteUser = async (db, userId) => {

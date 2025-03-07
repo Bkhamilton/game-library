@@ -4,30 +4,31 @@ import { UserContext } from '@/contexts/UserContext';
 import { TouchableOpacity, Text, View, ScrollView, TextInput, ClearView } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import EditProfileHeader from './EditProfileHeader';
 
 export default function EditProfileInfo() {
 
     const { text, grayBackground, grayBorder, background } = useTheme();
     
-    const { user } = useContext(UserContext);
+    const { user, updateUserInfo } = useContext(UserContext);
+
+    const router = useRouter();
 
     const [name, setName] = useState(user ? user.name : '');
     const [username, setUsername] = useState(user ? user.username : '');
 
-    const buildNewUser = () => {
-        if (!user) {
-            return null;
-        }
-        return {
-            id: user.id,
-            name: name ? name : user.name,
-            username: username ? username : user.username,
-        };
-    };
-
     const handleSaveChanges = () => {
-        alert('Changes saved');
+        if ((name === '' || name === user?.name) && (username === '' || username === user?.username)) {
+            return;
+        }
+        
+        const updatedUser = { ...user, name, username };
+        updateUserInfo(updatedUser);
+
+        alert('Changes saved!');
+
+        router.back();
     };
 
     return (
