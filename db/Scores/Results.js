@@ -74,3 +74,22 @@ export const getWinLossCountByGame = async (db, gameId) => {
         throw error;
     }
 };
+
+// Function to check if criteria is met
+export const checkCriteria = async (db, gameId, metric, threshold) => {
+    try {
+        let query;
+        if (metric === 'result') {
+            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score = "${threshold}"`;
+        } else if (metric === 'highScore') {
+            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > ${threshold}`;
+        } else {
+            throw new Error('Invalid metric');
+        }
+        const allRows = await db.getAllAsync(query);
+        return allRows.length > 0;
+    } catch (error) {
+        console.error('Error checking criteria:', error);
+        throw error;
+    }
+};
