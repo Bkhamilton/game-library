@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { Text, View, Modal } from '@/components/Themed';
+import { StyleSheet, TouchableWithoutFeedback, Modal } from 'react-native';
+import { Text, View } from '@/components/Themed';
 
 export default function AboutModal({ visible, close }) {
     return (

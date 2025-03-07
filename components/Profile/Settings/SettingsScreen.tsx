@@ -1,11 +1,13 @@
-import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Text, View, TouchableOpacity } from '@/components/Themed';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useTheme from '@/hooks/useTheme';
 import AccountInfo from './AccountInfo';
 import SettingsOptions from './SettingsOption';
+import AboutModal from '@/components/Modals/AboutModal';
+import HelpModal from '@/components/Modals/HelpModal';
 
 export default function SettingsScreen() {
 
@@ -13,12 +15,46 @@ export default function SettingsScreen() {
 
     const router = useRouter();
 
+    const [aboutModalVisible, setAboutModalVisible] = useState(false);
+    const [helpModalVisible, setHelpModalVisible] = useState(false);
+
+    const closeAboutModal = () => {
+        setAboutModalVisible(false);
+    }
+
+    const closeHelpModal = () => {
+        setHelpModalVisible(false);
+    }
+
     const handleSelect = (option: string) => {
-        console.log(option);
+        switch (option) {
+            case 'Clear User Data':
+                alert('User data cleared!');
+                break;
+            case 'Help':
+                setHelpModalVisible(true);
+                break;
+            case 'About':
+                setAboutModalVisible(true);
+                break;
+            case 'Support Us':
+                alert('Support us by giving a 5 star rating!');
+                break
+            default:
+                break;
+        }
     }
 
     return (
         <View style={styles.container}>
+            <AboutModal
+                visible={aboutModalVisible}
+                close={closeAboutModal}
+            />
+            <HelpModal
+                visible={helpModalVisible}
+                close={closeHelpModal}
+            />
             <View style={styles.headerContainer}>
                 <TouchableOpacity
                     onPress={() => router.back()}
@@ -69,5 +105,19 @@ const styles = StyleSheet.create({
     accountHeaderText: {
         fontSize: 24, 
         fontWeight: '500'
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    aboutBox: {
+        padding: 16,
+        borderRadius: 8,
+    },
+    aboutText: {
+        fontSize: 16,
+        marginBottom: 8,
     },
 });

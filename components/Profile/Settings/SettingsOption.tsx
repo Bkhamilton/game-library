@@ -44,7 +44,7 @@ export default function SettingsOptions({ onSelect } : SettingsOptionsProps) {
         { icon: 'trash', title: 'Clear User Data', pressIcon: 'chevron-right' },
         { icon: 'help-circle', title: 'Help', pressIcon: 'chevron-right' },
         { icon: 'information-circle', title: 'About', pressIcon: 'chevron-right' },
-        { icon: 'cash', title: 'Support HamSullDevelopment', pressIcon: 'chevron-right' },
+        { icon: 'cash', title: 'Support Us', pressIcon: 'chevron-right' },
     ]
 
     return (

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { StyleSheet } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { Text, View, TouchableOpacity, ClearView } from '@/components/Themed';
 import { UserContext } from '@/contexts/UserContext';
 import useTheme from '@/hooks/useTheme';
@@ -21,7 +21,9 @@ export default function AccountInfo() {
     return (
         <View style={[styles.accountContainer, { backgroundColor: grayBackground }]}>
             <ClearView style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                <View style={styles.accountImageContainer}/>
+                <View style={styles.accountImageContainer}>
+                    <FontAwesome6 style={{ marginBottom: -2 }} name="user-large" size={50} color={text} />
+                </View>
                 <ClearView style={styles.accountInfoContainer}>
                     <Text style={{ fontWeight: '500', fontSize: 18 }}>{user ? user.username : ''}</Text>
                     <TouchableOpacity
@@ -54,7 +56,10 @@ const styles = StyleSheet.create({
         height: 60, 
         width: 60, 
         borderRadius: 30, 
-        borderWidth: 1
+        borderWidth: 1,
+        justifyContent: 'flex-end', 
+        alignItems: 'center', 
+        overflow: 'hidden',
     },
     accountInfoContainer: {
         paddingHorizontal: 10,
