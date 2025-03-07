@@ -29,7 +29,6 @@ export default function ProfileScreen() {
                     <Text>{ user ? user.username : '' }</Text>
                 </View>
                 <ProfileStats />
-                <ProfileBadges />
                 <ProfileAchievements />
                 <View style={{ height: 100 }} />
             </ScrollView>

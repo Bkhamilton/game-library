@@ -4,16 +4,18 @@ import { TouchableOpacity, Text, View } from '@/components/Themed';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
 import ProgressBar from '@/components/Helpers/ProgressBar';
+import achievements from '@/data/achievements.json';
 
 interface AchievementBoxProps {
     icon: JSX.Element;
     title: string;
     description: string;
+    segment: number;
 }
 
 export default function ProfileAchievements() {
 
-    const AchievementBox = ({ icon, title, description } : AchievementBoxProps) => {
+    const AchievementBox = ({ icon, title, description, segment } : AchievementBoxProps) => {
         return (
             <View style={styles.achievementBox}>
                 <View style={styles.achievementIcon}>
@@ -23,8 +25,8 @@ export default function ProfileAchievements() {
                     <Text style={styles.achievementTitle}>{title}</Text>
                     <Text style={styles.achievementDescription}>{description}</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, }}>
-                        <ProgressBar segment={1} total={3} />
-                        <Text style={{ paddingLeft: 12 }}>1/3</Text>
+                        <ProgressBar segment={0} total={segment} />
+                        <Text style={{ paddingLeft: 12 }}>0/{segment}</Text>
                     </View>
                 </View>
             </View>
@@ -36,21 +38,15 @@ export default function ProfileAchievements() {
             <View style={{ padding: 16 }}>
                 <Text style={{ fontSize: 22 }}>Achievements</Text>
             </View>
-            <AchievementBox
-                icon={<FontAwesome5 name="trophy" size={40} color="gold" />}
-                title="First Win"
-                description="Win your first game"
-            />
-            <AchievementBox
-                icon={<FontAwesome5 name="trophy" size={40} color="gold" />}
-                title="First Win"
-                description="Win your first game"
-            />
-            <AchievementBox
-                icon={<FontAwesome5 name="trophy" size={40} color="gold" />}
-                title="First Win"
-                description="Win your first game"
-            />
+            {achievements.map((achievement, index) => (
+                <AchievementBox
+                    key={index}
+                    icon={<FontAwesome5 name="trophy" size={36} color="gold" />}
+                    title={achievement.title}
+                    description={achievement.description}
+                    segment={achievement.criteria.threshold}
+                />
+            ))}
         </View>
     );
 }

@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "name": "First Sudoku Win",
+        "title": "First Sudoku Win",
         "description": "Win your first game of Sudoku",
         "criteria": {
             "game": "Sudoku",
@@ -11,7 +11,7 @@
     },
     {
         "id": 2,
-        "name": "First Minesweeper Win",
+        "title": "First Minesweeper Win",
         "description": "Win your first game of Minesweeper",
         "criteria": {
             "game": "Minesweeper",
@@ -21,7 +21,7 @@
     },
     {
         "id": 3,
-        "name": "First Word Search Win",
+        "title": "First Word Search Win",
         "description": "Win your first game of Word Search",
         "criteria": {
             "game": "Word Search",
@@ -31,7 +31,7 @@
     },
     {
         "id": 4,
-        "name": "Score a 10 in Ostrich Haul",
+        "title": "Score a 10 in Ostrich Haul",
         "description": "Score a 10 in Ostrich Haul",
         "criteria": {
             "game": "Ostrich Haul",
@@ -41,7 +41,7 @@
     },
     {
         "id": 5,
-        "name": "Score a 10 in GoGoBird",
+        "title": "Score a 10 in GoGoBird",
         "description": "Score a 10 in GoGoBird",
         "criteria": {
             "game": "GoGoBird",

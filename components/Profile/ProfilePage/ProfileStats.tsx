@@ -12,7 +12,7 @@ interface StatBoxProps {
 
 export default function ProfileStats() {
 
-    const { primary, grayBorder, grayBackground } = useTheme();
+    const { primary, grayBorder, grayBackground, secondary } = useTheme();
 
     const StatBox = ({ icon, title, stat } : StatBoxProps) => {
         return (
@@ -31,7 +31,7 @@ export default function ProfileStats() {
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', paddingVertical: 14 }}>
             <StatBox icon={<FontAwesome5 name="trophy" size={24} color={'gold'} />} title="Wins" stat="1000" />
-            <StatBox icon={<MaterialCommunityIcons name="clock-fast" size={24} color={primary} />} title="Fastest Time" stat="1:14" />
+            <StatBox icon={<MaterialCommunityIcons name="clock-fast" size={24} color={secondary} />} title="Fastest Time" stat="1:14" />
             <StatBox icon={<FontAwesome5 name="fire-alt" size={24} color={'red'} />} title="Streak" stat="50" />
         </View>
     );
