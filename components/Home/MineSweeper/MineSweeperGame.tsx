@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "@/components/Themed";
-import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize } from "@/utils/MineSweeperGenerator";
+import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize, createBoard, initializeBoardWithFirstClick } from "@/utils/MineSweeperGenerator";
 import { useLocalSearchParams } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
 import Cell from "./Cell";
@@ -32,11 +32,13 @@ export interface Board {
     mines: number;
 }
 
-const GameBoard: React.FC = () => {
+export default function MineSweeperGame() {
     const { difficulty } = useLocalSearchParams();
     const [board, setBoard] = useState<CellProps[][]>([]);
     const [gameState, setGameState] = useState<string>("active");
     const [minesCount, setMinesCount] = useState(10);
+
+    const [firstMoveMade, setFirstMoveMade] = useState(false);
 
     const [trigger, setTrigger] = useState(false);
 
@@ -53,10 +55,11 @@ const GameBoard: React.FC = () => {
     };
 
     useEffect(() => {
-        const newBoard = initializeBoard(difficulty);
+        const emptyBoard = createBoard(difficulty);
+        setFirstMoveMade(false);
         const minesCount = getMineCount(difficulty);
         setGameState("active");
-        setBoard(newBoard);
+        setBoard(emptyBoard);
         setMinesCount(minesCount);
     }, [difficulty, trigger]);
 
@@ -77,6 +80,12 @@ const GameBoard: React.FC = () => {
     }
 
     const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
+        if (!firstMoveMade) {
+            const newBoard = initializeBoardWithFirstClick(difficulty, row, col);
+            setBoard(newBoard);
+            setFirstMoveMade(true);
+            return;
+        }
         if (gameState !== "active") return;
 
         const newBoard = [...board];
@@ -171,5 +180,3 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
 });
-
-export default GameBoard;
