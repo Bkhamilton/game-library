@@ -1,3 +1,5 @@
+import { getGameIdByTitle } from "../Games/Games";
+
 // Function to get all scores
 export const getScores = async (db) => {
     try {
@@ -82,14 +84,26 @@ export const checkCriteria = async (db, gameId, metric, threshold) => {
         if (metric === 'result') {
             query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score = "${threshold}"`;
         } else if (metric === 'highScore') {
-            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > ${threshold}`;
+            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > ${threshold} ORDER BY score DESC LIMIT 1`;
         } else {
             throw new Error('Invalid metric');
         }
         const allRows = await db.getAllAsync(query);
-        return allRows.length > 0;
+        return allRows;
     } catch (error) {
         console.error('Error checking criteria:', error);
         throw error;
     }
 };
+
+// Function to check for achievement
+export const checkForAchievement = async (db, criteria) => {
+    try {
+        const gameId = await getGameIdByTitle(db, criteria.game);
+        const { metric, threshold } = criteria;
+        return await checkCriteria(db, gameId, metric, threshold);
+    } catch (error) {
+        console.error('Error checking for achievement:', error);
+        throw error;
+    }
+}
