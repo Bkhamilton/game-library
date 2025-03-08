@@ -14,7 +14,7 @@ export const getGames = async (db) => {
 // Function to get gameId by title
 export const getGameIdByTitle = async (db, title) => {
     try {
-        const result = await db.getAsync('SELECT id FROM Games WHERE title = ?', [title]);
+        const result = await db.getAllAsync('SELECT id FROM Games WHERE title = ?', [title]);
         return result;
     } catch (error) {
         console.error('Error getting game id by title:', error);
