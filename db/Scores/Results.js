@@ -82,7 +82,7 @@ export const checkCriteria = async (db, gameId, metric, threshold) => {
     try {
         let query;
         if (metric === 'result') {
-            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score = "${threshold} LIMIT 1"`;
+            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > 0 LIMIT 1`;
         } else if (metric === 'highScore') {
             query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > ${threshold} ORDER BY score DESC LIMIT 1`;
         } else {

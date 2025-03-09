@@ -22,7 +22,7 @@ export default function ProgressBar({ segment, total } : ProgressBarProps) {
 const styles = StyleSheet.create({
     container: {
         height: 10,
-        width: '100%',
+        width: '90%',
         backgroundColor: '#e0e0e0',
         borderRadius: 5,
         overflow: 'hidden',
