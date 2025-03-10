@@ -57,7 +57,7 @@ export default function CrosswordGame2() {
 
         setGrid(grid);
         setPlacedWords(placedWords);
-        setWordsToFind(shuffle(placedWords));
+        setWordsToFind(placedWords);
     
         setIsLoading(false);
     };
@@ -68,11 +68,14 @@ export default function CrosswordGame2() {
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
                 <>
-                    <CrosswordGrid grid={grid} />
+                    <CrosswordGrid 
+                        grid={grid}
+                        placedWords={placedWords} 
+                    />
                     <View>
                         <Text>Words to Find:</Text>
                         {wordsToFind.map((word, index) => (
-                            <Text key={index}>{word}</Text>
+                            <Text key={index}>{word.word} {JSON.stringify(word.startPosition)}</Text>
                         ))}
                     </View>
                     <Button title="Regenerate" onPress={generateCrossword} />
