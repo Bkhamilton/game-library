@@ -11,6 +11,28 @@ export const getScores = async (db) => {
     }
 };
 
+// Function to get total wins
+export const getTotalWins = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "result" AND score > 0');
+        return allRows.length;
+    } catch (error) {
+        console.error('Error getting total wins:', error);
+        throw error;
+    }
+};
+
+// Function to get total losses
+export const getTotalLosses = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "result" AND score < 0');
+        return allRows.length;
+    } catch (error) {
+        console.error('Error getting total losses:', error);
+        throw error;
+    }
+};
+
 // Function to get scores by game
 export const getGameScores = async (db, gameId) => {
     try {
@@ -40,6 +62,39 @@ export const getHighScoreByGame = async (db, gameId) => {
         return allRows;
     } catch (error) {
         console.error('Error getting high scores:', error);
+        throw error;
+    }
+};
+
+// Function to get highest score of any game
+export const getHighestScore = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "highScore" ORDER BY score DESC LIMIT 1');
+        return allRows.length > 0 ? allRows[0].score : 0; // Return the highest score or null if no scores
+    } catch (error) {
+        console.error('Error getting highest score:', error);
+        throw error;
+    }
+}
+
+// Function to get fastest time of any game
+export const getFastestTime = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "time" ORDER BY score ASC LIMIT 1');
+        return allRows.length > 0 ? allRows[0].score : '0:00';
+    } catch (error) {
+        console.error('Error getting fastest time:', error);
+        throw error;
+    }
+};
+
+// Function to get streak of any game
+export const getStreak = async (db) => {
+    try {
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "streak" ORDER BY score DESC LIMIT 1');
+        return allRows;
+    } catch (error) {
+        console.error('Error getting streak:', error);
         throw error;
     }
 };
@@ -104,6 +159,27 @@ export const checkForAchievement = async (db, criteria) => {
         return await checkCriteria(db, gameId, metric, threshold);
     } catch (error) {
         console.error('Error checking for achievement:', error);
+        throw error;
+    }
+}
+
+// Function to return stats by title: title is one word from the following array ['Wins', 'Fastest Time', 'Streak']
+export const getStatByTitle = async (db, title) => {
+    try {
+        switch (title) {
+            case 'Wins':
+                return await getTotalWins(db);
+            case 'Fastest Time':
+                return await getFastestTime(db);
+            case 'Streak':
+                return await getStreak(db);
+            case 'High Score':
+                return await getHighestScore(db);
+            default:
+                throw new Error('Invalid title');
+        }
+    } catch (error) {
+        console.error('Error getting stat by title:', error);
         throw error;
     }
 }
