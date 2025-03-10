@@ -8,18 +8,21 @@ import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
 import { createCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
 
-type Word = {
-    id: number;
+type PlacedWord = {
     word: string;
-    clue: string;
+    startPosition: {
+        row: number;
+        col: number;
+        direction: 'horizontal' | 'vertical';
+    }
 }
 
 export default function CrosswordGame2() {
     const { difficulty } = useLocalSearchParams();
     const [grid, setGrid] = useState<string[][]>([]);
-    const [placedWords, setPlacedWords] = useState<Word[]>([]);
+    const [placedWords, setPlacedWords] = useState<PlacedWord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [wordsToFind, setWordsToFind] = useState<string[]>([]);  
+    const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]);  
 
     useEffect(() => {
         generateCrossword();
@@ -36,11 +39,11 @@ export default function CrosswordGame2() {
     const getWordCount = (difficulty: string) => {
         switch (difficulty) {
             case 'Easy':
-                return 10;
+                return 6;
             case 'Medium':
-                return 15;
+                return 9;
             case 'Hard':
-                return 20;
+                return 14;
             default:
                 return 5;
         }
