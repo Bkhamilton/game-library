@@ -7,6 +7,7 @@ import wordsList from '@/data/wordsList.json';
 import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
 import { createCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
+import CrosswordHeader from './CrosswordHeader';
 
 type PlacedWord = {
     word: string;
@@ -66,11 +67,16 @@ export default function CrosswordGame2() {
     };
 
     return (
-        <View>
+        <View style={styles.container}>
             {isLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
                 <>
+                    <CrosswordHeader
+                        wordsFound={0}
+                        totalWords={wordsToFind.length}
+                        reset={false}
+                    />
                     <CrosswordGrid 
                         grid={grid}
                         placedWords={placedWords} 
@@ -91,6 +97,8 @@ export default function CrosswordGame2() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        alignItems: "center",
+        paddingTop: 24,
     },
     row: {
         flexDirection: 'row',
