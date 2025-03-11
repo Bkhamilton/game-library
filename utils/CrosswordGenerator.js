@@ -65,14 +65,19 @@ export const placeFirstWord = (grid, word) => {
 }
 
 // Function to get a viable letter from the grid to intersect new word with
-const getViableLetter = (grid) => {
+const getViableLetter = (grid, placedWords) => {
     let viableLetter = null;
     let viableRow = null;
     let viableCol = null;
     while (!viableLetter) {
         const row = Math.floor(Math.random() * grid.length);
         const col = Math.floor(Math.random() * grid[0].length);
-        if (grid[row][col] !== '') {
+
+        const isStartPosition = (row, col) => {
+            return placedWords.some(({ startPosition }) => startPosition.row === row && startPosition.col === col);
+        };
+
+        if (grid[row][col] !== '' && !isStartPosition(row, col)) {
             const topLeft = row > 0 && col > 0 ? grid[row - 1][col - 1] : null;
             const topRight = row > 0 && col < grid[0].length - 1 ? grid[row - 1][col + 1] : null;
             const bottomLeft = row < grid.length - 1 && col > 0 ? grid[row + 1][col - 1] : null;
@@ -93,9 +98,9 @@ const getViableWords = (wordBank, letter) => {
 }
 
 // Function to place subsequent words in the grid
-export const placeSubsequentWords = (grid, wordBank) => {
+export const placeSubsequentWords = (grid, wordBank, placedWords) => {
     // Step 1: Choose a letter from the grid to intersect new word with
-    const newCharacter = getViableLetter(grid);
+    const newCharacter = getViableLetter(grid, placedWords);
 
     // Step 2: Grab all words from the wordbank that contain that letter
     const viableWords = getViableWords(wordBank, newCharacter.viableLetter);
@@ -204,6 +209,21 @@ export const condenseGrid = (grid, placedWords) => {
 
 // Function to create the crossword puzzle
 export const createCrossword = (size, wordBank, numWords) => {
+    let minWords;
+    switch (size) {
+        case 6:
+            minWords = 5;
+            break;
+        case 9:
+            minWords = 7;
+            break;
+        case 14:
+            minWords = 10;
+            break;
+        default:
+            minWords = 3;
+    }
+
     let grid = createGrid(size);
     const firstWord = wordBank.splice(Math.floor(Math.random() * wordBank.length), 1)[0];
     const { grid: newGrid, startPosition: firstWordPosition } = placeFirstWord(grid, firstWord);
@@ -211,7 +231,7 @@ export const createCrossword = (size, wordBank, numWords) => {
     const placedWords = [{ word: firstWord, startPosition: firstWordPosition }];
 
     for (let i = 0; i < numWords; i++) {
-        const { grid: newGrid, placedWord, startPosition } = placeSubsequentWords(grid, wordBank);
+        const { grid: newGrid, placedWord, startPosition } = placeSubsequentWords(grid, wordBank, placedWords);
         grid = newGrid;
         if (placedWord) {
             const index = wordBank.indexOf(placedWord);
