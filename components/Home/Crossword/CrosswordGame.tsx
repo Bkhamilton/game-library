@@ -5,7 +5,7 @@ import useTheme from '@/hooks/useTheme';
 import crosswordBank from '@/data/crosswordBank.json';
 import wordsList from '@/data/wordsList.json';
 import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
-import { createCrossword } from '@/utils/CrosswordGenerator';
+import { buildCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
 import CrosswordHeader from './CrosswordHeader';
 import CrosswordWords from './CrosswordWords';
@@ -59,7 +59,7 @@ export default function CrosswordGame2() {
 
         const bank = crosswordBank;
 
-        const { grid, placedWords } = createCrossword(size, wordsList, getWordCount(difficulty as string));
+        const { grid, placedWords } = buildCrossword(size, wordsList, getWordCount(difficulty as string));
 
         setGrid(grid);
         setPlacedWords(placedWords);

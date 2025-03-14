@@ -227,21 +227,6 @@ export const condenseGrid = (grid, placedWords) => {
 
 // Function to create the crossword puzzle
 export const createCrossword = (size, wordBank, numWords) => {
-    let minWords;
-    switch (size) {
-        case 6:
-            minWords = 5;
-            break;
-        case 9:
-            minWords = 7;
-            break;
-        case 14:
-            minWords = 10;
-            break;
-        default:
-            minWords = 3;
-    }
-
     let grid = createGrid(size);
     const firstWord = wordBank.splice(Math.floor(Math.random() * wordBank.length), 1)[0];
     const { grid: newGrid, startPosition: firstWordPosition } = placeFirstWord(grid, firstWord);
@@ -263,4 +248,29 @@ export const createCrossword = (size, wordBank, numWords) => {
     const { condensedGrid, adjustedPlacedWords } = condenseGrid(grid, placedWords);
 
     return { grid: condensedGrid, placedWords: adjustedPlacedWords };
+}
+
+export const buildCrossword = (size, wordBank, numWords) => {
+    let minWords;
+    switch (numWords) {
+        case 6:
+            minWords = 5;
+            break;
+        case 9:
+            minWords = 7;
+            break;
+        case 14:
+            minWords = 10;
+            break;
+        default:
+            minWords = 3;
+    }
+    
+    do {
+        const { grid, placedWords } = createCrossword(size, wordBank, numWords);
+        if (placedWords.length >= minWords) {
+            return { grid, placedWords };
+        }
+    }
+    while (true);
 }
