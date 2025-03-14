@@ -20,6 +20,7 @@ export default function EditProfileHeader() {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity
                     onPress={() => router.back()}
+                    style={{ padding: 8 }}
                 >
                     <FontAwesome5 name="chevron-left" size={24} color={text} />
                 </TouchableOpacity>
