@@ -4,7 +4,7 @@ import { TouchableOpacity, Text, View } from '@/components/Themed';
 import { MonoText } from '@/components/StyledText';
 import useTheme from '@/hooks/useTheme';
 
-export default function CrosswordGrid({ grid, placedWords }) {
+export default function CrosswordGrid({ grid, placedWords, guessedWords }) {
 
     const { primary, grayBackground, grayBorder, background, text } = useTheme();
 
@@ -29,10 +29,10 @@ export default function CrosswordGrid({ grid, placedWords }) {
                                     }]
                                 }
                             >
-                                <Text style={{ position: 'absolute', top: 0, left: 0, color: primary, fontSize: 6, padding: 0 }}>
+                                <Text style={{ position: 'absolute', top: 0, left: 0, color: primary, fontSize: 8, padding: 0 }}>
                                     {startIndex !== -1 ? startIndex + 1 : ''}
                                 </Text>
-                                <MonoText style={styles.cellText}>{cell}</MonoText>
+                                <MonoText style={styles.cellText}> </MonoText>
                             </View>
                         );
                     })}

@@ -102,6 +102,10 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
     // Step 1: Choose a letter from the grid to intersect new word with
     const newCharacter = getViableLetter(grid, placedWords);
 
+    const isStartPosition = (row, col) => {
+        return placedWords.some(({ startPosition }) => startPosition.row === row && startPosition.col === col);
+    };
+
     // Step 2: Grab all words from the wordbank that contain that letter
     const viableWords = getViableWords(wordBank, newCharacter.viableLetter);
     const shuffledWords = shuffle(viableWords);
@@ -127,6 +131,13 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
                     (viableCol - letterIndex + word.length < grid[0].length && grid[viableRow][viableCol - letterIndex + word.length] !== '')) {
                     canPlaceHorizontally = false;
                 }
+                // Check the spaces below each letter to make sure they are not the starting letter of another word
+                for (let i = 0; i < word.length; i++) {
+                    if (viableRow + 1 < grid.length && isStartPosition(viableRow + 1, viableCol - letterIndex + i)) {
+                        canPlaceHorizontally = false;
+                        break;
+                    }
+                }
             }
             if (canPlaceHorizontally) {
                 for (let i = 0; i < word.length; i++) {
@@ -151,6 +162,13 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
                 if ((viableRow - letterIndex - 1 >= 0 && grid[viableRow - letterIndex - 1][viableCol] !== '') ||
                     (viableRow - letterIndex + word.length < grid.length && grid[viableRow - letterIndex + word.length][viableCol] !== '')) {
                     canPlaceVertically = false;
+                }
+                // Check the spaces to the right of each letter to make sure they are not the starting letter of another word
+                for (let i = 0; i < word.length; i++) {
+                    if (viableCol + 1 < grid[0].length && isStartPosition(viableRow - letterIndex + i, viableCol + 1)) {
+                        canPlaceVertically = false;
+                        break;
+            }
                 }
             }
             if (canPlaceVertically) {

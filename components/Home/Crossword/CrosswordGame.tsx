@@ -8,6 +8,7 @@ import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
 import { createCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
 import CrosswordHeader from './CrosswordHeader';
+import CrosswordWords from './CrosswordWords';
 
 type PlacedWord = {
     word: string;
@@ -23,7 +24,8 @@ export default function CrosswordGame2() {
     const [grid, setGrid] = useState<string[][]>([]);
     const [placedWords, setPlacedWords] = useState<PlacedWord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]);  
+    const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]); 
+    const [guessedWords, setGuessedWords] = useState<PlacedWord[]>([]);
 
     useEffect(() => {
         generateCrossword();
@@ -80,13 +82,11 @@ export default function CrosswordGame2() {
                     <CrosswordGrid 
                         grid={grid}
                         placedWords={placedWords} 
+                        guessedWords={guessedWords}
                     />
-                    <View>
-                        <Text>Words to Find:</Text>
-                        {wordsToFind.map((word, index) => (
-                            <Text key={index}>{word.word} {JSON.stringify(word.startPosition)}</Text>
-                        ))}
-                    </View>
+                    <CrosswordWords
+                        wordsToFind={wordsToFind}
+                    />
                     <Button title="Regenerate" onPress={generateCrossword} />
                 </>
             )}
