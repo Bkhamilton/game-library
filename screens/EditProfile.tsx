@@ -5,7 +5,7 @@ import { TouchableOpacity, Text, View, ScrollView, TextInput, ClearView } from '
 import useTheme from '@/hooks/useTheme';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import EditProfileHeader from './EditProfileHeader';
+import EditProfileHeader from '@/components/Profile/EditProfile/EditProfileHeader';
 
 export default function EditProfileInfo() {
 

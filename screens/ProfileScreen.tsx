@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import ProfileHeader from './ProfileHeader';
-import ProfileStats from './ProfileStats';
-import ProfileBadges from './ProfileBadges';
-import ProfileAchievements from './ProfileAchievements';
+import ProfileHeader from '@/components/Profile/ProfilePage/ProfileHeader';
+import ProfileStats from '@/components/Profile/ProfilePage//ProfileStats';
+import ProfileBadges from '@/components/Profile/ProfilePage//ProfileBadges';
+import ProfileAchievements from '@/components/Profile/ProfilePage//ProfileAchievements';
 import { UserContext } from '@/contexts/UserContext';
 import { FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';

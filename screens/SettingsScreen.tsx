@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View, TouchableOpacity } from '@/components/Themed';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useTheme from '@/hooks/useTheme';
-import AccountInfo from './AccountInfo';
-import SettingsOptions from './SettingsOption';
+import AccountInfo from '@/components/Profile/Settings/AccountInfo';
+import SettingsOptions from '@/components/Profile/Settings/SettingsOption';
 import AboutModal from '@/components/Modals/AboutModal';
 import HelpModal from '@/components/Modals/HelpModal';
 

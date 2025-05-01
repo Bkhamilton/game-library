@@ -1,5 +1,5 @@
 import React from 'react';
-import EditProfileScreen from '@/components/Profile/EditProfile/EditProfile';
+import EditProfileScreen from '@/screens/EditProfile';
 
 export default function EditProfilePage() {
     return (

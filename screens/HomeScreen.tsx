@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet } from "react-native";
-import { Text, View } from "@/components/Themed";
-import GameSelector from "./GameSelector/GameSelector";
+import { ScrollView } from "@/components/Themed";
+import GameSelector from "@/components/Home/GameSelector/GameSelector";
 import SelectGame from "@/components/Modals/SelectGame";
 import { useRouter } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
@@ -47,7 +47,7 @@ export default function HomeScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <GameSelector
                 handleSelectGame={handleSelectGame}
             />
@@ -60,7 +60,7 @@ export default function HomeScreen() {
                     selectGame={confirmSelectGame}
                 />
             )}
-        </View>
+        </ScrollView>
     );
 }
 
