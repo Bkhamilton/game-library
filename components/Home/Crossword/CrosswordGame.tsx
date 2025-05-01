@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { View } from '@/components/Themed';
 import wordsList from '@/data/wordsList.json';
 import crosswordData from '@/data/crosswordData.json';
@@ -19,13 +19,14 @@ type PlacedWord = {
     clue: string;
 }
 
-export default function CrosswordGame2() {
+export default function CrosswordGame() {
     const { difficulty } = useLocalSearchParams();
     const [grid, setGrid] = useState<string[][]>([]);
     const [placedWords, setPlacedWords] = useState<PlacedWord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]); 
     const [guessedWords, setGuessedWords] = useState<PlacedWord[]>([]);
+    const [activeCell, setActiveCell] = useState<{row: number, col: number} | null>(null);
 
     useEffect(() => {
         generateCrossword();
@@ -33,20 +34,15 @@ export default function CrosswordGame2() {
 
     const getWordCount = (difficulty: string) => {
         switch (difficulty) {
-            case 'Easy':
-                return 6;
-            case 'Medium':
-                return 9;
-            case 'Hard':
-                return 14;
-            default:
-                return 5;
+            case 'Easy': return 6;
+            case 'Medium': return 9;
+            case 'Hard': return 14;
+            default: return 5;
         }
     }
     
     const generateCrossword = () => {
         setIsLoading(true);
-    
         const size = 15;
 
         const { grid, placedWords } = buildCrossword(size, wordsList, getWordCount(difficulty as string));
@@ -61,8 +57,38 @@ export default function CrosswordGame2() {
         setGrid(grid);
         setPlacedWords(placedWords);
         setWordsToFind(placedWords);
-    
         setIsLoading(false);
+    };
+
+    const handleCellPress = (row: number, col: number) => {
+        setActiveCell({ row, col });
+    };
+
+    const handleGuessSubmit = (guess: string) => {
+        if (!activeCell) return;
+
+        // Find if the guess matches any word in the grid
+        const matchedWord = placedWords.find(word => {
+            const { row, col, direction } = word.startPosition;
+            const wordLength = word.word.length;
+            
+            if (direction === 'horizontal') {
+                return col <= activeCell.col && activeCell.col < col + wordLength && 
+                       row === activeCell.row;
+            } else {
+                return row <= activeCell.row && activeCell.row < row + wordLength && 
+                       col === activeCell.col;
+            }
+        });
+
+        if (matchedWord && guess.toLowerCase() === matchedWord.word.toLowerCase()) {
+            // Add to guessed words if not already there
+            if (!guessedWords.some(w => w.word === matchedWord.word)) {
+                setGuessedWords([...guessedWords, matchedWord]);
+            }
+        }
+        
+        setActiveCell(null);
     };
 
     return (
@@ -72,7 +98,7 @@ export default function CrosswordGame2() {
             ) : (
                 <>
                     <CrosswordHeader
-                        wordsFound={0}
+                        wordsFound={guessedWords.length}
                         totalWords={wordsToFind.length}
                         reset={false}
                     />
@@ -80,12 +106,14 @@ export default function CrosswordGame2() {
                         grid={grid}
                         placedWords={placedWords} 
                         guessedWords={guessedWords}
+                        activeCell={activeCell}
+                        onCellPress={handleCellPress}
+                        onGuessSubmit={handleGuessSubmit}
                     />
                     <CrosswordWords
                         wordsToFind={wordsToFind}
                         guessedWords={guessedWords}
                     />
-                    <Button title="Regenerate" onPress={generateCrossword} />
                 </>
             )}
         </View>
@@ -97,15 +125,5 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         paddingTop: 24,
-    },
-    row: {
-        flexDirection: 'row',
-    },
-    cell: {
-        width: 20,
-        height: 20,
-        textAlign: 'center',
-        borderWidth: 1,
-        borderColor: '#000',
     },
 });
