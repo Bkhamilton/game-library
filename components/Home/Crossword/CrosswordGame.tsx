@@ -4,6 +4,7 @@ import { TouchableOpacity, Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import crosswordBank from '@/data/crosswordBank.json';
 import wordsList from '@/data/wordsList.json';
+import crosswordData from '@/data/crosswordData.json';
 import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
 import { buildCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
@@ -17,6 +18,7 @@ type PlacedWord = {
         col: number;
         direction: 'horizontal' | 'vertical';
     }
+    clue: string;
 }
 
 export default function CrosswordGame2() {
@@ -61,6 +63,13 @@ export default function CrosswordGame2() {
 
         const { grid, placedWords } = buildCrossword(size, wordsList, getWordCount(difficulty as string));
 
+        for (const word of placedWords) {
+            const wordData = crosswordData.find((data) => data.word === word.word);
+            if (wordData) {
+                word.clue = wordData.clue;
+            }
+        }
+
         setGrid(grid);
         setPlacedWords(placedWords);
         setWordsToFind(placedWords);
@@ -86,6 +95,7 @@ export default function CrosswordGame2() {
                     />
                     <CrosswordWords
                         wordsToFind={wordsToFind}
+                        guessedWords={guessedWords}
                     />
                     <Button title="Regenerate" onPress={generateCrossword} />
                 </>

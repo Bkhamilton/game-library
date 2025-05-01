@@ -10,13 +10,15 @@ type PlacedWord = {
         col: number;
         direction: 'horizontal' | 'vertical';
     }
+    clue: string;
 }
 
 interface CrosswordWordsProps {
     wordsToFind: PlacedWord[];
+    guessedWords: PlacedWord[];
 }
 
-export default function CrosswordWords({ wordsToFind } : CrosswordWordsProps) {
+export default function CrosswordWords({ wordsToFind, guessedWords } : CrosswordWordsProps) {
     
     const getStartingPositionIndex = (row : number, col: number) => {
         return wordsToFind.findIndex(({ startPosition }) => startPosition.row === row && startPosition.col === col);
@@ -26,7 +28,7 @@ export default function CrosswordWords({ wordsToFind } : CrosswordWordsProps) {
         <ScrollView style={{ flex: 1, padding: 10, width: '100%' }} contentContainerStyle={{ flexGrow: 1 }}>
             {wordsToFind.map((word, index) => (
                 <View key={index} style={{ marginVertical: 2, padding: 8 }}>
-                    <Text style={{ fontWeight: 'bold' }}>{`${index + 1}. `} {word.word}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>{`${index + 1}. `} {word.clue}</Text>
                 </View>
             ))}
         </ScrollView>
