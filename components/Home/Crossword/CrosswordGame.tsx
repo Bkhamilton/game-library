@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ActivityIndicator, Button } from 'react-native';
-import { TouchableOpacity, Text, View } from '@/components/Themed';
-import useTheme from '@/hooks/useTheme';
-import crosswordBank from '@/data/crosswordBank.json';
+import { View } from '@/components/Themed';
 import wordsList from '@/data/wordsList.json';
 import crosswordData from '@/data/crosswordData.json';
 import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
@@ -33,14 +31,6 @@ export default function CrosswordGame2() {
         generateCrossword();
     }, []);
 
-    const shuffle = (array: any[]) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
     const getWordCount = (difficulty: string) => {
         switch (difficulty) {
             case 'Easy':
@@ -58,8 +48,6 @@ export default function CrosswordGame2() {
         setIsLoading(true);
     
         const size = 15;
-
-        const bank = crosswordBank;
 
         const { grid, placedWords } = buildCrossword(size, wordsList, getWordCount(difficulty as string));
 
