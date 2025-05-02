@@ -73,6 +73,12 @@ export default function CrosswordGrid({
         setShowInputModal(false);
     };
 
+    const handleCellPress = (rowIndex, colIndex, cell, isGuessed) => {
+        if (cell !== '' && !isGuessed) {
+            onCellPress(rowIndex, colIndex);
+        }
+    };
+
     return (
         <View style={styles.gridContainer}>
             {grid.map((row, rowIndex) => (
@@ -86,7 +92,7 @@ export default function CrosswordGrid({
                         return (
                             <Pressable
                                 key={colIndex}
-                                onPress={() => !isGuessed && onCellPress(rowIndex, colIndex)}
+                                onPress={() => handleCellPress(rowIndex, colIndex, cell, isGuessed)}
                                 style={[
                                     styles.cell,
                                     { 

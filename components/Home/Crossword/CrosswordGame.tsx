@@ -34,6 +34,8 @@ export default function CrosswordGame() {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [endGameResult, setEndGameResult] = useState<boolean>(false);
 
+    const [wrongCount, setWrongCount] = useState(0);
+
     const { db, curGame } = useContext(DBContext);
 
     const handleWin = () => {
@@ -107,6 +109,22 @@ export default function CrosswordGame() {
                 setGuessedWords([...guessedWords, matchedWord]);
             }
         }
+
+        // Check if all words have been guessed
+        if (guessedWords.length + 1 === wordsToFind.length) {
+            handleWin();
+        }
+
+        // Check if the guess is incorrect
+        if (matchedWord && guess.toLowerCase() !== matchedWord.word.toLowerCase()) {
+            setWrongCount(prevCount => prevCount + 1);
+        }
+
+        // Check if the wrong count exceeds 4
+        if (wrongCount >= 4) {
+            handleLoss();
+        }
+
         
         setActiveCell(null);
     };
@@ -134,6 +152,7 @@ export default function CrosswordGame() {
             ) : (
                 <>
                     <CrosswordHeader
+                        wrongCount={wrongCount}
                         wordsFound={guessedWords.length}
                         totalWords={wordsToFind.length}
                         reset={false}

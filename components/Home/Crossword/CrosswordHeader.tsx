@@ -5,17 +5,18 @@ import useTheme from '@/hooks/useTheme';
 import Timer from '../Helpers/Timer';
 
 interface CrosswordHeaderProps {
+    wrongCount: number;
     wordsFound: number;
     totalWords: number;
     reset: boolean;
 }
 
-export default function CrosswordHeader({ wordsFound, totalWords, reset }: CrosswordHeaderProps) {
+export default function CrosswordHeader({ wrongCount, wordsFound, totalWords, reset }: CrosswordHeaderProps) {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
                 <View>
-
+                    <Text style={{ fontSize: 16 }}>{wrongCount}/4</Text>
                 </View>
                 <Timer 
                     isActive={true}
