@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, ActivityIndicator } from 'react-native';
 import { View } from '@/components/Themed';
 import wordsList from '@/data/wordsList.json';
@@ -8,6 +8,9 @@ import { buildCrossword } from '@/utils/CrosswordGenerator';
 import { useLocalSearchParams } from "expo-router";
 import CrosswordHeader from './CrosswordHeader';
 import CrosswordWords from './CrosswordWords';
+import EndGameMessage from '@/components/Modals/EndGameMessage';
+import { DBContext } from '@/contexts/DBContext';
+import { insertWin, insertLoss } from '@/db/Scores/Scores';
 
 type PlacedWord = {
     word: string;
@@ -27,6 +30,23 @@ export default function CrosswordGame() {
     const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]); 
     const [guessedWords, setGuessedWords] = useState<PlacedWord[]>([]);
     const [activeCell, setActiveCell] = useState<{row: number, col: number} | null>(null);
+
+    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+    const [endGameResult, setEndGameResult] = useState<boolean>(false);
+
+    const { db, curGame } = useContext(DBContext);
+
+    const handleWin = () => {
+        insertWin(db, curGame && curGame.id, difficulty);
+        setEndGameResult(true);
+        setEndGameModalVisible(true);
+    }
+
+    const handleLoss = () => {
+        insertLoss(db, curGame && curGame.id, difficulty);
+        setEndGameResult(false);
+        setEndGameModalVisible(true);
+    }
 
     useEffect(() => {
         generateCrossword();
@@ -91,8 +111,24 @@ export default function CrosswordGame() {
         setActiveCell(null);
     };
 
+    const restartGame = () => {
+        setGrid([]);
+        setPlacedWords([]);
+        setGuessedWords([]);
+        setActiveCell(null);
+        generateCrossword();
+    };
+
     return (
         <View style={styles.container}>
+            <EndGameMessage 
+                visible={endGameModalVisible} 
+                close={() => setEndGameModalVisible(false)} 
+                win={endGameResult} 
+                game={curGame} 
+                initialDifficulty={difficulty} 
+                restartGame={restartGame}
+            />
             {isLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
