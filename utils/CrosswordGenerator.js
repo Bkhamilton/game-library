@@ -106,6 +106,14 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
         return placedWords.some(({ startPosition }) => startPosition.row === row && startPosition.col === col);
     };
 
+    // function to check if a row, column, and direction is already occupied by another word
+    const isOccupied = (row, col, direction) => {
+        return placedWords.some(({ startPosition }) => {
+            const { row: startRow, col: startCol, direction: wordDirection } = startPosition;
+            return row === startRow && col === startCol && direction === wordDirection;
+        });
+    };
+
     // Step 2: Grab all words from the wordbank that contain that letter
     const viableWords = getViableWords(wordBank, newCharacter.viableLetter);
     const shuffledWords = shuffle(viableWords);
@@ -140,10 +148,18 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
                 }
             }
             if (canPlaceHorizontally) {
+                startPosition = { row: viableRow, col: viableCol - letterIndex, direction: 'horizontal' };
+                // check if startPosition is already occupied by another word
+                if (isOccupied(startPosition.row, startPosition.col, startPosition.direction)) {
+                    canPlaceHorizontally = false;
+                }
+                if (!canPlaceHorizontally) {
+                    continue;
+                }
+                // Place the word in the grid
                 for (let i = 0; i < word.length; i++) {
                     grid[viableRow][viableCol - letterIndex + i] = word[i];
                 }
-                startPosition = { row: viableRow, col: viableCol - letterIndex, direction: 'horizontal' };
                 return { grid, placedWord: word, startPosition };
             }
         }
@@ -172,10 +188,19 @@ export const placeSubsequentWords = (grid, wordBank, placedWords) => {
                 }
             }
             if (canPlaceVertically) {
+                startPosition = { row: viableRow - letterIndex, col: viableCol, direction: 'vertical' };
+                // check if startPosition is already occupied by another word
+                if (isOccupied(startPosition.row, startPosition.col, startPosition.direction)) {
+                    canPlaceVertically = false;
+                }
+                if (!canPlaceVertically) {
+                    continue;
+                }
+                // Place the word in the grid
                 for (let i = 0; i < word.length; i++) {
                     grid[viableRow - letterIndex + i][viableCol] = word[i];
                 }
-                startPosition = { row: viableRow - letterIndex, col: viableCol, direction: 'vertical' };
+
                 return { grid, placedWord: word, startPosition };
             }
         }

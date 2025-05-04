@@ -129,6 +129,12 @@ export default function CrosswordGame() {
         setActiveCell(null);
     };
 
+    const handleCluePress = (word: PlacedWord) => {
+        // Find the first cell of the word to focus on
+        const { row, col } = word.startPosition;
+        setActiveCell({ row, col });
+    };
+
     const restartGame = () => {
         setGrid([]);
         setPlacedWords([]);
@@ -168,6 +174,7 @@ export default function CrosswordGame() {
                     <CrosswordWords
                         wordsToFind={wordsToFind}
                         guessedWords={guessedWords}
+                        onCluePress={handleCluePress}
                     />
                 </>
             )}
