@@ -80,7 +80,7 @@ export const getHighestScore = async (db) => {
 // Function to get fastest time of any game
 export const getFastestTime = async (db) => {
     try {
-        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "time" ORDER BY score ASC LIMIT 1');
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "timeScore" ORDER BY score ASC LIMIT 1');
         return allRows.length > 0 ? allRows[0].score : '0:00';
     } catch (error) {
         console.error('Error getting fastest time:', error);
