@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { View } from '@/components/Themed';
 import { WORD_POOLS } from "@/data/wordSearchWords";
 import { initializeGrid } from "@/utils/WordSearchGenerator";
 import { useLocalSearchParams } from "expo-router";
