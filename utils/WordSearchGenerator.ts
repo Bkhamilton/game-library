@@ -5,7 +5,7 @@ export type Cell = {
     selected: boolean,
     partOfWord: boolean,
     isFound: boolean,
-    partOfFoundWord?: boolean,
+    partOfFoundWord: boolean,
     wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left",
 };
 
@@ -119,6 +119,7 @@ export const initializeGrid = (gridSize: number, words: string[]): Cell[][] => {
                     selected: false,
                     partOfWord: false,
                     isFound: false,
+                    partOfFoundWord: false,
                 };
             }
         }

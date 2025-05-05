@@ -85,7 +85,6 @@ export default function WordSearchGame() {
         setWordBank(selectedWords);
         setActiveWords(selectedWords);
 
-        console.log("Selected Words:", selectedWords); // Debug log
         const newGrid = initializeGrid(settings.gridSize, selectedWords);
         setGrid(newGrid);
     };
