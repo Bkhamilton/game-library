@@ -31,6 +31,16 @@
     },
     {
         "id": 4,
+        "title": "First Crossword Win",
+        "description": "Win your first game of Crossword",
+        "criteria": {
+            "game": "Crossword",
+            "metric" : "result",
+            "threshold": 1
+        }
+    },
+    {
+        "id": 5,
         "title": "Score a 10 in Ostrich Haul",
         "description": "Score a 10 in Ostrich Haul",
         "criteria": {
@@ -40,7 +50,7 @@
         }
     },
     {
-        "id": 5,
+        "id": 6,
         "title": "Score a 10 in GoGoBird",
         "description": "Score a 10 in GoGoBird",
         "criteria": {

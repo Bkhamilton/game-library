@@ -2,14 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet } from 'react-native';
 import { TouchableOpacity, Text, View } from '@/components/Themed';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
-import useTheme from '@/hooks/useTheme';
 import { DBContext } from '@/contexts/DBContext';
 import ProgressBar from '@/components/Helpers/ProgressBar';
 import achievements from '@/data/achievements.json';
 import { checkForAchievement } from '@/db/Scores/Results';
 
 interface AchievementBoxProps {
-    icon: JSX.Element;
+    icon: React.ReactNode;
     title: string;
     description: string;
     segment: number;
