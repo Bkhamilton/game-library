@@ -128,7 +128,7 @@ export const initializeGrid = (gridSize: number, words: string[]): Cell[][] => {
 };
 
 // Update placeWord function to use dynamic gridSize
-export const placeWord = (grid, word, gridSize) => {
+export const placeWord = (grid: Cell[][], word: string, gridSize: number) => {
     let placed = false;
     let attempts = 0;
     const maxAttempts = 100;

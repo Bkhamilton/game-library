@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { WORD_POOLS } from "@/data/wordSearchWords";
@@ -8,32 +8,10 @@ import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
-import { insertWin, insertLoss } from '@/db/Scores/Scores';
-
-const getRandomColor = () => {
-    const colors = [
-        "#FF6B6B", // Red
-        "#4ECDC4", // Turquoise
-        "#45B7D1", // Light Blue
-        "#96CEB4", // Sage Green
-        "#D4A5A5", // Dusty Rose
-        "#9B59B6", // Purple
-        "#3498DB", // Blue
-        "#E67E22", // Orange
-        "#16A085", // Green
-        "#F39C12", // Yellow
-        "#D35400", // Pumpkin
-        "#8E44AD", // Dark Purple
-        "#2980B9", // Dark Blue
-        "#C0392B", // Dark Red
-        "#27AE60", // Dark Green
-        "#F1C40F", // Dark Yellow
-        "#7F8C8D", // Dark Gray
-        "#34495E", // Dark Blue Gray
-        "#2C3E50", // Dark Gray
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-};
+import { insertWin, insertTimeScore } from '@/db/Scores/Scores';
+import { getStrikethroughStyle, getRandomColor } from "@/utils/wordSearch";
+import WordSearchHeader from "./WordSearchHeader";
+import WordSearchWords from "./WordSearchWords";
 
 interface Cell {
     letter: string;
@@ -64,6 +42,12 @@ export default function WordSearchGame() {
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
+    const [gameTime, setGameTime] = useState(0);
+
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
+
     const { db, curGame } = useContext(DBContext);
 
     const router = useRouter();
@@ -76,7 +60,8 @@ export default function WordSearchGame() {
     };
 
     const handleWin = () => {
-        insertWin(db, curGame && curGame.id, difficulty);
+        insertWin(db, curGame?.id, difficulty);
+        insertTimeScore(db, curGame?.id, gameTime, difficulty);
         setIsGameComplete(true);
         setEndGameModalVisible(true);        
     }
@@ -141,71 +126,13 @@ export default function WordSearchGame() {
         }
     };
 
-    const getStrikethroughStyle = (direction?: string, color?: string) => {
-        const baseStyle = {
-            position: "absolute",
-            backgroundColor: color || "#4CAF50",
-            opacity: 0.7,
-        };
-
-        switch (direction) {
-            case "vertical":
-                return {
-                    ...baseStyle,
-                    width: 3,
-                    top: -5,
-                    bottom: -5,
-                    left: "50%",
-                    transform: [{ translateX: -1.5 }],
-                };
-            case "diagonal-right":
-                return {
-                    ...baseStyle,
-                    height: 3,
-                    width: "141%", // √2 * 100% to cover diagonal
-                    top: "50%",
-                    left: "-20%",
-                    transform: [{ translateY: -1.5 }, { rotate: "45deg" }],
-                };
-            case "diagonal-left":
-                return {
-                    ...baseStyle,
-                    height: 3,
-                    width: "141%", // √2 * 100% to cover diagonal
-                    top: "50%",
-                    left: "-20%",
-                    transform: [{ translateY: -1.5 }, { rotate: "-45deg" }],
-                };
-            default: // horizontal
-                return {
-                    ...baseStyle,
-                    height: 3,
-                    left: -5,
-                    right: -5,
-                    top: "50%",
-                    transform: [{ translateY: -1.5 }],
-                };
-        }
-    };
-
     return (
-        <View style={[styles.container]}>
-            <View style={styles.wordBank}>
-                {wordBank.map((word) => (
-                    <Text
-                        key={word}
-                        style={[
-                            styles.word,
-                            foundWords.includes(word) && {
-                                ...styles.foundWord,
-                                color: wordColors[word] || "green",
-                            },
-                        ]}
-                    >
-                        {word}
-                    </Text>
-                ))}
-            </View>
+        <View style={styles.container}>
+            <WordSearchHeader 
+                wordCount={wordBank.length} 
+                foundWords={foundWords.length} 
+                onTimeUpdate={handleTimeUpdate} 
+            />
             <View style={[styles.grid, { borderWidth: 5, borderColor: primary }]}>
                 {grid.map((row, i) => (
                     <View key={i} style={[styles.row, { borderWidth: 1, borderColor: primary }]}>
@@ -227,6 +154,11 @@ export default function WordSearchGame() {
                     </View>
                 ))}
             </View>
+            <WordSearchWords
+                wordBank={wordBank}
+                foundWords={foundWords}
+                wordColors={wordColors}
+            />
             <View style={[{ alignItems: "center" }]}>
                 <TouchableOpacity
                     onPress={() => {
@@ -251,8 +183,9 @@ export default function WordSearchGame() {
 
 const styles = StyleSheet.create({
     container: {
-        width: "auto",
-        height: "100%",
+        flex: 1,
+        alignItems: "center",
+        paddingTop: 24,
     },
     wordBank: {
         flexDirection: "row",
@@ -279,6 +212,7 @@ const styles = StyleSheet.create({
     },
     grid: {
         alignItems: "center",
+        justifyContent: "center",
     },
     row: {
         flexDirection: "row",
