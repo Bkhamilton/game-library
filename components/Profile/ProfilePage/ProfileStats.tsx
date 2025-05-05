@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet } from 'react-native';
 import { DBContext } from '@/contexts/DBContext';
-import { TouchableOpacity, Text, View, ClearView } from '@/components/Themed';
+import { Text, View, ClearView } from '@/components/Themed';
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
 import { getStatByTitle } from '@/db/Scores/Results'
 
 interface StatBoxProps {
-    icon: JSX.Element;
+    icon: React.ReactNode;
     title: string;
 }
 
