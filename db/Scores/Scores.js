@@ -54,6 +54,17 @@ export const insertLoss = async (db, gameId, difficulty) => {
     await insertResult(db, gameId, 0, difficulty);
 }
 
+// Function to insert a time score
+export const insertTimeScore = async (db, gameId, time, difficulty) => {
+    try {
+        const metric = 'timeScore';
+        await insertScore(db, gameId, time, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting time score:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {
