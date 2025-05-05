@@ -7,7 +7,7 @@ import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -58,7 +58,7 @@ export default function SudokuGame() {
             handleWin();
         }
         // Check if the board is lost
-        if (wrongCount >= 4 && !lossModalShown) {
+        if (wrongCount >= 3 && !lossModalShown) {
             handleLoss();
         }
     };
@@ -87,7 +87,7 @@ export default function SudokuGame() {
     const restartGame = (difficulty: string) => {
         setWrongCount(0);
         setLossModalShown(false);
-        router.push(`/sudoku?difficulty=${difficulty}`);
+        router.replace(`/sudoku?difficulty=${difficulty}`);
     }
 
     return (

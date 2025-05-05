@@ -50,7 +50,7 @@ export default function MineSweeperGame() {
     const [isActive, setIsActive] = useState(true);
 
     const restartGame = (difficulty: string) => {
-        router.push(`/minesweeper?difficulty=${difficulty}`);
+        router.replace(`/minesweeper?difficulty=${difficulty}`);
         setTrigger(!trigger);
     };
 

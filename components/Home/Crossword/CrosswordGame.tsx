@@ -121,7 +121,7 @@ export default function CrosswordGame() {
         }
 
         // Check if the wrong count exceeds 4
-        if (wrongCount >= 4) {
+        if (wrongCount >= 3) {
             handleLoss();
         }
 

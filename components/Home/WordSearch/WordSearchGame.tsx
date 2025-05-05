@@ -69,7 +69,7 @@ export default function WordSearchGame() {
     const router = useRouter();
 
     const restartGame = (difficulty: string) => {
-        router.push(`/wordSearch?difficulty=${difficulty}`);
+        router.replace(`/wordSearch?difficulty=${difficulty}`);
         setTrigger(!trigger);
         initializeGameWithDifficulty(difficulty as Difficulty);
         setFoundWords([]);
