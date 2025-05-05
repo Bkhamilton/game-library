@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
@@ -22,16 +22,23 @@ export default function SudokuGame() {
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
 
+    const [gameTime, setGameTime] = useState(0); // Track game time
+
     const { db, curGame } = useContext(DBContext);
 
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
+
     const handleWin = () => {
-        insertWin(db, curGame && curGame.id, difficulty);
+        insertWin(db, curGame!.id, difficulty);
+        insertTimeScore(db, curGame!.id, gameTime, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
 
     const handleLoss = () => {
-        insertLoss(db, curGame && curGame.id, difficulty);
+        insertLoss(db, curGame!.id, difficulty);
         setEndGameResult(false);
         setEndGameModalVisible(true);
         setLossModalShown(true);
@@ -94,6 +101,7 @@ export default function SudokuGame() {
         <View style={styles.container}>
             <SudokuHeader 
                 wrongCount={wrongCount}
+                onTimeUpdate={handleTimeUpdate}
             />
             <SudokuBoard 
                 board={board} 

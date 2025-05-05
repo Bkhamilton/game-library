@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { StyleSheet, ActivityIndicator } from 'react-native';
 import { View } from '@/components/Themed';
 import wordsList from '@/data/wordsList.json';
@@ -10,7 +10,7 @@ import CrosswordHeader from './CrosswordHeader';
 import CrosswordWords from './CrosswordWords';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
 
 type PlacedWord = {
     word: string;
@@ -34,12 +34,19 @@ export default function CrosswordGame() {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [endGameResult, setEndGameResult] = useState<boolean>(false);
 
+    const [gameTime, setGameTime] = useState(0); // Track game time
+
     const [wrongCount, setWrongCount] = useState(0);
 
     const { db, curGame } = useContext(DBContext);
 
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
+
     const handleWin = () => {
         insertWin(db, curGame && curGame.id, difficulty);
+        insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
@@ -161,7 +168,7 @@ export default function CrosswordGame() {
                         wrongCount={wrongCount}
                         wordsFound={guessedWords.length}
                         totalWords={wordsToFind.length}
-                        reset={false}
+                        onTimeUpdate={handleTimeUpdate}
                     />
                     <CrosswordGrid 
                         grid={grid}

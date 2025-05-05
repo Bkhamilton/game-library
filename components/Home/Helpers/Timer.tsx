@@ -4,28 +4,36 @@ import { Text, View } from '@/components/Themed';
 interface TimerProps {
     isActive: boolean;
     reset: boolean;
+    onTimeUpdate?: (seconds: number) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ isActive, reset }) => {
+const Timer: React.FC<TimerProps> = ({ isActive, reset, onTimeUpdate }) => {
     const [seconds, setSeconds] = useState(0);
-
-    useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-        if (isActive) {
-            interval = setInterval(() => {
-                setSeconds((prevSeconds) => prevSeconds + 1);
-            }, 1000);
-        } else if (!isActive && seconds !== 0) {
-            clearInterval(interval!);
-        }
-        return () => clearInterval(interval!);
-    }, [isActive, seconds]);
 
     useEffect(() => {
         if (reset) {
             setSeconds(0);
         }
     }, [reset]);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout | number | null = null;
+        if (isActive) {
+            interval = setInterval(() => {
+                setSeconds(prevSeconds => prevSeconds + 1);
+            }, 1000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isActive]);
+
+    useEffect(() => {
+        // Notify parent of time changes in a separate effect
+        if (onTimeUpdate) {
+            onTimeUpdate(seconds);
+        }
+    }, [seconds, onTimeUpdate]);
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);

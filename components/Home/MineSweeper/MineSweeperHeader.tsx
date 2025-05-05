@@ -8,9 +8,10 @@ interface MineSweeperHeaderProps {
     minesCount: number;
     gameState: string;
     trigger: boolean;
+    onTimeUpdate?: (seconds: number) => void;
 }
 
-export default function MineSweeperHeader({ minesCount, gameState, trigger }: MineSweeperHeaderProps) {
+export default function MineSweeperHeader({ minesCount, gameState, trigger, onTimeUpdate }: MineSweeperHeaderProps) {
 
     const [isActive, setIsActive] = useState(true);
 
@@ -29,6 +30,7 @@ export default function MineSweeperHeader({ minesCount, gameState, trigger }: Mi
                 <Timer 
                     isActive={isActive}
                     reset={trigger}
+                    onTimeUpdate={onTimeUpdate} // Pass through the callback
                 />
                 <View>
                     <Text style={{ fontSize: 16 }}>{minesCount}</Text>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
@@ -6,17 +6,18 @@ import Timer from '../Helpers/Timer';
 
 interface SudokuHeaderProps {
     wrongCount: number;
+    onTimeUpdate?: (seconds: number) => void; // Add this prop
 }
 
-export default function SudokuHeader({ wrongCount }: SudokuHeaderProps) {
+export default function SudokuHeader({ wrongCount, onTimeUpdate }: SudokuHeaderProps) {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
-                <View>
-
-                </View>
+                <View></View>
                 <Timer 
                     isActive={true}
+                    reset={false}
+                    onTimeUpdate={onTimeUpdate} // Pass through the callback
                 />
                 <View>
                     <Text style={{ fontSize: 16 }}>{wrongCount}/4</Text>

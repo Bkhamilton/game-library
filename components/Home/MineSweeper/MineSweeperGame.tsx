@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "@/components/Themed";
 import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize, createBoard, initializeBoardWithFirstClick } from "@/utils/MineSweeperGenerator";
@@ -9,7 +9,7 @@ import MineSweeperHeader from "./MineSweeperHeader";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
-import { insertWin, insertLoss } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -47,7 +47,11 @@ export default function MineSweeperGame() {
 
     const { db, curGame } = useContext(DBContext);
 
-    const [isActive, setIsActive] = useState(true);
+    const [gameTime, setGameTime] = useState(0);
+
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
 
     const restartGame = (difficulty: string) => {
         router.replace(`/minesweeper?difficulty=${difficulty}`);
@@ -64,19 +68,18 @@ export default function MineSweeperGame() {
     }, [difficulty, trigger]);
 
     const handleWin = () => {
-        insertWin(db, curGame && curGame.id, difficulty);
+        insertWin(db, curGame!.id, difficulty);
+        insertTimeScore(db, curGame!.id, gameTime, difficulty);
         setGameState("won");
         setEndGameResult(true);
         setEndGameModalVisible(true);
-        setIsActive(false);
     }
 
     const handleLoss = () => {
-        insertLoss(db, curGame && curGame.id, difficulty);
+        insertLoss(db, curGame!.id, difficulty);
         setGameState("lost");
         setEndGameResult(false);
         setEndGameModalVisible(true);
-        setIsActive(false);
     }
 
     const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
@@ -147,6 +150,7 @@ export default function MineSweeperGame() {
                 minesCount={minesCount} 
                 gameState={gameState} 
                 trigger={trigger}
+                onTimeUpdate={handleTimeUpdate}
             />
             <View style={[styles.board, { borderColor: primary }]}>
                 {board.map((row, rowIndex) => (

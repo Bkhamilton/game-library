@@ -8,10 +8,10 @@ interface CrosswordHeaderProps {
     wrongCount: number;
     wordsFound: number;
     totalWords: number;
-    reset: boolean;
+    onTimeUpdate?: (seconds: number) => void;
 }
 
-export default function CrosswordHeader({ wrongCount, wordsFound, totalWords, reset }: CrosswordHeaderProps) {
+export default function CrosswordHeader({ wrongCount, wordsFound, totalWords, onTimeUpdate }: CrosswordHeaderProps) {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
@@ -20,7 +20,8 @@ export default function CrosswordHeader({ wrongCount, wordsFound, totalWords, re
                 </View>
                 <Timer 
                     isActive={true}
-                    reset={reset}
+                    reset={false}
+                    onTimeUpdate={onTimeUpdate} // Pass through the callback
                 />
                 <View>
                     <Text style={{ fontSize: 16 }}>{wordsFound}/{totalWords}</Text>
