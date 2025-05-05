@@ -1,4 +1,5 @@
 import { getGameIdByTitle } from "../Games/Games";
+import { formatTime } from '@/utils/helpers';
 
 // Function to get all scores
 export const getScores = async (db) => {
@@ -81,7 +82,7 @@ export const getHighestScore = async (db) => {
 export const getFastestTime = async (db) => {
     try {
         const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = "timeScore" ORDER BY score ASC LIMIT 1');
-        return allRows.length > 0 ? allRows[0].score : '0:00';
+        return allRows.length > 0 ? formatTime(allRows[0].score) : '0:00';
     } catch (error) {
         console.error('Error getting fastest time:', error);
         throw error;

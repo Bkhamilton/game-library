@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from '@/components/Themed';
+import { formatTime } from '@/utils/helpers';
 
 interface TimerProps {
     isActive: boolean;
@@ -34,12 +35,6 @@ const Timer: React.FC<TimerProps> = ({ isActive, reset, onTimeUpdate }) => {
             onTimeUpdate(seconds);
         }
     }, [seconds, onTimeUpdate]);
-
-    const formatTime = (seconds: number) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-    };
 
     return (
         <View>

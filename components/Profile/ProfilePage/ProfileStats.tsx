@@ -25,7 +25,7 @@ export default function ProfileStats() {
 
     const getStats = async (title: string) => {
         const stat = await getStatByTitle(db, title);
-        return JSON.stringify(stat);
+        return stat;
     }
 
     const getIcon = (title: string) => {
