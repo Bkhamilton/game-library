@@ -8,6 +8,7 @@ import AccountInfo from '@/components/Profile/Settings/AccountInfo';
 import SettingsOptions from '@/components/Profile/Settings/SettingsOption';
 import AboutModal from '@/components/Modals/AboutModal';
 import HelpModal from '@/components/Modals/HelpModal';
+import ConfirmMessage from '@/components/Modals/ConfirmMessage';
 
 export default function SettingsScreen() {
 
@@ -17,6 +18,8 @@ export default function SettingsScreen() {
 
     const [aboutModalVisible, setAboutModalVisible] = useState(false);
     const [helpModalVisible, setHelpModalVisible] = useState(false);
+    const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+    const [confirmMessage, setConfirmMessage] = useState('');
 
     const closeAboutModal = () => {
         setAboutModalVisible(false);
@@ -26,10 +29,24 @@ export default function SettingsScreen() {
         setHelpModalVisible(false);
     }
 
+    const closeConfirmationModal = () => {
+        setConfirmationModalVisible(false);
+    }
+
+    const onHandleConfirm = () => {
+        setConfirmationModalVisible(false);
+        alert('User data cleared!');
+    }
+
+    const handleConfirmation = (message: string) => {
+        setConfirmMessage(message);
+        setConfirmationModalVisible(true);
+    }
+
     const handleSelect = (option: string) => {
         switch (option) {
             case 'Clear User Data':
-                alert('User data cleared!');
+                handleConfirmation('clear all user data? This action cannot be undone.');
                 break;
             case 'Help':
                 setHelpModalVisible(true);
@@ -54,6 +71,12 @@ export default function SettingsScreen() {
             <HelpModal
                 visible={helpModalVisible}
                 close={closeHelpModal}
+            />
+            <ConfirmMessage
+                visible={confirmationModalVisible}
+                close={closeConfirmationModal}
+                message={confirmMessage}
+                confirm={onHandleConfirm}
             />
             <View style={styles.headerContainer}>
                 <TouchableOpacity
