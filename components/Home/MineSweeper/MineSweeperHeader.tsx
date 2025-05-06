@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { Text, View } from '@/components/Themed';
-import useTheme from '@/hooks/useTheme';
-import Timer from '../Helpers/Timer';
+import { Text } from '@/components/Themed';
+import GameHeader from '../GameHeader/GameHeader';
 
 interface MineSweeperHeaderProps {
     minesCount: number;
@@ -12,7 +10,6 @@ interface MineSweeperHeaderProps {
 }
 
 export default function MineSweeperHeader({ minesCount, gameState, trigger, onTimeUpdate }: MineSweeperHeaderProps) {
-
     const [isActive, setIsActive] = useState(true);
 
     useEffect(() => {
@@ -22,34 +19,11 @@ export default function MineSweeperHeader({ minesCount, gameState, trigger, onTi
     }, [gameState]);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.innerContainer}>
-                <View>
-
-                </View>
-                <Timer 
-                    isActive={isActive}
-                    reset={trigger}
-                    onTimeUpdate={onTimeUpdate} // Pass through the callback
-                />
-                <View>
-                    <Text style={{ fontSize: 16 }}>{minesCount}</Text>
-                </View>
-            </View>
-        </View>
+        <GameHeader
+            rightContent={<Text style={{ fontSize: 16 }}>{minesCount}</Text>}
+            timerActive={isActive}
+            timerReset={trigger}
+            onTimeUpdate={onTimeUpdate}
+        />
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 16,
-    },
-    innerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        paddingHorizontal: 16,
-    },
-});
