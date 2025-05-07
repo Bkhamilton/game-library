@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Modal, TouchableOpacity, Image } from "react-native";
 import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
-import { GameLogos } from "@/constants/Types";
+import { GameLogos } from "@/constants/GameLogos";
 
 export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);

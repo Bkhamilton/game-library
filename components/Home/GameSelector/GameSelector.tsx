@@ -4,7 +4,7 @@ import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
 import { Games } from "@/constants/Types";
-import { GameLogos } from "@/constants/Types";
+import { GameLogos } from "@/constants/GameLogos";
 
 interface GameSelectorProps {
     handleSelectGame: (game: Games) => void;
