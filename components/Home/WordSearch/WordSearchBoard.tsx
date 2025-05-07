@@ -20,7 +20,7 @@ interface WordSearchBoardProps {
 
 const WordSearchBoard: React.FC<WordSearchBoardProps> = ({ grid, handleCellPress }) => {
 
-    const { primary } = useTheme();
+    const { primary, text } = useTheme();
 
     return (
         <View style={[styles.grid, { borderWidth: 5, borderColor: primary }]}>
@@ -37,7 +37,7 @@ const WordSearchBoard: React.FC<WordSearchBoardProps> = ({ grid, handleCellPress
                             ]}
                             onPress={() => handleCellPress(i, j)}
                         >
-                            <Text style={[styles.letter, cell.partOfFoundWord && { color: cell.foundColor }]}>
+                            <Text style={[styles.letter, cell.partOfFoundWord && { color: cell.foundColor }, { color: cell.selected ? primary : text }]}>
                                 {cell.letter}
                             </Text>
                             {cell.partOfFoundWord && (
