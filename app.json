@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hamiltondevelopment.gamelibrary"
+      "bundleIdentifier": "com.hamiltondevelopment.gamelibrary",
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {
