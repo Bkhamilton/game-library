@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Image, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
@@ -12,8 +12,12 @@ interface GameSelectorProps {
 
 const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     const { grayBackground, grayBorder, text, background } = useTheme();
-
     const { games } = useContext(DBContext);
+    
+    const screenWidth = Dimensions.get('window').width;
+    // Use 3 columns for wider screens (tablets), 2 for mobile
+    const columns = screenWidth > 600 ? 3 : 2;
+    const itemWidth = columns === 3 ? "31%" : "48%";
 
     const handleGamePress = (title: Games) => {
         handleSelectGame(title);
@@ -22,10 +26,10 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     return (
         <View style={styles.gameContainer}>
             {games.map((game, index) => (
-                <View key={index} style={styles.gameItem}>
+                <View key={index} style={[styles.gameItem, { width: itemWidth }]}>
                     <TouchableOpacity 
                         onPress={() => handleGamePress(game)}
-                        activeOpacity={0.8}
+                        activeOpacity={0.7}
                         style={[
                             styles.gameCard,
                             { 
@@ -59,51 +63,52 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: 12,
-        paddingTop: 8,
+        paddingHorizontal: 16,
+        paddingTop: 12,
     },
     gameItem: {
-        width: "48%",
-        marginBottom: 16,
+        marginBottom: 20,
     },
     gameCard: {
-        borderRadius: 12,
+        borderRadius: 16,
         overflow: "hidden",
-        borderWidth: 1,
-        elevation: 4, // Android shadow
+        borderWidth: 1.5,
+        elevation: 6, // Android shadow
         shadowColor: "#000", // iOS shadow
         shadowOffset: {
             width: 0,
-            height: 2,
+            height: 3,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
     },
     gameImageBackground: {
         width: "100%",
-        height: 180,
+        height: 200,
         justifyContent: "flex-end",
     },
     gameImage: {
-        borderRadius: 12,
+        borderRadius: 16,
         resizeMode: "cover",
     },
     gradientOverlay: {
         ...StyleSheet.absoluteFillObject,
-        opacity: 0.6,
+        opacity: 0.65,
     },
     gameInfo: {
-        padding: 12,
+        padding: 14,
         backgroundColor: "transparent",
     },
     gameTitle: {
-        fontSize: 18,
+        fontSize: 19,
         fontWeight: "bold",
-        marginBottom: 4,
+        marginBottom: 6,
+        letterSpacing: 0.3,
     },
     gameDescription: {
-        fontSize: 12,
-        opacity: 0.8,
+        fontSize: 13,
+        opacity: 0.85,
+        lineHeight: 18,
     },
 });
 
