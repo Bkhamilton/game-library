@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
@@ -11,9 +11,13 @@ interface GameSelectorProps {
 }
 
 const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
-    const { grayBackground } = useTheme();
-
+    const { grayBackground, grayBorder, text, background } = useTheme();
     const { games } = useContext(DBContext);
+    
+    const screenWidth = Dimensions.get('window').width;
+    // Use 3 columns for wider screens (tablets), 2 for mobile
+    const columns = screenWidth > 600 ? 3 : 2;
+    const itemWidth = columns === 3 ? "31%" : "48%";
 
     const handleGamePress = (title: Games) => {
         handleSelectGame(title);
@@ -22,12 +26,31 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     return (
         <View style={styles.gameContainer}>
             {games.map((game, index) => (
-                <View key={index} style={styles.gameItem}>
-                    <TouchableOpacity onPress={() => handleGamePress(game)}>
-                        <View style={[styles.gameIcon, { backgroundColor: grayBackground }]}>
-                            <Image source={GameLogos[game.title as keyof typeof GameLogos]} style={styles.gameLogo} />
-                        </View>
-                        <Text style={styles.gameTitle}>{game.title}</Text>
+                <View key={index} style={[styles.gameItem, { width: itemWidth }]}>
+                    <TouchableOpacity 
+                        onPress={() => handleGamePress(game)}
+                        activeOpacity={0.7}
+                        style={[
+                            styles.gameCard,
+                            { 
+                                backgroundColor: grayBackground,
+                                borderColor: grayBorder,
+                            }
+                        ]}
+                    >
+                        <ImageBackground 
+                            source={GameLogos[game.title as keyof typeof GameLogos]} 
+                            style={styles.gameImageBackground}
+                            imageStyle={styles.gameImage}
+                        >
+                            <View style={[styles.gradientOverlay, { backgroundColor: `${background}CC` }]} />
+                            <View style={styles.gameInfo}>
+                                <Text style={[styles.gameTitle, { color: text }]}>{game.title}</Text>
+                                <Text style={[styles.gameDescription, { color: text }]} numberOfLines={2}>
+                                    {game.description}
+                                </Text>
+                            </View>
+                        </ImageBackground>
                     </TouchableOpacity>
                 </View>
             ))}
@@ -36,34 +59,56 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
 };
 
 const styles = StyleSheet.create({
-    scrollViewContent: {
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-    },
-    gameLogo: {
-        height: 100,
-        width: 100,
-        borderRadius: 8,
-    },
     gameContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
+        paddingHorizontal: 16,
+        paddingTop: 12,
     },
     gameItem: {
-        width: "48%", // Adjust the width to fit two items per row with some spacing
-        alignItems: "center",
-        marginVertical: 10,
+        marginBottom: 20,
     },
-    gameIcon: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
+    gameCard: {
+        borderRadius: 16,
+        overflow: "hidden",
+        borderWidth: 1.5,
+        elevation: 6, // Android shadow
+        shadowColor: "#000", // iOS shadow
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+    },
+    gameImageBackground: {
+        width: "100%",
+        height: 200,
+        justifyContent: "flex-end",
+    },
+    gameImage: {
+        borderRadius: 16,
+        resizeMode: "cover",
+    },
+    gradientOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        opacity: 0.65,
+    },
+    gameInfo: {
+        padding: 14,
+        backgroundColor: "transparent",
     },
     gameTitle: {
-        marginTop: 10,
-        fontSize: 16,
-        textAlign: "center",
+        fontSize: 19,
+        fontWeight: "bold",
+        marginBottom: 6,
+        letterSpacing: 0.3,
+    },
+    gameDescription: {
+        fontSize: 13,
+        opacity: 0.85,
+        lineHeight: 18,
     },
 });
 
