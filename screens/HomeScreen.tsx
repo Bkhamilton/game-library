@@ -41,6 +41,10 @@ export default function HomeScreen() {
                 return router.push(`/minesweeper?difficulty=${difficulty}`);
             case "GoGoBird":
                 return router.push(`/gogobird?difficulty=${difficulty}`);
+            case "2048":
+                return router.push(`/2048?difficulty=${difficulty}`);
+            case "Memory Match":
+                return router.push(`/memorymatch?difficulty=${difficulty}`);
             default:
                 return "";
         }

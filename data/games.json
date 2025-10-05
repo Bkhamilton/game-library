@@ -28,5 +28,15 @@
         "id": 6,
         "title": "GoGoBird",
         "description": "An action game where you control a bird to avoid obstacles."
+    },
+    {
+        "id": 7,
+        "title": "2048",
+        "description": "Combine tiles to reach 2048"
+    },
+    {
+        "id": 9,
+        "title": "Memory Match",
+        "description": "Find matching pairs of cards"
     }
 ]

@@ -4,6 +4,8 @@ import wordSearchLogo from "@/assets/images/gamelogo/wordSearchLogo.jpg";
 import ostrichHaulLogo from "@/assets/images/gamelogo/ostrichHaulLogo.jpg";
 import crosswordLogo from "@/assets/images/gamelogo/crosswordLogo.jpg";
 import minesweeperLogo from "../assets/images/gamelogo/minesweeperLogo.jpg";
+import twoZeroFourEightLogo from "@/assets/images/gamelogo/2048Logo.jpg";
+import memoryMatchLogo from "@/assets/images/gamelogo/memoryMatchLogo.jpg";
 
 export const GameLogos = {
     Sudoku: sudokuLogo,
@@ -12,4 +14,6 @@ export const GameLogos = {
     "Ostrich Haul": ostrichHaulLogo,
     Crossword: crosswordLogo,
     Minesweeper: minesweeperLogo,
+    "2048": twoZeroFourEightLogo,
+    "Memory Match": memoryMatchLogo,
 };
