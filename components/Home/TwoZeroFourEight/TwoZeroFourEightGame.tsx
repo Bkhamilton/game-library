@@ -79,17 +79,17 @@ export default function TwoZeroFourEightGame() {
 
     const handleWin = (finalScore: number) => {
         if (db && curGame) {
-            insertWin(db, curGame.id, difficulty);
-            insertHighScore(db, curGame.id, finalScore, difficulty);
-            insertTimeScore(db, curGame.id, gameTime, difficulty);
+            insertWin(db, curGame.id, String(difficulty || 'Easy'));
+            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };
 
     const handleLoss = (finalScore: number) => {
         if (db && curGame) {
-            insertLoss(db, curGame.id, difficulty);
-            insertHighScore(db, curGame.id, finalScore, difficulty);
+            insertLoss(db, curGame.id, String(difficulty || 'Easy'));
+            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };
@@ -130,6 +130,8 @@ export default function TwoZeroFourEightGame() {
                 
                 <Text style={styles.score}>Score: {score}</Text>
                 
+                <Text style={styles.instructions}>Swipe to move tiles</Text>
+                
                 <GestureDetector gesture={gesture}>
                     <View>
                         <TwoZeroFourEightBoard board={board} />
@@ -161,7 +163,12 @@ const styles = StyleSheet.create({
     score: {
         fontSize: 28,
         fontWeight: "bold",
-        marginBottom: 20,
+        marginBottom: 10,
         marginTop: 10,
+    },
+    instructions: {
+        fontSize: 14,
+        opacity: 0.6,
+        marginBottom: 20,
     },
 });
