@@ -1,106 +1,174 @@
-import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { StyleSheet } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
+import TwoZeroFourEightBoard from "./TwoZeroFourEightBoard";
+import TwoZeroFourEightHeader from "./TwoZeroFourEightHeader";
+import { 
+    initializeBoardWithTiles, 
+    move, 
+    addRandomTile, 
+    canMove, 
+    hasWon,
+    Board 
+} from "@/utils/TwoZeroFourEightGenerator";
+import { insertHighScore, insertWin, insertLoss, insertTimeScore } from "@/db/Scores/Scores";
+import { getHighScoreByGame } from "@/db/Scores/Results";
 
 export default function TwoZeroFourEightGame() {
     const router = useRouter();
     const { difficulty } = useLocalSearchParams();
+    const [board, setBoard] = useState<Board>([]);
     const [score, setScore] = useState(0);
-    const [isGameRunning, setIsGameRunning] = useState(false);
+    const [highScore, setHighScore] = useState(0);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+    const [gameWon, setGameWon] = useState(false);
+    const [gameTime, setGameTime] = useState(0);
 
     const { db, curGame } = useContext(DBContext);
 
-    const startGame = () => {
-        setIsGameRunning(true);
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
+
+    // Load high score
+    useEffect(() => {
+        const loadHighScore = async () => {
+            if (db && curGame) {
+                const scores = await getHighScoreByGame(db, curGame.id);
+                if (scores && scores.length > 0) {
+                    setHighScore(scores[0].score);
+                }
+            }
+        };
+        loadHighScore();
+    }, [db, curGame]);
+
+    // Initialize game on mount (auto-start)
+    useEffect(() => {
+        const initialBoard = initializeBoardWithTiles();
+        setBoard(initialBoard);
         setScore(0);
+    }, [difficulty]);
+
+    const handleMove = (direction: 'up' | 'down' | 'left' | 'right') => {
+        const { board: newBoard, moved, scoreGained } = move(board, direction);
+        
+        if (!moved) return;
+        
+        const boardWithNewTile = addRandomTile(newBoard);
+        setBoard(boardWithNewTile);
+        
+        const newScore = score + scoreGained;
+        setScore(newScore);
+        
+        // Check for win
+        if (hasWon(boardWithNewTile) && !gameWon) {
+            setGameWon(true);
+            handleWin(newScore);
+        }
+        
+        // Check for loss
+        if (!canMove(boardWithNewTile)) {
+            handleLoss(newScore);
+        }
     };
 
-    const restartGame = (difficulty: string) => {
-        router.push(`/2048?difficulty=${difficulty}`);
-        setScore(0);
-        setIsGameRunning(false);
-        setEndGameModalVisible(false);
-    };
-
-    const handleLoss = () => {
-        setIsGameRunning(false);
+    const handleWin = (finalScore: number) => {
+        if (db && curGame) {
+            insertWin(db, curGame.id, String(difficulty || 'Easy'));
+            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
+        }
         setEndGameModalVisible(true);
     };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>2048</Text>
-            <Text style={styles.difficulty}>Difficulty: {difficulty}</Text>
-            <Text style={styles.score}>Score: {score}</Text>
+    const handleLoss = (finalScore: number) => {
+        if (db && curGame) {
+            insertLoss(db, curGame.id, String(difficulty || 'Easy'));
+            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+        }
+        setEndGameModalVisible(true);
+    };
+
+    const restartGame = (difficulty: string) => {
+        router.replace(`/2048?difficulty=${difficulty}`);
+    };
+
+    // Swipe gesture handler
+    const gesture = Gesture.Pan()
+        .onEnd((e) => {
+            const { translationX, translationY } = e;
+            const absX = Math.abs(translationX);
+            const absY = Math.abs(translationY);
             
-            <View style={styles.board}>
-                <Text style={styles.placeholder}>Game board will go here</Text>
+            if (absX > absY) {
+                if (translationX > 0) {
+                    handleMove('right');
+                } else {
+                    handleMove('left');
+                }
+            } else {
+                if (translationY > 0) {
+                    handleMove('down');
+                } else {
+                    handleMove('up');
+                }
+            }
+        });
+
+    return (
+        <GestureHandlerRootView style={styles.gestureContainer}>
+            <View style={styles.container}>
+                <TwoZeroFourEightHeader 
+                    highScore={highScore}
+                    onTimeUpdate={handleTimeUpdate}
+                />
+                
+                <Text style={styles.score}>Score: {score}</Text>
+                
+                <Text style={styles.instructions}>Swipe to move tiles</Text>
+                
+                <GestureDetector gesture={gesture}>
+                    <View>
+                        <TwoZeroFourEightBoard board={board} />
+                    </View>
+                </GestureDetector>
+
+                <EndGameMessage
+                    visible={endGameModalVisible}
+                    close={() => setEndGameModalVisible(false)}
+                    win={gameWon}
+                    game={curGame}
+                    initialDifficulty={difficulty}
+                    restartGame={restartGame}
+                />
             </View>
-
-            {!isGameRunning && (
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.startText}>Start</Text>
-                </TouchableOpacity>
-            )}
-
-            <EndGameMessage
-                visible={endGameModalVisible}
-                close={() => setEndGameModalVisible(false)}
-                win={false}
-                game={curGame}
-                initialDifficulty={difficulty}
-                restartGame={restartGame}
-            />
-        </View>
+        </GestureHandlerRootView>
     );
 }
 
 const styles = StyleSheet.create({
+    gestureContainer: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    difficulty: {
-        fontSize: 18,
-        marginBottom: 10,
+        paddingTop: 24,
     },
     score: {
-        fontSize: 24,
-        marginBottom: 20,
-    },
-    board: {
-        width: 300,
-        height: 300,
-        backgroundColor: "#bbada0",
-        borderRadius: 10,
-        justifyContent: "center",
-        alignItems: "center",
-        marginBottom: 20,
-    },
-    placeholder: {
-        fontSize: 16,
-        color: "#776e65",
-    },
-    startButton: {
-        backgroundColor: "#33a5ff",
-        padding: 15,
-        paddingHorizontal: 60,
-        borderRadius: 10,
-    },
-    startText: {
-        fontSize: 20,
-        color: "#FFF",
+        fontSize: 28,
         fontWeight: "bold",
+        marginBottom: 10,
+        marginTop: 10,
+    },
+    instructions: {
+        fontSize: 14,
+        opacity: 0.6,
+        marginBottom: 20,
     },
 });
