@@ -17,4 +17,11 @@ export interface Obstacle {
     x: Animated.Value;
 }
 
+export interface Cloud {
+    key: string;
+    x: Animated.Value;
+    y: number;
+    size: number;
+}
+
 export type DifficultyLevel = "Easy" | "Medium" | "Hard";
