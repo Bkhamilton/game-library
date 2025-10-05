@@ -13,6 +13,7 @@ export default function useTheme() {
         grayBorder: Colors[colorScheme].grayBorder,
         primary: Colors[colorScheme].primary,
         secondary: Colors[colorScheme].secondary,
+        tabBarInactiveColor: Colors[colorScheme].tabBarInactiveColor,
     }
 
     return themeColors;

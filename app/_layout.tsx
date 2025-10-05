@@ -9,6 +9,7 @@ import "react-native-reanimated";
 import { initializeDatabase } from '@/api/startup'; 
 import { DBContextProvider } from "@/contexts/DBContext";
 import { UserContextProvider } from "@/contexts/UserContext";
+import { ThemeProvider as CustomThemeProvider } from "@/contexts/ThemeContext";
 import { useColorScheme } from "@/components/useColorScheme";
 
 export {
@@ -49,7 +50,9 @@ export default function RootLayout() {
         <SQLiteProvider databaseName="gamelibrary.db" onInit={initializeDatabase} useSuspense>
             <DBContextProvider>
                 <UserContextProvider>
-                    <RootLayoutNav />
+                    <CustomThemeProvider>
+                        <RootLayoutNav />
+                    </CustomThemeProvider>
                 </UserContextProvider>
             </DBContextProvider>
         </SQLiteProvider>
