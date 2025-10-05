@@ -5,6 +5,8 @@ import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { DBContext } from '@/contexts/DBContext';
 import ProgressBar from '@/components/Helpers/ProgressBar';
 import { getUserAchievements, getUserTotalPoints } from '@/db/Achievements/Achievements';
+import { useRouter } from 'expo-router';
+import useTheme from '@/hooks/useTheme';
 
 interface AchievementBoxProps {
     icon: React.ReactNode;
@@ -22,13 +24,21 @@ export default function ProfileAchievements() {
     const { db } = useContext(DBContext);
     const [achievements, setAchievements] = useState<any[]>([]);
     const [totalPoints, setTotalPoints] = useState(0);
+    const router = useRouter();
+    const { primary } = useTheme();
 
     useEffect(() => {
         const loadAchievements = async () => {
             if (db) {
                 try {
                     const userAchievements = await getUserAchievements(db, 1); // userId = 1
-                    setAchievements(userAchievements);
+                    
+                    // Show all unlocked achievements plus a few locked ones (max 6 total)
+                    const unlocked = userAchievements.filter(a => a.unlocked);
+                    const locked = userAchievements.filter(a => !a.unlocked).slice(0, Math.max(0, 6 - unlocked.length));
+                    const displayAchievements = [...unlocked, ...locked];
+                    
+                    setAchievements(displayAchievements);
                     
                     const points = await getUserTotalPoints(db, 1);
                     setTotalPoints(points);
@@ -76,13 +86,15 @@ export default function ProfileAchievements() {
 
     return (
         <View style={styles.container}>
-            <View style={{ padding: 16 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 }}>
                 <Text style={{ fontSize: 22 }}>Achievements</Text>
-                <Text style={{ fontSize: 16, marginTop: 8, opacity: 0.7 }}>
+                <TouchableOpacity onPress={() => router.navigate('/profile/achievements')}>
+                    <Text style={{ fontSize: 18, color: primary }}>View all</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+                <Text style={{ fontSize: 16, opacity: 0.7 }}>
                     Total Points: {totalPoints}
-                </Text>
-                <Text style={{ fontSize: 14, marginTop: 4, opacity: 0.6 }}>
-                    {achievements.filter(a => a.unlocked).length} / {achievements.length} unlocked
                 </Text>
             </View>
             {achievements.map((achievement, index) => {

@@ -186,3 +186,24 @@ export const getAchievementsByTier = async (db, tier) => {
         throw error;
     }
 };
+
+// Function to get user achievements with game information
+export const getUserAchievementsWithGames = async (db, userId) => {
+    try {
+        const allRows = await db.getAllAsync(
+            `SELECT a.*, ua.progress, ua.unlocked, ua.unlockedAt, g.title as gameTitle
+             FROM Achievements a
+             LEFT JOIN UserAchievements ua ON a.id = ua.achievementId AND ua.userId = ?
+             LEFT JOIN Games g ON a.criteria LIKE '%"game"%' AND json_extract(a.criteria, '$.game') = g.title
+             ORDER BY a.id`,
+            [userId]
+        );
+        return allRows.map(row => ({
+            ...row,
+            criteria: JSON.parse(row.criteria)
+        }));
+    } catch (error) {
+        console.error('Error getting user achievements with games:', error);
+        throw error;
+    }
+};
