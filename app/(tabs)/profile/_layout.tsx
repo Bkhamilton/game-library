@@ -6,6 +6,7 @@ export default function ProfileLayout() {
       <Stack.Screen name="profilePage" options={{ headerShown: false }} />
       <Stack.Screen name="settings" options={{ presentation: 'card', animation: 'slide_from_right', headerShown: false }} />
       <Stack.Screen name="editProfile" options={{ presentation: 'card', animation: 'slide_from_right', headerShown: false }} />
+      <Stack.Screen name="achievements" options={{ presentation: 'card', animation: 'slide_from_right', headerShown: false }} />
     </Stack>
   );
 }
