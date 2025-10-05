@@ -1,50 +1,41 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Image, View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, Animated, Easing, View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { Ostrich } from "./Ostrich";
+import { Ostrich, OSTRICH_SPRITE_COUNT } from "./Ostrich";
+import { Obstacle } from "./Obstacle";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
 import { insertHighScore } from '@/db/Scores/Scores';
-
-const OSTRICH_SPRITES = [
-    require("@/assets/images/ostrichHaul/ostrichSprite1.png"),
-    require("@/assets/images/ostrichHaul/ostrichSprite2.png"),
-    require("@/assets/images/ostrichHaul/ostrichSprite3.png"),
-];
-
-import spikeSprite from "@/assets/images/ostrichHaul/spike.png";
-
-const DIFFICULTY_SETTINGS = {
-    Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500 },
-    Medium: { obstacleSpeed: 1500, minSpawnRate: 1000, maxSpawnRate: 2000 },
-    Hard: { obstacleSpeed: 1000, minSpawnRate: 1000, maxSpawnRate: 1500 },
-};
-
-const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
-const groundLevel = screenHeight - 450;
-const jumpVelocity = -15;
-
-const OSTRICH_WIDTH = 100;
-const OSTRICH_HEIGHT = 121;
-const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the ground
-const COLLISION_ADJUST = 20; // Amount to reduce collision box size
+import { 
+    DIFFICULTY_SETTINGS,
+    screenWidth,
+    screenHeight,
+    groundLevel,
+    jumpVelocity,
+    OSTRICH_HEIGHT,
+    OSTRICH_OFFSET,
+    SPRITE_ANIMATION_INTERVAL,
+    GAME_LOOP_FPS,
+    OBSTACLE_WIDTH
+} from "./constants";
+import { Position, GameState, Obstacle as ObstacleType } from "./types";
+import { checkCollision, calculateGravity, getRandomSpawnRate } from "./utils";
 
 export default function OstrichHaulGame() {
     const router = useRouter();
     const { difficulty } = useLocalSearchParams();
-    const [position, setPosition] = useState({
+    const [position, setPosition] = useState<Position>({
         y: new Animated.Value(groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET),
         x: new Animated.Value(15),
     });
-    const [gameState, setGameState] = useState({
+    const [gameState, setGameState] = useState<GameState>({
         velocity: 0,
         isJumping: false,
         gravity: 1,
         spriteFrame: 0,
     });
-    const [obstacles, setObstacles] = useState<{ key: string; x: Animated.Value }[]>([]);
+    const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
     const [trigger, setTrigger] = useState(false);
@@ -53,20 +44,6 @@ export default function OstrichHaulGame() {
     const { db, curGame } = useContext(DBContext);
 
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
-
-    const checkCollision = (obstacle: any) => {
-        const ostrichTop = position.y.__getValue() + COLLISION_ADJUST;
-        const ostrichBottom = ostrichTop + OSTRICH_HEIGHT - COLLISION_ADJUST * 2;
-        const ostrichLeft = position.x.__getValue() + COLLISION_ADJUST;
-        const ostrichRight = ostrichLeft + OSTRICH_WIDTH - COLLISION_ADJUST * 2;
-
-        const obstacleLeft = obstacle.x.__getValue();
-        const obstacleRight = obstacleLeft + 50;
-        const obstacleTop = obstacle.gapTop;
-        const obstacleBottom = groundLevel;
-
-        return ostrichRight > obstacleLeft && ostrichLeft < obstacleRight && (ostrichTop < obstacleTop || ostrichBottom > obstacleBottom);
-    };
 
     const restartGame = (difficulty: string) => {
         router.push(`/ostrichhaul?difficulty=${difficulty}`);
@@ -104,14 +81,14 @@ export default function OstrichHaulGame() {
                 });
 
                 obstacles.forEach((obstacle, index) => {
-                    if (checkCollision(obstacle)) {
+                    if (checkCollision(position, obstacle)) {
                         handleLoss();
-                    } else if (position.x.__getValue() > obstacle.x.__getValue() + 50) {
+                    } else if (position.x.__getValue() > obstacle.x.__getValue() + OBSTACLE_WIDTH) {
                         setScore((prevScore) => prevScore + 1);
                         setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
                     }
                 });
-            }, 1000 / 60);
+            }, 1000 / GAME_LOOP_FPS);
 
             return () => clearInterval(gameLoop);
         }
@@ -139,7 +116,7 @@ export default function OstrichHaulGame() {
                     }
                 });
 
-                const randomSpawnRate = Math.random() * (settings.maxSpawnRate - settings.minSpawnRate) + settings.minSpawnRate;
+                const randomSpawnRate = getRandomSpawnRate(settings.minSpawnRate, settings.maxSpawnRate);
                 spawnTimeout = setTimeout(spawnObstacle, randomSpawnRate);
             };
 
@@ -150,22 +127,11 @@ export default function OstrichHaulGame() {
     }, [isGameRunning]);
 
     useEffect(() => {
-        if (gameState.isJumping && gameState.velocity > -5 && gameState.velocity < 5) {
-            if (difficulty === "Hard") {
-                setGameState((prev) => ({
-                    ...prev,
-                    gravity: 0.6,
-                }));
-            } else {
-                setGameState((prev) => ({
-                    ...prev,
-                    gravity: 0.2,
-                }));
-            }
-        } else {
+        const newGravity = calculateGravity(gameState.isJumping, gameState.velocity, difficulty as string);
+        if (gameState.gravity !== newGravity) {
             setGameState((prev) => ({
                 ...prev,
-                gravity: 1,
+                gravity: newGravity,
             }));
         }
     }, [gameState.isJumping, gameState.velocity]);
@@ -175,9 +141,9 @@ export default function OstrichHaulGame() {
             const spriteInterval = setInterval(() => {
                 setGameState((prev) => ({
                     ...prev,
-                    spriteFrame: (prev.spriteFrame + 1) % OSTRICH_SPRITES.length,
+                    spriteFrame: (prev.spriteFrame + 1) % OSTRICH_SPRITE_COUNT,
                 }));
-            }, 70); // Change sprite every 100ms
+            }, SPRITE_ANIMATION_INTERVAL);
 
             return () => clearInterval(spriteInterval);
         }
@@ -217,19 +183,7 @@ export default function OstrichHaulGame() {
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
                 <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
                 {obstacles.map((obstacle) => (
-                    <React.Fragment key={obstacle.key}>
-                        <Animated.Image
-                            source={spikeSprite}
-                            style={[
-                                styles.obstacle,
-                                {
-                                    left: obstacle.x,
-                                    height: 100,
-                                    top: groundLevel - 50,
-                                },
-                            ]}
-                        />
-                    </React.Fragment>
+                    <Obstacle key={obstacle.key} x={obstacle.x} />
                 ))}
             </TouchableOpacity>
             {!isGameRunning && (
@@ -279,10 +233,6 @@ const styles = StyleSheet.create({
     ostrich: {
         position: "absolute",
         resizeMode: "cover",
-    },
-    obstacle: {
-        position: "absolute",
-        width: 50,
     },
     score: {
         position: "absolute",
