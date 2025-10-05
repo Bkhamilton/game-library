@@ -88,6 +88,14 @@ function RootLayoutNav() {
                     name="gogobird"
                     options={{ title: "GoGoBird", headerBackTitle: "Home" }}
                 />
+                <Stack.Screen
+                    name="2048"
+                    options={{ title: "2048", headerBackTitle: "Home" }}
+                />
+                <Stack.Screen
+                    name="memorymatch"
+                    options={{ title: "Memory Match", headerBackTitle: "Home" }}
+                />
             </Stack>
         </ThemeProvider>
     );
