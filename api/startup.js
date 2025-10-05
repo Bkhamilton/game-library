@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import games from '@/data/games.json';
+import achievements from '@/data/achievements.json';
 import { insertGame } from '@/db/Games/Games';
 import { insertUser } from '@/db/Users/Users';
+import { insertAchievement } from '@/db/Achievements/Achievements';
 
 export const createTables = async (db) => {
     // Your table creation logic here
@@ -10,6 +12,7 @@ export const createTables = async (db) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             name TEXT NOT NULL,
+            totalPoints INTEGER DEFAULT 0,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE IF NOT EXISTS Games (
@@ -25,7 +28,27 @@ export const createTables = async (db) => {
             difficulty TEXT NOT NULL,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (gameId) REFERENCES Games(id)
-        );  
+        );
+        CREATE TABLE IF NOT EXISTS Achievements (
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            tier TEXT,
+            points INTEGER DEFAULT 0,
+            icon TEXT,
+            category TEXT,
+            criteria TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS UserAchievements (
+            userId INTEGER NOT NULL,
+            achievementId INTEGER NOT NULL,
+            progress INTEGER DEFAULT 0,
+            unlocked BOOLEAN DEFAULT 0,
+            unlockedAt DATETIME,
+            FOREIGN KEY (userId) REFERENCES Users(id),
+            FOREIGN KEY (achievementId) REFERENCES Achievements(id),
+            UNIQUE(userId, achievementId)
+        );
     `);
 };
 
@@ -48,6 +71,12 @@ export const syncData = async (db) => {
     const gamesData = games;
     for (const game of gamesData) {
         await insertGame(db, game);
+    }
+
+    // Add achievements data to the database
+    const achievementsData = achievements;
+    for (const achievement of achievementsData) {
+        await insertAchievement(db, achievement);
     }
 }
     
