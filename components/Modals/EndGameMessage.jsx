@@ -140,18 +140,18 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                         {/* Achievements Section */}
                         {newlyUnlockedAchievements.length > 0 && (
                             <View style={[styles.achievementSection, { borderColor: primary, backgroundColor: secondary }]}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>🏆 Achievements Unlocked! 🏆</Text>
-                                </View>
+                                <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>🏆 Achievements Unlocked! 🏆</Text>
+                                </ClearView>
                                 {newlyUnlockedAchievements.map((achievement, index) => (
                                     <View key={index} style={[styles.achievementItem, { borderColor: primary }]}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                                        <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                             <Text style={{ fontSize: 24, marginRight: 8 }}>{achievement.icon}</Text>
-                                            <View style={{ flex: 1 }}>
+                                            <ClearView style={{ flex: 1 }}>
                                                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{achievement.title}</Text>
                                                 <Text style={{ fontSize: 12, opacity: 0.7 }}>{achievement.description}</Text>
-                                            </View>
-                                        </View>
+                                            </ClearView>
+                                        </ClearView>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <Text style={{ fontSize: 12, fontWeight: '600', color: primary }}>
                                                 {achievement.tier} Tier
