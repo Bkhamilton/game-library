@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, Animated, Easing, View, Text } from "reac
 import { useLocalSearchParams } from "expo-router";
 import { Ostrich, OSTRICH_SPRITE_COUNT } from "./Ostrich";
 import { Obstacle } from "./Obstacle";
+import { Cloud } from "./Cloud";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
@@ -17,9 +18,15 @@ import {
     OSTRICH_OFFSET,
     SPRITE_ANIMATION_INTERVAL,
     GAME_LOOP_FPS,
-    OBSTACLE_WIDTH
+    OBSTACLE_WIDTH,
+    CLOUD_MIN_SPAWN_RATE,
+    CLOUD_MAX_SPAWN_RATE,
+    CLOUD_MIN_SIZE,
+    CLOUD_MAX_SIZE,
+    CLOUD_MIN_Y,
+    CLOUD_MAX_Y
 } from "./constants";
-import { Position, GameState, Obstacle as ObstacleType } from "./types";
+import { Position, GameState, Obstacle as ObstacleType, Cloud as CloudType } from "./types";
 import { checkCollision, calculateGravity, getRandomSpawnRate } from "./utils";
 
 export default function OstrichHaulGame() {
@@ -36,6 +43,7 @@ export default function OstrichHaulGame() {
         spriteFrame: 0,
     });
     const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
+    const [clouds, setClouds] = useState<CloudType[]>([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
     const [trigger, setTrigger] = useState(false);
@@ -127,6 +135,40 @@ export default function OstrichHaulGame() {
     }, [isGameRunning]);
 
     useEffect(() => {
+        if (isGameRunning) {
+            let spawnTimeout: NodeJS.Timeout;
+
+            const spawnCloud = () => {
+                const newCloud = {
+                    key: Math.random().toString(),
+                    x: new Animated.Value(screenWidth),
+                    y: Math.random() * (CLOUD_MAX_Y - CLOUD_MIN_Y) + CLOUD_MIN_Y,
+                    size: Math.random() * (CLOUD_MAX_SIZE - CLOUD_MIN_SIZE) + CLOUD_MIN_SIZE,
+                };
+                setClouds((prevClouds) => [...prevClouds, newCloud]);
+
+                Animated.timing(newCloud.x, {
+                    toValue: -150,
+                    duration: settings.cloudSpeed,
+                    easing: Easing.linear,
+                    useNativeDriver: false,
+                }).start(({ finished }) => {
+                    if (finished) {
+                        setClouds((prevClouds) => prevClouds.filter((cloud) => cloud.key !== newCloud.key));
+                    }
+                });
+
+                const randomSpawnRate = getRandomSpawnRate(CLOUD_MIN_SPAWN_RATE, CLOUD_MAX_SPAWN_RATE);
+                spawnTimeout = setTimeout(spawnCloud, randomSpawnRate);
+            };
+
+            spawnCloud();
+
+            return () => clearTimeout(spawnTimeout);
+        }
+    }, [isGameRunning]);
+
+    useEffect(() => {
         const newGravity = calculateGravity(gameState.isJumping, gameState.velocity, difficulty as string);
         if (gameState.gravity !== newGravity) {
             setGameState((prev) => ({
@@ -162,6 +204,7 @@ export default function OstrichHaulGame() {
             spriteFrame: 0,
         });
         setObstacles([]);
+        setClouds([]);
         setScore(0);
     };
 
@@ -179,6 +222,9 @@ export default function OstrichHaulGame() {
         <View style={styles.container}>
             <Text style={styles.score}>{score}</Text>
             <View style={styles.sky} />
+            {clouds.map((cloud) => (
+                <Cloud key={cloud.key} x={cloud.x} y={cloud.y} size={cloud.size} />
+            ))}
             <View style={styles.ground} />
             <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
                 <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
