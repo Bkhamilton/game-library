@@ -7,6 +7,8 @@ const OSTRICH_SPRITES = [
     require("@/assets/images/ostrichHaul/ostrichSprite3.png"),
 ];
 
+export const OSTRICH_SPRITE_COUNT = OSTRICH_SPRITES.length;
+
 interface OstrichProps {
     y: Animated.Value;
     x: Animated.Value;
