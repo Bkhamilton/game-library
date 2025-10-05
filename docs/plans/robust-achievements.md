@@ -703,7 +703,7 @@ Users (added: totalPoints INTEGER DEFAULT 0)
 - 6 Platinum tier (100 points each)
 - 6 Diamond tier (200 points each)
 - Categories: Completion (24), Score (16), Skill (8), Time-Based (4)
-- Max achievable points: 2,475 (significantly expanded from 260)
+- Max achievable points: 2,975 (significantly expanded from 260)
 
 **Tier System Implemented:**
 - Bronze: 10 points - Entry level achievements
