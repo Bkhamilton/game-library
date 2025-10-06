@@ -10,10 +10,11 @@ interface TwoZeroFourEightBoardProps {
 export default function TwoZeroFourEightBoard({ board }: TwoZeroFourEightBoardProps) {
     const { primary, secondary } = useTheme();
     
-    // Get cell size based on screen dimensions
+    // Get cell size based on screen dimensions and board size
     const screenWidth = Dimensions.get('window').width;
-    const cellSize = Math.min((screenWidth - 80) / 4, 90);
-    const boardSize = cellSize * 4 + 5 * 8; // 4 cells + 5 gaps
+    const boardLength = board.length || 4; // Get board size dynamically
+    const cellSize = Math.min((screenWidth - 80) / boardLength, 90);
+    const boardSize = cellSize * boardLength + (boardLength + 1) * 8; // Dynamic cells + gaps
     
     // Get tile color based on value
     const getTileColor = (value: number | null): string => {
