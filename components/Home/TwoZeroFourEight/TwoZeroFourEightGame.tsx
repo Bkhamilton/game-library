@@ -101,20 +101,25 @@ export default function TwoZeroFourEightGame() {
     // Swipe gesture handler
     const gesture = Gesture.Pan()
         .onEnd((e) => {
+            console.log(e);
             const { translationX, translationY } = e;
             const absX = Math.abs(translationX);
             const absY = Math.abs(translationY);
             
             if (absX > absY) {
                 if (translationX > 0) {
+                    console.log("Swipe Right");
                     handleMove('right');
                 } else {
+                    console.log("Swipe Left");
                     handleMove('left');
                 }
             } else {
                 if (translationY > 0) {
+                    console.log("Swipe Down");
                     handleMove('down');
                 } else {
+                    console.log("Swipe Up");
                     handleMove('up');
                 }
             }
