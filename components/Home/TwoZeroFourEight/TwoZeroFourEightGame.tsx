@@ -14,7 +14,8 @@ import {
     addRandomTile, 
     canMove, 
     hasWon,
-    Board 
+    Board,
+    Difficulty
 } from "@/utils/TwoZeroFourEightGenerator";
 import { insertHighScore, insertWin, insertLoss, insertTimeScore } from "@/db/Scores/Scores";
 import { getHighScoreByGame } from "@/db/Scores/Results";
@@ -51,7 +52,7 @@ export default function TwoZeroFourEightGame() {
 
     // Initialize game on mount (auto-start)
     useEffect(() => {
-        const initialBoard = initializeBoardWithTiles();
+        const initialBoard = initializeBoardWithTiles(difficulty as Difficulty);
         setBoard(initialBoard);
         setScore(0);
     }, [difficulty]);
@@ -61,7 +62,7 @@ export default function TwoZeroFourEightGame() {
         
         if (!moved) return;
         
-        const boardWithNewTile = addRandomTile(newBoard);
+        const boardWithNewTile = addRandomTile(newBoard, difficulty as Difficulty);
         setBoard(boardWithNewTile);
         
         const newScore = score + scoreGained;
