@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
-import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated from 'react-native-reanimated';
+import { MaterialIcons } from '@expo/vector-icons';
 import TwoZeroFourEightBoard from "./TwoZeroFourEightBoard";
 import TwoZeroFourEightHeader from "./TwoZeroFourEightHeader";
+import useTheme from "@/hooks/useTheme";
 import { 
     initializeBoardWithTiles, 
     move, 
@@ -30,6 +30,7 @@ export default function TwoZeroFourEightGame() {
     const [gameTime, setGameTime] = useState(0);
 
     const { db, curGame } = useContext(DBContext);
+    const { primary, text } = useTheme();
 
     const handleTimeUpdate = useCallback((seconds: number) => {
         setGameTime(seconds);
@@ -99,68 +100,73 @@ export default function TwoZeroFourEightGame() {
         router.replace(`/2048?difficulty=${difficulty}`);
     };
 
-    // Swipe gesture handler
-    const gesture = Gesture.Pan()
-        .onEnd((e) => {
-            console.log(e);
-            const { translationX, translationY } = e;
-            const absX = Math.abs(translationX);
-            const absY = Math.abs(translationY);
-            
-            if (absX > absY) {
-                if (translationX > 0) {
-                    console.log("Swipe Right");
-                    handleMove('right');
-                } else {
-                    console.log("Swipe Left");
-                    handleMove('left');
-                }
-            } else {
-                if (translationY > 0) {
-                    console.log("Swipe Down");
-                    handleMove('down');
-                } else {
-                    console.log("Swipe Up");
-                    handleMove('up');
-                }
-            }
-        });
-
     return (
-        <GestureHandlerRootView style={styles.gestureContainer}>
-            <View style={styles.container}>
-                <TwoZeroFourEightHeader 
-                    highScore={highScore}
-                    onTimeUpdate={handleTimeUpdate}
-                />
+        <View style={styles.container}>
+            <TwoZeroFourEightHeader 
+                highScore={highScore}
+                onTimeUpdate={handleTimeUpdate}
+            />
+            
+            <Text style={styles.score}>Score: {score}</Text>
+            
+            <Text style={styles.instructions}>Tap arrows to move tiles</Text>
+            
+            <TwoZeroFourEightBoard board={board} />
+            
+            {/* Directional Controls */}
+            <View style={styles.controlsContainer}>
+                {/* Up Button */}
+                <View style={styles.topRow}>
+                    <TouchableOpacity 
+                        style={[styles.arrowButton, { backgroundColor: primary }]}
+                        onPress={() => handleMove('up')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <MaterialIcons name="arrow-upward" size={32} color={text} />
+                    </TouchableOpacity>
+                </View>
                 
-                <Text style={styles.score}>Score: {score}</Text>
-                
-                <Text style={styles.instructions}>Swipe to move tiles</Text>
-                
-                <GestureDetector gesture={gesture}>
-                    <Animated.View>
-                        <TwoZeroFourEightBoard board={board} />
-                    </Animated.View>
-                </GestureDetector>
-
-                <EndGameMessage
-                    visible={endGameModalVisible}
-                    close={() => setEndGameModalVisible(false)}
-                    win={gameWon}
-                    game={curGame}
-                    initialDifficulty={difficulty}
-                    restartGame={restartGame}
-                />
+                {/* Left, Down, Right Buttons */}
+                <View style={styles.bottomRow}>
+                    <TouchableOpacity 
+                        style={[styles.arrowButton, { backgroundColor: primary }]}
+                        onPress={() => handleMove('left')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <MaterialIcons name="arrow-back" size={32} color={text} />
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                        style={[styles.arrowButton, { backgroundColor: primary }]}
+                        onPress={() => handleMove('down')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <MaterialIcons name="arrow-downward" size={32} color={text} />
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                        style={[styles.arrowButton, { backgroundColor: primary }]}
+                        onPress={() => handleMove('right')}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <MaterialIcons name="arrow-forward" size={32} color={text} />
+                    </TouchableOpacity>
+                </View>
             </View>
-        </GestureHandlerRootView>
+
+            <EndGameMessage
+                visible={endGameModalVisible}
+                close={() => setEndGameModalVisible(false)}
+                win={gameWon}
+                game={curGame}
+                initialDifficulty={difficulty}
+                restartGame={restartGame}
+            />
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    gestureContainer: {
-        flex: 1,
-    },
     container: {
         flex: 1,
         alignItems: "center",
@@ -176,5 +182,25 @@ const styles = StyleSheet.create({
         fontSize: 14,
         opacity: 0.6,
         marginBottom: 20,
+    },
+    controlsContainer: {
+        marginTop: 30,
+        alignItems: 'center',
+    },
+    topRow: {
+        marginBottom: 8,
+    },
+    bottomRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    arrowButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        borderRadius: 12,
+        minWidth: 80,
+        minHeight: 80,
     },
 });
