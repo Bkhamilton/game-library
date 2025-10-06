@@ -667,7 +667,7 @@
     "description": "Avoid 500 obstacles in Ostrich Haul",
     "tier": "Gold",
     "points": 50,
-    "icon": "shield",
+    "icon": "shield-alt",
     "category": "Skill",
     "criteria": {
       "game": "Ostrich Haul",
@@ -681,7 +681,7 @@
     "description": "Make 1000 jumps in Ostrich Haul",
     "tier": "Silver",
     "points": 25,
-    "icon": "up-arrow",
+    "icon": "arrow-up",
     "category": "Score",
     "criteria": {
       "game": "Ostrich Haul",
@@ -709,7 +709,7 @@
     "description": "Avoid 500 obstacles in GoGoBird",
     "tier": "Gold",
     "points": 50,
-    "icon": "shield",
+    "icon": "shield-alt",
     "category": "Skill",
     "criteria": {
       "game": "GoGoBird",
@@ -723,7 +723,7 @@
     "description": "Make 1000 flaps in GoGoBird",
     "tier": "Silver",
     "points": 25,
-    "icon": "wing",
+    "icon": "feather-alt",
     "category": "Score",
     "criteria": {
       "game": "GoGoBird",
