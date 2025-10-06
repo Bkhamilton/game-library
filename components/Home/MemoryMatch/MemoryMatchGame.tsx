@@ -20,7 +20,7 @@ export default function MemoryMatchGame() {
     };
 
     const restartGame = (difficulty: string) => {
-        router.push(`/memorymatch?difficulty=${difficulty}`);
+        router.replace(`/memorymatch?difficulty=${difficulty}`);
         setScore(0);
         setIsGameRunning(false);
         setEndGameModalVisible(false);
