@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
 import { GestureHandlerRootView, GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import TwoZeroFourEightBoard from "./TwoZeroFourEightBoard";
 import TwoZeroFourEightHeader from "./TwoZeroFourEightHeader";
 import { 
@@ -133,9 +134,9 @@ export default function TwoZeroFourEightGame() {
                 <Text style={styles.instructions}>Swipe to move tiles</Text>
                 
                 <GestureDetector gesture={gesture}>
-                    <View>
+                    <Animated.View>
                         <TwoZeroFourEightBoard board={board} />
-                    </View>
+                    </Animated.View>
                 </GestureDetector>
 
                 <EndGameMessage
