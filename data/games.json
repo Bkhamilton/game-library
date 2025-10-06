@@ -38,5 +38,10 @@
         "id": 9,
         "title": "Memory Match",
         "description": "Find matching pairs of cards"
+    },
+    {
+        "id": 13,
+        "title": "Simon Says",
+        "description": "Repeat increasingly longer sequences of colors and sounds"
     }
 ]

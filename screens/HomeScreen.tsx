@@ -45,6 +45,8 @@ export default function HomeScreen() {
                 return router.push(`/2048?difficulty=${difficulty}`);
             case "Memory Match":
                 return router.push(`/memorymatch?difficulty=${difficulty}`);
+            case "Simon Says":
+                return router.push(`/simonsays?difficulty=${difficulty}`);
             default:
                 return "";
         }

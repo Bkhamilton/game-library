@@ -7,4 +7,5 @@ export default {
     'GoGoBird': ['Easy', 'Hard'],
     '2048': ['Easy', 'Medium', 'Hard'],
     'Memory Match': ['Easy', 'Medium', 'Hard'],
+    'Simon Says': ['Easy', 'Medium', 'Hard'],
 }
