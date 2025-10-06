@@ -54,7 +54,7 @@ export default function OstrichHaulGame() {
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
     const restartGame = (difficulty: string) => {
-        router.push(`/ostrichhaul?difficulty=${difficulty}`);
+        router.replace(`/ostrichhaul?difficulty=${difficulty}`);
         setTrigger(!trigger);
     };
 

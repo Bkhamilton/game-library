@@ -39,7 +39,7 @@ export default function FlappyBirdGame() {
     const settings = DIFFICULTY_SETTINGS[difficulty || "Easy"];
 
     const restartGame = (difficulty: string) => {
-        router.push(`/gogobird?difficulty=${difficulty}`);
+        router.replace(`/gogobird?difficulty=${difficulty}`);
         setTrigger(!trigger);
         setScore(0);
         setBirdY(new Animated.Value(300));
