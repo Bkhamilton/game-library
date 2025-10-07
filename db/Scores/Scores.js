@@ -65,6 +65,28 @@ export const insertTimeScore = async (db, gameId, time, difficulty) => {
     }
 };
 
+// Function to insert a total score
+export const insertTotalScore = async (db, gameId, score, difficulty) => {
+    try {
+        const metric = 'totalScore';
+        await insertScore(db, gameId, score, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting total score:', error);
+        throw error;
+    }
+};
+
+// Function to insert moves count
+export const insertMoves = async (db, gameId, moves, difficulty) => {
+    try {
+        const metric = 'moves';
+        await insertScore(db, gameId, moves, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting moves:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {

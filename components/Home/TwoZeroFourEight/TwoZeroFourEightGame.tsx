@@ -17,7 +17,7 @@ import {
     Board,
     Difficulty
 } from "@/utils/TwoZeroFourEightGenerator";
-import { insertHighScore, insertWin, insertLoss, insertTimeScore } from "@/db/Scores/Scores";
+import { insertHighScore, insertWin, insertLoss, insertTimeScore, insertTotalScore, insertMoves } from "@/db/Scores/Scores";
 import { getHighScoreByGame } from "@/db/Scores/Results";
 
 export default function TwoZeroFourEightGame() {
@@ -29,6 +29,7 @@ export default function TwoZeroFourEightGame() {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [gameWon, setGameWon] = useState(false);
     const [gameTime, setGameTime] = useState(0);
+    const [moves, setMoves] = useState(0);
 
     const { db, curGame } = useContext(DBContext);
     const { primary, text } = useTheme();
@@ -55,6 +56,7 @@ export default function TwoZeroFourEightGame() {
         const initialBoard = initializeBoardWithTiles(difficulty as Difficulty);
         setBoard(initialBoard);
         setScore(0);
+        setMoves(0);
     }, [difficulty]);
 
     const handleMove = (direction: 'up' | 'down' | 'left' | 'right') => {
@@ -67,32 +69,37 @@ export default function TwoZeroFourEightGame() {
         
         const newScore = score + scoreGained;
         setScore(newScore);
+        setMoves(moves + 1);
         
         // Check for win
         if (hasWon(boardWithNewTile) && !gameWon) {
             setGameWon(true);
-            handleWin(newScore);
+            handleWin(newScore, moves + 1);
         }
         
         // Check for loss
         if (!canMove(boardWithNewTile)) {
-            handleLoss(newScore);
+            handleLoss(newScore, moves + 1);
         }
     };
 
-    const handleWin = (finalScore: number) => {
+    const handleWin = (finalScore: number, finalMoves: number) => {
         if (db && curGame) {
             insertWin(db, curGame.id, String(difficulty || 'Easy'));
             insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+            insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
             insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
+            insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };
 
-    const handleLoss = (finalScore: number) => {
+    const handleLoss = (finalScore: number, finalMoves: number) => {
         if (db && curGame) {
             insertLoss(db, curGame.id, String(difficulty || 'Easy'));
             insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+            insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
+            insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };

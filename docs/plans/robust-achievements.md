@@ -698,14 +698,14 @@ Users (added: totalPoints INTEGER DEFAULT 0)
 ```
 
 **Achievement Data:**
-- 73 total achievements implemented (updated from 52)
-- 13 Bronze tier (10 points each)
-- 27 Silver tier (25 points each)
-- 18 Gold tier (50 points each)
-- 9 Platinum tier (100 points each)
-- 6 Diamond tier (200 points each)
-- Categories: Completion (24), Score (16), Skill (8), Time-Based (4), Streak (8), Collection (13)
-- Max achievable points: 3,805 (significantly expanded from 2,975)
+- 86 total achievements implemented (updated from 73)
+- 16 Bronze tier (10 points each)
+- 31 Silver tier (25 points each)
+- 21 Gold tier (50 points each)
+- 11 Platinum tier (100 points each)
+- 7 Diamond tier (200 points each)
+- Categories: Completion (30), Score (20), Skill (9), Time-Based (5), Streak (9), Collection (13)
+- Max achievable points: 4,485 (significantly expanded from 3,805)
 
 **Tier System Implemented:**
 - Bronze: 10 points - Entry level achievements
@@ -791,30 +791,30 @@ Users (added: totalPoints INTEGER DEFAULT 0)
    - Examples: "Game Explorer" (play all 6 games), "Complete Collection" (win all games), "Ultimate Collector" (50 achievements)
 
 **Achievement Breakdown by Category:**
-- Completion: 24 achievements (First wins, multi-tier progression for each game)
-- Score: 16 achievements (High score milestones)
-- Skill: 8 achievements (No hints, perfect games, special skills)
-- Time-Based: 4 achievements (Speed completions)
-- Streak: 8 achievements (Win streaks, game-specific streaks) ✨ NEW
-- Collection: 13 achievements (Game exploration, completionist goals) ✨ NEW
+- Completion: 30 achievements (First wins, multi-tier progression for each game)
+- Score: 20 achievements (High score milestones)
+- Skill: 9 achievements (No hints, perfect games, special skills)
+- Time-Based: 5 achievements (Speed completions)
+- Streak: 9 achievements (Win streaks, game-specific streaks)
+- Collection: 13 achievements (Game exploration, completionist goals)
 
 **Total Achievement Stats:**
-- Total achievements: 73 (up from 52)
-- Total possible points: 3,805 (up from 2,975)
-- New achievements added: 21
+- Total achievements: 86 (up from 73)
+- Total possible points: 4,485 (up from 3,805)
+- New achievements added: 13
 - Categories implemented: 6 out of 7 (Social category not included as it requires backend infrastructure)
 
 **Games Covered:**
-All achievements implemented for the 6 working games:
+All achievements implemented for the 7 working games:
 - Sudoku (Game ID: 1)
 - Minesweeper (Game ID: 5)
 - Word Search (Game ID: 3)
 - Crossword (Game ID: 4)
 - Ostrich Haul (Game ID: 2)
 - GoGoBird (Game ID: 6)
+- 2048 (Game ID: 7) ✨ NEW
 
 **Excluded Games:**
-- 2048 (Game ID: 7) - Not fully implemented
 - Memory Match (Game ID: 9) - Not fully implemented
 
 **Database Schema:**
