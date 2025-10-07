@@ -10,27 +10,28 @@ import {
 const checkCriteria = async (db, criteria) => {
     try {
         const { game, metric, threshold } = criteria;
-        const gameId = await getGameIdByTitle(db, game);
         
-        let query;
-        if (metric === 'result') {
-            // Count wins (score > 0)
-            query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
-        } else if (metric === 'highScore') {
-            // Check if there's a high score above threshold
-            query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
-        } else {
-            throw new Error('Invalid metric');
+        // Handle metrics that require game ID
+        if (game) {
+            const gameId = await getGameIdByTitle(db, game);
+            
+            let query;
+            if (metric === 'result') {
+                // Count wins (score > 0)
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return result[0].count >= threshold;
+            } else if (metric === 'highScore') {
+                // Check if there's a high score above threshold
+                query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return (result[0].maxScore || 0) >= threshold;
+            }
         }
         
-        const result = await db.getAllAsync(query, [gameId, metric]);
-        
-        if (metric === 'result') {
-            return result[0].count >= threshold;
-        } else if (metric === 'highScore') {
-            return (result[0].maxScore || 0) >= threshold;
-        }
-        
+        // For unsupported metrics, return false (not yet implemented)
+        // This prevents errors when checking achievements with metrics that aren't tracked yet
+        console.log(`Metric '${metric}' is not yet supported for achievement tracking`);
         return false;
     } catch (error) {
         console.error('Error checking criteria:', error);
@@ -42,27 +43,26 @@ const checkCriteria = async (db, criteria) => {
 const getProgressForAchievement = async (db, criteria) => {
     try {
         const { game, metric, threshold } = criteria;
-        const gameId = await getGameIdByTitle(db, game);
         
-        let query;
-        if (metric === 'result') {
-            // Count wins (score > 0)
-            query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
-        } else if (metric === 'highScore') {
-            // Get the highest score
-            query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
-        } else {
-            return 0;
+        // Handle metrics that require game ID
+        if (game) {
+            const gameId = await getGameIdByTitle(db, game);
+            
+            let query;
+            if (metric === 'result') {
+                // Count wins (score > 0)
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return Math.min(result[0].count, threshold);
+            } else if (metric === 'highScore') {
+                // Get the highest score
+                query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return Math.min(result[0].maxScore || 0, threshold);
+            }
         }
         
-        const result = await db.getAllAsync(query, [gameId, metric]);
-        
-        if (metric === 'result') {
-            return Math.min(result[0].count, threshold);
-        } else if (metric === 'highScore') {
-            return Math.min(result[0].maxScore || 0, threshold);
-        }
-        
+        // For unsupported metrics, return 0 (not yet implemented)
         return 0;
     } catch (error) {
         console.error('Error getting progress:', error);
