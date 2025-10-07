@@ -1,56 +1,156 @@
-import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { View, Text } from "@/components/Themed";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { StyleSheet } from "react-native";
+import { View } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import MemoryMatchBoard from "./MemoryMatchBoard";
+import MemoryMatchHeader from "./MemoryMatchHeader";
+import { 
+    initializeBoard, 
+    checkMatch, 
+    checkWin, 
+    getMaxIncorrectGuesses,
+    Card,
+    getBoardSize
+} from "@/utils/MemoryMatchGenerator";
+import { insertWin, insertLoss, insertTimeScore, insertTotalScore } from "@/db/Scores/Scores";
 
 export default function MemoryMatchGame() {
     const router = useRouter();
     const { difficulty } = useLocalSearchParams();
-    const [score, setScore] = useState(0);
-    const [isGameRunning, setIsGameRunning] = useState(false);
+    const [cards, setCards] = useState<Card[]>([]);
+    const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
+    const [matches, setMatches] = useState(0);
+    const [incorrectGuesses, setIncorrectGuesses] = useState(0);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
+    const [gameWon, setGameWon] = useState(false);
+    const [gameTime, setGameTime] = useState(0);
+    const [canFlip, setCanFlip] = useState(true);
+    const [timerActive, setTimerActive] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
 
-    const startGame = () => {
-        setIsGameRunning(true);
-        setScore(0);
+    const maxIncorrectGuesses = getMaxIncorrectGuesses(difficulty as string);
+    const { rows, cols } = getBoardSize(difficulty as string);
+    const totalPairs = (rows * cols) / 2;
+
+    const handleTimeUpdate = useCallback((seconds: number) => {
+        setGameTime(seconds);
+    }, []);
+
+    // Initialize the board when component mounts or difficulty changes
+    useEffect(() => {
+        const newCards = initializeBoard(difficulty as string);
+        setCards(newCards);
+        setMatches(0);
+        setIncorrectGuesses(0);
+        setFlippedIndices([]);
+        setGameWon(false);
+    }, [difficulty]);
+
+    // Handle card flipping logic
+    useEffect(() => {
+        if (flippedIndices.length === 2 && canFlip) {
+            setCanFlip(false);
+            const [firstIndex, secondIndex] = flippedIndices;
+            const firstCard = cards[firstIndex];
+            const secondCard = cards[secondIndex];
+
+            if (checkMatch(firstCard, secondCard)) {
+                // Cards match
+                setTimeout(() => {
+                    const newCards = [...cards];
+                    newCards[firstIndex].isMatched = true;
+                    newCards[secondIndex].isMatched = true;
+                    newCards[firstIndex].isFlipped = false;
+                    newCards[secondIndex].isFlipped = false;
+                    setCards(newCards);
+                    setMatches(matches + 1);
+                    setFlippedIndices([]);
+                    setCanFlip(true);
+
+                    // Check for win
+                    if (checkWin(newCards)) {
+                        handleWin();
+                    }
+                }, 600);
+            } else {
+                // Cards don't match
+                setTimeout(() => {
+                    const newCards = [...cards];
+                    newCards[firstIndex].isFlipped = false;
+                    newCards[secondIndex].isFlipped = false;
+                    setCards(newCards);
+                    setIncorrectGuesses(incorrectGuesses + 1);
+                    setFlippedIndices([]);
+                    setCanFlip(true);
+                }, 1000);
+            }
+        }
+    }, [flippedIndices, cards, matches, incorrectGuesses, canFlip]);
+
+    // Check for loss condition
+    useEffect(() => {
+        if (incorrectGuesses >= maxIncorrectGuesses && !gameWon && !endGameModalVisible) {
+            handleLoss();
+        }
+    }, [incorrectGuesses, maxIncorrectGuesses, gameWon, endGameModalVisible]);
+
+    const handleCardPress = (index: number) => {
+        if (!canFlip || flippedIndices.length >= 2) return;
+        
+        const newCards = [...cards];
+        newCards[index].isFlipped = true;
+        setCards(newCards);
+        setFlippedIndices([...flippedIndices, index]);
+    };
+
+    const handleWin = () => {
+        setTimerActive(false);
+        if (db && curGame) {
+            insertWin(db, curGame.id, String(difficulty || 'Easy'));
+            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
+            insertTotalScore(db, curGame.id, matches, String(difficulty || 'Easy'));
+        }
+        setGameWon(true);
+        setEndGameModalVisible(true);
+    };
+
+    const handleLoss = () => {
+        setTimerActive(false);
+        if (db && curGame) {
+            insertLoss(db, curGame.id, String(difficulty || 'Easy'));
+        }
+        setGameWon(false);
+        setEndGameModalVisible(true);
     };
 
     const restartGame = (difficulty: string) => {
         router.replace(`/memorymatch?difficulty=${difficulty}`);
-        setScore(0);
-        setIsGameRunning(false);
-        setEndGameModalVisible(false);
-    };
-
-    const handleLoss = () => {
-        setIsGameRunning(false);
-        setEndGameModalVisible(true);
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Memory Match</Text>
-            <Text style={styles.difficulty}>Difficulty: {difficulty}</Text>
-            <Text style={styles.score}>Matches: {score}</Text>
-            
-            <View style={styles.board}>
-                <Text style={styles.placeholder}>Game board will go here</Text>
-            </View>
+            <MemoryMatchHeader
+                incorrectGuesses={incorrectGuesses}
+                maxIncorrectGuesses={maxIncorrectGuesses}
+                matches={matches}
+                totalPairs={totalPairs}
+                onTimeUpdate={handleTimeUpdate}
+                timerActive={timerActive}
+            />
 
-            {!isGameRunning && (
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.startText}>Start</Text>
-                </TouchableOpacity>
-            )}
+            <MemoryMatchBoard
+                cards={cards}
+                onCardPress={handleCardPress}
+                difficulty={difficulty as string}
+            />
 
             <EndGameMessage
                 visible={endGameModalVisible}
                 close={() => setEndGameModalVisible(false)}
-                win={false}
+                win={gameWon}
                 game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
@@ -63,44 +163,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    difficulty: {
-        fontSize: 18,
-        marginBottom: 10,
-    },
-    score: {
-        fontSize: 24,
-        marginBottom: 20,
-    },
-    board: {
-        width: 300,
-        height: 300,
-        backgroundColor: "#2c3e50",
-        borderRadius: 10,
-        justifyContent: "center",
-        alignItems: "center",
-        marginBottom: 20,
-    },
-    placeholder: {
-        fontSize: 16,
-        color: "#ecf0f1",
-    },
-    startButton: {
-        backgroundColor: "#33a5ff",
-        padding: 15,
-        paddingHorizontal: 60,
-        borderRadius: 10,
-    },
-    startText: {
-        fontSize: 20,
-        color: "#FFF",
-        fontWeight: "bold",
+        paddingTop: 24,
     },
 });
