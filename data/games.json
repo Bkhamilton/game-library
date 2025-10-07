@@ -43,5 +43,10 @@
         "id": 13,
         "title": "Simon Says",
         "description": "Repeat increasingly longer sequences of colors and sounds"
+    },
+    {
+        "id": 10,
+        "title": "Connect Four",
+        "description": "Two-player strategy game where you connect four discs in a row"
     }
 ]

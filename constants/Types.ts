@@ -1,4 +1,4 @@
-export type GameTitle = "Sudoku" | "Ostrich Haul" | "Word Search" | "Crossword" | "Minesweeper" | "GoGoBird" | "2048" | "Memory Match" | "Simon Says";
+export type GameTitle = "Sudoku" | "Ostrich Haul" | "Word Search" | "Crossword" | "Minesweeper" | "GoGoBird" | "2048" | "Memory Match" | "Simon Says" | "Connect Four";
 
 export type Difficulty = "Easy" | "Medium" | "Hard" | "Extreme";
 

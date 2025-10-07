@@ -6,6 +6,7 @@ import crosswordLogo from "@/assets/images/gamelogo/crosswordLogo.jpg";
 import minesweeperLogo from "../assets/images/gamelogo/minesweeperLogo.jpg";
 import twoZeroFourEightLogo from "@/assets/images/gamelogo/2048Logo.jpg";
 import memoryMatchLogo from "@/assets/images/gamelogo/memoryMatchLogo.jpg";
+import connectFourLogo from "@/assets/images/gamelogo/connectFourLogo.jpg";
 
 export const GameLogos = {
     Sudoku: sudokuLogo,
@@ -16,4 +17,5 @@ export const GameLogos = {
     Minesweeper: minesweeperLogo,
     "2048": twoZeroFourEightLogo,
     "Memory Match": memoryMatchLogo,
+    "Connect Four": connectFourLogo,
 };

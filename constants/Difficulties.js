@@ -8,4 +8,5 @@ export default {
     '2048': ['Easy', 'Medium', 'Hard'],
     'Memory Match': ['Easy', 'Medium', 'Hard'],
     'Simon Says': ['Easy', 'Medium', 'Hard'],
+    'Connect Four': ['Easy', 'Medium', 'Hard'],
 }
