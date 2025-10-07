@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Modal, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { Text, View, ClearView } from '@/components/Themed';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { GameTheme } from '@/constants/Themes';
@@ -10,22 +10,30 @@ interface ThemeSelectorProps {
 }
 
 export default function ThemeSelector({ visible, close }: ThemeSelectorProps) {
-    const { availableThemes, themeId, setTheme } = useThemeContext();
+    const { availableThemes, themeId, setTheme, useDefaultPhoneMode, setUseDefaultPhoneMode } = useThemeContext();
 
     const handleSelectTheme = (selectedThemeId: string) => {
-        setTheme(selectedThemeId);
-        // Don't close the modal yet - let user see the selection
-        // In future, this will actually apply the theme
+        if (!useDefaultPhoneMode) {
+            setTheme(selectedThemeId);
+            // Don't close the modal yet - let user see the selection
+            // In future, this will actually apply the theme
+        }
+    };
+
+    const handleToggleDefaultMode = (value: boolean) => {
+        setUseDefaultPhoneMode(value);
     };
 
     const renderThemeBox = (theme: GameTheme) => {
         const isSelected = theme.id === themeId;
+        const isDisabled = useDefaultPhoneMode;
         
         return (
             <TouchableOpacity
                 key={theme.id}
                 style={styles.themeBoxContainer}
                 onPress={() => handleSelectTheme(theme.id)}
+                disabled={isDisabled}
             >
                 <View
                     style={[
@@ -34,10 +42,15 @@ export default function ThemeSelector({ visible, close }: ThemeSelectorProps) {
                         backgroundColor: theme.colors.primary,
                         borderColor: isSelected ? theme.colors.accent : theme.colors.border,
                         borderWidth: isSelected ? 3 : 2,
+                        opacity: isDisabled ? 0.4 : 1,
                         },
                     ]}
                 />
-                <Text numberOfLines={1} style={[styles.themeLabel, isSelected && styles.selectedLabel]}>
+                <Text numberOfLines={1} style={[
+                    styles.themeLabel, 
+                    isSelected && styles.selectedLabel,
+                    isDisabled && styles.disabledLabel
+                ]}>
                     {theme.name}
                 </Text>
             </TouchableOpacity>
@@ -60,6 +73,16 @@ export default function ThemeSelector({ visible, close }: ThemeSelectorProps) {
                         </TouchableOpacity>
                     </ClearView>
                     
+                    <ClearView style={styles.toggleContainer}>
+                        <Text style={styles.toggleLabel}>Use Default Phone Mode</Text>
+                        <Switch
+                            value={useDefaultPhoneMode}
+                            onValueChange={handleToggleDefaultMode}
+                            trackColor={{ false: '#767577', true: '#007AFF' }}
+                            thumbColor={useDefaultPhoneMode ? '#fff' : '#f4f3f4'}
+                        />
+                    </ClearView>
+
                     <ScrollView
                         horizontal
                         contentContainerStyle={styles.themesContainer}
@@ -145,5 +168,20 @@ const styles = StyleSheet.create({
     selectedLabel: {
         fontWeight: '700',
         color: '#007AFF',
+    },
+    disabledLabel: {
+        opacity: 0.4,
+    },
+    toggleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 4,
+        marginBottom: 8,
+    },
+    toggleLabel: {
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

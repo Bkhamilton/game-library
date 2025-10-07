@@ -6,12 +6,15 @@ interface ThemeContextType {
   themeId: string;
   setTheme: (themeId: string) => void;
   availableThemes: GameTheme[];
+  useDefaultPhoneMode: boolean;
+  setUseDefaultPhoneMode: (value: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [themeId, setThemeId] = useState<string>('light');
+  const [useDefaultPhoneMode, setUseDefaultPhoneMode] = useState<boolean>(true);
 
   const setTheme = (newThemeId: string) => {
     if (THEMES[newThemeId]) {
@@ -24,6 +27,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     themeId,
     setTheme,
     availableThemes: Object.values(THEMES),
+    useDefaultPhoneMode,
+    setUseDefaultPhoneMode,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
