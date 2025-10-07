@@ -8,6 +8,7 @@ interface MemoryMatchHeaderProps {
     matches: number;
     totalPairs: number;
     onTimeUpdate?: (seconds: number) => void;
+    timerActive?: boolean;
 }
 
 export default function MemoryMatchHeader({ 
@@ -15,13 +16,15 @@ export default function MemoryMatchHeader({
     maxIncorrectGuesses,
     matches,
     totalPairs,
-    onTimeUpdate 
+    onTimeUpdate,
+    timerActive = true
 }: MemoryMatchHeaderProps) {
     return (
         <GameHeader
             leftContent={<Text style={{ fontSize: 16 }}>{matches}/{totalPairs}</Text>}
             rightContent={<Text style={{ fontSize: 16 }}>{incorrectGuesses}/{maxIncorrectGuesses}</Text>}
             onTimeUpdate={onTimeUpdate}
+            timerActive={timerActive}
         />
     );
 }

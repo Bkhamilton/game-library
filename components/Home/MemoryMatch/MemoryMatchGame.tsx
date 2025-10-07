@@ -27,6 +27,7 @@ export default function MemoryMatchGame() {
     const [gameWon, setGameWon] = useState(false);
     const [gameTime, setGameTime] = useState(0);
     const [canFlip, setCanFlip] = useState(true);
+    const [timerActive, setTimerActive] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
 
@@ -106,6 +107,7 @@ export default function MemoryMatchGame() {
     };
 
     const handleWin = () => {
+        setTimerActive(false);
         if (db && curGame) {
             insertWin(db, curGame.id, String(difficulty || 'Easy'));
             insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
@@ -116,6 +118,7 @@ export default function MemoryMatchGame() {
     };
 
     const handleLoss = () => {
+        setTimerActive(false);
         if (db && curGame) {
             insertLoss(db, curGame.id, String(difficulty || 'Easy'));
         }
@@ -135,6 +138,7 @@ export default function MemoryMatchGame() {
                 matches={matches}
                 totalPairs={totalPairs}
                 onTimeUpdate={handleTimeUpdate}
+                timerActive={timerActive}
             />
 
             <MemoryMatchBoard
