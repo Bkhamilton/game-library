@@ -153,23 +153,35 @@ export default function SimonSaysGame() {
 
     const renderTiles = () => {
         const { rows, cols } = settings.gridLayout;
-        const tileSize = Math.min(300 / cols, 300 / rows) - 10;
+        const tileSize = Math.min(280 / cols, 280 / rows) - 10;
 
-        const tiles: JSX.Element[] = [];
-        for (let i = 0; i < tileColors.length; i++) {
-            tiles.push(
-                <ColorTile
-                    key={i}
-                    color={tileColors[i]}
-                    isActive={activeTile === i}
-                    onPress={() => handleTilePress(i)}
-                    disabled={gameState !== 'input'}
-                    size={tileSize}
-                />
+        // Render tiles in rows
+        const tileRows = [];
+        for (let row = 0; row < rows; row++) {
+            const tilesInRow = [];
+            for (let col = 0; col < cols; col++) {
+                const index = row * cols + col;
+                if (index < tileColors.length) {
+                    tilesInRow.push(
+                        <ColorTile
+                            key={index}
+                            color={tileColors[index]}
+                            isActive={activeTile === index}
+                            onPress={() => handleTilePress(index)}
+                            disabled={gameState !== 'input'}
+                            size={tileSize}
+                        />
+                    );
+                }
+            }
+            tileRows.push(
+                <View key={row} style={styles.tileRow}>
+                    {tilesInRow}
+                </View>
             );
         }
 
-        return tiles;
+        return tileRows;
     };
 
     return (
@@ -179,15 +191,7 @@ export default function SimonSaysGame() {
             <Text style={styles.score}>Round: {round}</Text>
             <Text style={styles.message}>{message}</Text>
             
-            <View style={[
-                styles.board,
-                {
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    width: 300,
-                    height: 300,
-                }
-            ]}>
+            <View style={styles.board}>
                 {isGameRunning ? renderTiles() : (
                     <Text style={styles.placeholder}>Game board will appear here</Text>
                 )}
@@ -245,6 +249,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 20,
+    },
+    tileRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     placeholder: {
         fontSize: 16,
