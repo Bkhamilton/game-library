@@ -28,6 +28,7 @@ export default function MemoryMatchGame() {
     const [gameTime, setGameTime] = useState(0);
     const [canFlip, setCanFlip] = useState(true);
     const [timerActive, setTimerActive] = useState(true);
+    const [isPreviewPhase, setIsPreviewPhase] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
 
@@ -42,11 +43,25 @@ export default function MemoryMatchGame() {
     // Initialize the board when component mounts or difficulty changes
     useEffect(() => {
         const newCards = initializeBoard(difficulty as string);
-        setCards(newCards);
+        // Start with all cards flipped for preview
+        const previewCards = newCards.map(card => ({ ...card, isFlipped: true }));
+        setCards(previewCards);
         setMatches(0);
         setIncorrectGuesses(0);
         setFlippedIndices([]);
         setGameWon(false);
+        setIsPreviewPhase(true);
+        setCanFlip(false);
+        
+        // After 1 second, flip all cards back
+        const timer = setTimeout(() => {
+            const hiddenCards = newCards.map(card => ({ ...card, isFlipped: false }));
+            setCards(hiddenCards);
+            setIsPreviewPhase(false);
+            setCanFlip(true);
+        }, 1000);
+        
+        return () => clearTimeout(timer);
     }, [difficulty]);
 
     // Handle card flipping logic
@@ -98,7 +113,7 @@ export default function MemoryMatchGame() {
     }, [incorrectGuesses, maxIncorrectGuesses, gameWon, endGameModalVisible]);
 
     const handleCardPress = (index: number) => {
-        if (!canFlip || flippedIndices.length >= 2) return;
+        if (!canFlip || flippedIndices.length >= 2 || isPreviewPhase) return;
         
         const newCards = [...cards];
         newCards[index].isFlipped = true;
