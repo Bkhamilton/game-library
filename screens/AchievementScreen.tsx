@@ -116,6 +116,13 @@ export default function AchievementScreen() {
             filtered = filtered.filter(a => a.category === selectedCategory);
         }
 
+        // Sort so unlocked achievements appear first
+        filtered.sort((a, b) => {
+            if (a.unlocked && !b.unlocked) return -1;
+            if (!a.unlocked && b.unlocked) return 1;
+            return 0;
+        });
+
         return filtered;
     }, [selectedTier, selectedGame, selectedCategory, achievements]);
 
