@@ -131,6 +131,39 @@ export const insertFlaps = async (db, gameId, flaps, difficulty) => {
     }
 };
 
+// Function to insert mistakes
+export const insertMistakes = async (db, gameId, mistakes, difficulty) => {
+    try {
+        const metric = 'mistakes';
+        await insertScore(db, gameId, mistakes, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting mistakes:', error);
+        throw error;
+    }
+};
+
+// Function to insert hints used
+export const insertHintsUsed = async (db, gameId, hints, difficulty) => {
+    try {
+        const metric = 'hintsUsed';
+        await insertScore(db, gameId, hints, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting hints used:', error);
+        throw error;
+    }
+};
+
+// Function to insert mines flagged
+export const insertMinesFlagged = async (db, gameId, minesFlagged, difficulty) => {
+    try {
+        const metric = 'minesFlagged';
+        await insertScore(db, gameId, minesFlagged, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting mines flagged:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {
