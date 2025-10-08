@@ -18,7 +18,7 @@ export default function TabLayout() {
     const colorScheme = useColorScheme();
     const [showThemeSelector, setShowThemeSelector] = useState(false);
 
-    const { tint, primary, tabBarInactiveColor } = useTheme();
+    const { tint, primary, tabBarInactiveColor, tabBar } = useTheme();
 
     return (
         <>
@@ -35,7 +35,7 @@ export default function TabLayout() {
                     tabBarInactiveTintColor: tabBarInactiveColor,
                     tabBarStyle: {
                         borderRadius: 32,
-                        backgroundColor: "white",
+                        backgroundColor: tabBar,
                         position: "absolute",
                         height: "7%",
                         paddingTop: "1%",
