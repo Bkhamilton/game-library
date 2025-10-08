@@ -164,6 +164,28 @@ export const insertMinesFlagged = async (db, gameId, minesFlagged, difficulty) =
     }
 };
 
+// Function to insert correct words
+export const insertCorrectWords = async (db, gameId, correctWords, difficulty) => {
+    try {
+        const metric = 'correctWords';
+        await insertScore(db, gameId, correctWords, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting correct words:', error);
+        throw error;
+    }
+};
+
+// Function to insert words found
+export const insertWordsFound = async (db, gameId, wordsFound, difficulty) => {
+    try {
+        const metric = 'wordsFound';
+        await insertScore(db, gameId, wordsFound, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting words found:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {

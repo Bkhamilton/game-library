@@ -26,6 +26,21 @@ const checkCriteria = async (db, criteria) => {
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
                 const result = await db.getAllAsync(query, [gameId, metric]);
                 return (result[0].maxScore || 0) >= threshold;
+            } else if (metric === 'totalCorrectWords') {
+                // Sum all correct words across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'correctWords'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].total || 0) >= threshold;
+            } else if (metric === 'totalWordsFound') {
+                // Sum all words found across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'wordsFound'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].total || 0) >= threshold;
+            } else if (metric === 'noHints') {
+                // Count games where hints used is 0
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = 'hintsUsed' AND score = 0`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return result[0].count >= threshold;
             }
         }
         
@@ -59,6 +74,21 @@ const getProgressForAchievement = async (db, criteria) => {
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
                 const result = await db.getAllAsync(query, [gameId, metric]);
                 return Math.min(result[0].maxScore || 0, threshold);
+            } else if (metric === 'totalCorrectWords') {
+                // Sum all correct words across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'correctWords'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].total || 0, threshold);
+            } else if (metric === 'totalWordsFound') {
+                // Sum all words found across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'wordsFound'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].total || 0, threshold);
+            } else if (metric === 'noHints') {
+                // Count games where hints used is 0
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = 'hintsUsed' AND score = 0`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].count, threshold);
             }
         }
         

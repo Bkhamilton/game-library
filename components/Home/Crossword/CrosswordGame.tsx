@@ -10,7 +10,7 @@ import CrosswordHeader from './CrosswordHeader';
 import CrosswordWords from './CrosswordWords';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore, insertCorrectWords, insertHintsUsed } from '@/db/Scores/Scores';
 
 type PlacedWord = {
     word: string;
@@ -37,6 +37,7 @@ export default function CrosswordGame() {
     const [gameTime, setGameTime] = useState(0); // Track game time
 
     const [wrongCount, setWrongCount] = useState(0);
+    const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
 
     const { db, curGame } = useContext(DBContext);
 
@@ -47,6 +48,8 @@ export default function CrosswordGame() {
     const handleWin = () => {
         insertWin(db, curGame && curGame.id, difficulty);
         insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
+        insertCorrectWords(db, curGame && curGame.id, guessedWords.length, difficulty);
+        insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
