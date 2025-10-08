@@ -5,7 +5,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
-import { insertHighScore } from '@/db/Scores/Scores';
+import { insertHighScore, insertDistance, insertObstaclesAvoided, insertFlaps } from '@/db/Scores/Scores';
 import { Bird } from "./Bird";
 import { Pipe } from "./Pipe";
 import {
@@ -29,6 +29,8 @@ export default function FlappyBirdGame() {
     const [pipes, setPipes] = useState<PipeType[]>([]);
     const [passedPipes, setPassedPipes] = useState<string[]>([]);
     const [score, setScore] = useState(0);
+    const [flaps, setFlaps] = useState(0);
+    const [distance, setDistance] = useState(0);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [currentFrame, setCurrentFrame] = useState(0);
     const [trigger, setTrigger] = useState(false);
@@ -47,6 +49,9 @@ export default function FlappyBirdGame() {
 
     const handleLoss = () => {
         insertHighScore(db, curGame && curGame.id, score, difficulty);
+        insertDistance(db, curGame && curGame.id, distance, difficulty);
+        insertObstaclesAvoided(db, curGame && curGame.id, score, difficulty);
+        insertFlaps(db, curGame && curGame.id, flaps, difficulty);
         setIsGameRunning(false);
         setEndGameModalVisible(true);        
     }
@@ -71,6 +76,9 @@ export default function FlappyBirdGame() {
                 } else {
                     birdY.setValue(newBirdY);
                 }
+                // Track distance traveled
+                setDistance((prevDistance) => prevDistance + 1);
+                
                 pipes.forEach((pipe) => {
                     if (!passedPipes.includes(pipe.key) && pipe.x.__getValue() < 100) {
                         setScore((prevScore) => prevScore + 1);
@@ -119,9 +127,12 @@ export default function FlappyBirdGame() {
         setVelocity(0); // Reset velocity
         setPipes([]);
         setPassedPipes([]);
+        setFlaps(0);
+        setDistance(0);
     };
 
     const jump = () => {
+        setFlaps((prevFlaps) => prevFlaps + 1);
         setVelocity(JUMP_VELOCITY);
     };
 
