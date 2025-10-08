@@ -87,6 +87,50 @@ export const insertMoves = async (db, gameId, moves, difficulty) => {
     }
 };
 
+// Function to insert distance
+export const insertDistance = async (db, gameId, distance, difficulty) => {
+    try {
+        const metric = 'distance';
+        await insertScore(db, gameId, distance, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting distance:', error);
+        throw error;
+    }
+};
+
+// Function to insert obstacles avoided
+export const insertObstaclesAvoided = async (db, gameId, obstacles, difficulty) => {
+    try {
+        const metric = 'obstaclesAvoided';
+        await insertScore(db, gameId, obstacles, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting obstacles avoided:', error);
+        throw error;
+    }
+};
+
+// Function to insert jumps
+export const insertJumps = async (db, gameId, jumps, difficulty) => {
+    try {
+        const metric = 'jumps';
+        await insertScore(db, gameId, jumps, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting jumps:', error);
+        throw error;
+    }
+};
+
+// Function to insert flaps
+export const insertFlaps = async (db, gameId, flaps, difficulty) => {
+    try {
+        const metric = 'flaps';
+        await insertScore(db, gameId, flaps, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting flaps:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {

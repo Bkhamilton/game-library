@@ -7,7 +7,7 @@ import { Cloud } from "./Cloud";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
-import { insertHighScore } from '@/db/Scores/Scores';
+import { insertHighScore, insertDistance, insertObstaclesAvoided, insertJumps } from '@/db/Scores/Scores';
 import { 
     DIFFICULTY_SETTINGS,
     screenWidth,
@@ -46,6 +46,8 @@ export default function OstrichHaulGame() {
     const [clouds, setClouds] = useState<CloudType[]>([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
+    const [jumps, setJumps] = useState(0);
+    const [distance, setDistance] = useState(0);
     const [trigger, setTrigger] = useState(false);
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
 
@@ -60,6 +62,9 @@ export default function OstrichHaulGame() {
 
     const handleLoss = () => {
         insertHighScore(db, curGame && curGame.id, score, difficulty);
+        insertDistance(db, curGame && curGame.id, distance, difficulty);
+        insertObstaclesAvoided(db, curGame && curGame.id, score, difficulty);
+        insertJumps(db, curGame && curGame.id, jumps, difficulty);
         setIsGameRunning(false);
         setEndGameModalVisible(true);
     };
@@ -87,6 +92,9 @@ export default function OstrichHaulGame() {
                         velocity: newVelocity,
                     };
                 });
+
+                // Track distance traveled
+                setDistance((prevDistance) => prevDistance + 1);
 
                 obstacles.forEach((obstacle, index) => {
                     if (checkCollision(position, obstacle)) {
@@ -206,10 +214,13 @@ export default function OstrichHaulGame() {
         setObstacles([]);
         setClouds([]);
         setScore(0);
+        setJumps(0);
+        setDistance(0);
     };
 
     const jump = () => {
         if (!gameState.isJumping) {
+            setJumps((prevJumps) => prevJumps + 1);
             setGameState((prev) => ({
                 ...prev,
                 velocity: jumpVelocity,
