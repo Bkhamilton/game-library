@@ -7,7 +7,7 @@ import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -33,12 +33,14 @@ export default function SudokuGame() {
     const handleWin = () => {
         insertWin(db, curGame!.id, difficulty);
         insertTimeScore(db, curGame!.id, gameTime, difficulty);
+        insertMistakes(db, curGame!.id, wrongCount, difficulty);
         setEndGameResult(true);
         setEndGameModalVisible(true);
     }
 
     const handleLoss = () => {
         insertLoss(db, curGame!.id, difficulty);
+        insertMistakes(db, curGame!.id, wrongCount, difficulty);
         setEndGameResult(false);
         setEndGameModalVisible(true);
         setLossModalShown(true);
