@@ -140,8 +140,8 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                         {/* Achievements Section */}
                         {newlyUnlockedAchievements.length > 0 && (
                             <View style={[styles.achievementSection, { borderColor: primary, backgroundColor: secondary }]}>
-                                <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>🏆 Achievements Unlocked! 🏆</Text>
+                                <ClearView style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                                    <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>🏆Achievements Unlocked!🏆</Text>
                                 </ClearView>
                                 {newlyUnlockedAchievements.map((achievement, index) => (
                                     <View key={index} style={[styles.achievementItem, { borderColor: primary }]}>
@@ -180,7 +180,7 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                         </View>
 
                         {/* Buttons */}
-                        <View style={{ paddingTop: 16, width: '100%' }}>
+                        <View style={{ paddingTop: 16 }}>
                             <TouchableOpacity
                                 style={[styles.button, { backgroundColor: grayBackground }]}
                                 onPress={openDifficultyModal}
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     achievementSection: {
         borderWidth: 2,
         borderRadius: 12,
-        padding: 16,
+        paddingVertical: 16,
         marginVertical: 12,
         width: 320,
         maxWidth: '95%',
