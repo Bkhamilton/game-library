@@ -14,10 +14,11 @@ import {
     addRandomTile, 
     canMove, 
     hasWon,
+    getHighestTile,
     Board,
     Difficulty
 } from "@/utils/TwoZeroFourEightGenerator";
-import { insertHighScore, insertWin, insertLoss, insertTimeScore, insertTotalScore, insertMoves } from "@/db/Scores/Scores";
+import { insertHighScore, insertWin, insertLoss, insertTimeScore, insertTotalScore, insertMoves, insertHighestTile } from "@/db/Scores/Scores";
 import { getHighScoreByGame } from "@/db/Scores/Results";
 
 export default function TwoZeroFourEightGame() {
@@ -85,21 +86,25 @@ export default function TwoZeroFourEightGame() {
 
     const handleWin = (finalScore: number, finalMoves: number) => {
         if (db && curGame) {
+            const highestTile = getHighestTile(board);
             insertWin(db, curGame.id, String(difficulty || 'Easy'));
             insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
             insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
             insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
             insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
+            insertHighestTile(db, curGame.id, highestTile, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };
 
     const handleLoss = (finalScore: number, finalMoves: number) => {
         if (db && curGame) {
+            const highestTile = getHighestTile(board);
             insertLoss(db, curGame.id, String(difficulty || 'Easy'));
             insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
             insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
             insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
+            insertHighestTile(db, curGame.id, highestTile, String(difficulty || 'Easy'));
         }
         setEndGameModalVisible(true);
     };
