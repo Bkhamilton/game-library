@@ -186,6 +186,17 @@ export const insertWordsFound = async (db, gameId, wordsFound, difficulty) => {
     }
 };
 
+// Function to insert highest tile (for 2048 game)
+export const insertHighestTile = async (db, gameId, tile, difficulty) => {
+    try {
+        const metric = 'highestTile';
+        await insertScore(db, gameId, tile, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting highest tile:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {
