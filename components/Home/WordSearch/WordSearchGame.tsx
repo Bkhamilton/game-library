@@ -8,7 +8,7 @@ import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
-import { insertWin, insertTimeScore } from "@/db/Scores/Scores";
+import { insertWin, insertTimeScore, insertWordsFound, insertHintsUsed } from "@/db/Scores/Scores";
 import { getRandomColor } from "@/utils/wordSearch";
 import WordSearchHeader from "./WordSearchHeader";
 import WordSearchWords from "./WordSearchWords";
@@ -40,6 +40,7 @@ export default function WordSearchGame() {
     const [wordColors, setWordColors] = useState<{ [key: string]: string }>({});
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [gameTime, setGameTime] = useState(0);
+    const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
 
     const { db, curGame } = useContext(DBContext);
     const router = useRouter();
@@ -58,6 +59,8 @@ export default function WordSearchGame() {
     const handleWin = () => {
         insertWin(db, curGame?.id, difficulty);
         insertTimeScore(db, curGame?.id, gameTime, difficulty);
+        insertWordsFound(db, curGame?.id, foundWords.length, difficulty);
+        insertHintsUsed(db, curGame?.id, hintsUsed, difficulty);
         setEndGameModalVisible(true);
     };
 

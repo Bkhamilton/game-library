@@ -87,6 +87,116 @@ export const insertMoves = async (db, gameId, moves, difficulty) => {
     }
 };
 
+// Function to insert distance
+export const insertDistance = async (db, gameId, distance, difficulty) => {
+    try {
+        const metric = 'distance';
+        await insertScore(db, gameId, distance, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting distance:', error);
+        throw error;
+    }
+};
+
+// Function to insert obstacles avoided
+export const insertObstaclesAvoided = async (db, gameId, obstacles, difficulty) => {
+    try {
+        const metric = 'obstaclesAvoided';
+        await insertScore(db, gameId, obstacles, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting obstacles avoided:', error);
+        throw error;
+    }
+};
+
+// Function to insert jumps
+export const insertJumps = async (db, gameId, jumps, difficulty) => {
+    try {
+        const metric = 'jumps';
+        await insertScore(db, gameId, jumps, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting jumps:', error);
+        throw error;
+    }
+};
+
+// Function to insert flaps
+export const insertFlaps = async (db, gameId, flaps, difficulty) => {
+    try {
+        const metric = 'flaps';
+        await insertScore(db, gameId, flaps, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting flaps:', error);
+        throw error;
+    }
+};
+
+// Function to insert mistakes
+export const insertMistakes = async (db, gameId, mistakes, difficulty) => {
+    try {
+        const metric = 'mistakes';
+        await insertScore(db, gameId, mistakes, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting mistakes:', error);
+        throw error;
+    }
+};
+
+// Function to insert hints used
+export const insertHintsUsed = async (db, gameId, hints, difficulty) => {
+    try {
+        const metric = 'hintsUsed';
+        await insertScore(db, gameId, hints, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting hints used:', error);
+        throw error;
+    }
+};
+
+// Function to insert mines flagged
+export const insertMinesFlagged = async (db, gameId, minesFlagged, difficulty) => {
+    try {
+        const metric = 'minesFlagged';
+        await insertScore(db, gameId, minesFlagged, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting mines flagged:', error);
+        throw error;
+    }
+};
+
+// Function to insert correct words
+export const insertCorrectWords = async (db, gameId, correctWords, difficulty) => {
+    try {
+        const metric = 'correctWords';
+        await insertScore(db, gameId, correctWords, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting correct words:', error);
+        throw error;
+    }
+};
+
+// Function to insert words found
+export const insertWordsFound = async (db, gameId, wordsFound, difficulty) => {
+    try {
+        const metric = 'wordsFound';
+        await insertScore(db, gameId, wordsFound, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting words found:', error);
+        throw error;
+    }
+};
+
+// Function to insert highest tile (for 2048 game)
+export const insertHighestTile = async (db, gameId, tile, difficulty) => {
+    try {
+        const metric = 'highestTile';
+        await insertScore(db, gameId, tile, metric, difficulty);
+    } catch (error) {
+        console.error('Error inserting highest tile:', error);
+        throw error;
+    }
+};
+
 // Function to update a score
 export const updateScore = async (db, scoreId, gameId, score, metric) => {
     try {

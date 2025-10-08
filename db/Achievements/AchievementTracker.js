@@ -9,7 +9,7 @@ import {
 // Function to check if criteria is met
 const checkCriteria = async (db, criteria) => {
     try {
-        const { game, metric, threshold } = criteria;
+        const { game, metric, threshold, operator } = criteria;
         
         // Handle metrics that require game ID
         if (game) {
@@ -26,6 +26,42 @@ const checkCriteria = async (db, criteria) => {
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
                 const result = await db.getAllAsync(query, [gameId, metric]);
                 return (result[0].maxScore || 0) >= threshold;
+            } else if (metric === 'highestTile') {
+                // Check if there's a highest tile above threshold (for 2048 game)
+                query = `SELECT MAX(score) as maxTile FROM Scores WHERE gameId = ? AND metric = ?`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return (result[0].maxTile || 0) >= threshold;
+            } else if (metric === 'time') {
+                // Check for time-based achievements
+                if (operator === 'less_than') {
+                    // Check if there's at least one game completed under the threshold time
+                    query = `SELECT MIN(score) as minTime FROM Scores WHERE gameId = ? AND metric = 'timeScore' AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId]);
+                    return result[0].minTime && result[0].minTime <= threshold;
+                }
+            } else if (metric === 'totalCorrectWords') {
+                // Sum all correct words across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'correctWords'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].total || 0) >= threshold;
+            } else if (metric === 'totalWordsFound') {
+                // Sum all words found across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'wordsFound'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].total || 0) >= threshold;
+            } else if (metric === 'noHints') {
+                // Count games where hints used is 0
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = 'hintsUsed' AND score = 0`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return result[0].count >= threshold;
+            } else if (metric === 'moves') {
+                // Check for move-based achievements
+                if (operator === 'less_than') {
+                    // Check if there's at least one game completed under the threshold moves
+                    query = `SELECT MIN(score) as minMoves FROM Scores WHERE gameId = ? AND metric = 'moves' AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId]);
+                    return result[0].minMoves && result[0].minMoves <= threshold;
+                }
             }
         }
         
@@ -42,7 +78,7 @@ const checkCriteria = async (db, criteria) => {
 // Function to get current progress for an achievement
 const getProgressForAchievement = async (db, criteria) => {
     try {
-        const { game, metric, threshold } = criteria;
+        const { game, metric, threshold, operator } = criteria;
         
         // Handle metrics that require game ID
         if (game) {
@@ -59,6 +95,48 @@ const getProgressForAchievement = async (db, criteria) => {
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
                 const result = await db.getAllAsync(query, [gameId, metric]);
                 return Math.min(result[0].maxScore || 0, threshold);
+            } else if (metric === 'highestTile') {
+                // Get the highest tile (for 2048 game)
+                query = `SELECT MAX(score) as maxTile FROM Scores WHERE gameId = ? AND metric = ?`;
+                const result = await db.getAllAsync(query, [gameId, metric]);
+                return Math.min(result[0].maxTile || 0, threshold);
+            } else if (metric === 'time') {
+                // Get progress for time-based achievements
+                if (operator === 'less_than') {
+                    // Get the minimum time achieved
+                    query = `SELECT MIN(score) as minTime FROM Scores WHERE gameId = ? AND metric = 'timeScore' AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId]);
+                    // For "less than" achievements, progress is the threshold minus the best time
+                    // If best time is less than threshold, return threshold (100% progress)
+                    const minTime = result[0].minTime || threshold;
+                    return minTime <= threshold ? threshold : minTime;
+                }
+            } else if (metric === 'totalCorrectWords') {
+                // Sum all correct words across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'correctWords'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].total || 0, threshold);
+            } else if (metric === 'totalWordsFound') {
+                // Sum all words found across all games
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'wordsFound'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].total || 0, threshold);
+            } else if (metric === 'noHints') {
+                // Count games where hints used is 0
+                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = 'hintsUsed' AND score = 0`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].count, threshold);
+            } else if (metric === 'moves') {
+                // Get progress for move-based achievements
+                if (operator === 'less_than') {
+                    // Get the minimum moves achieved
+                    query = `SELECT MIN(score) as minMoves FROM Scores WHERE gameId = ? AND metric = 'moves' AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId]);
+                    // For "less than" achievements, progress is the threshold minus the best moves
+                    // If best moves is less than threshold, return threshold (100% progress)
+                    const minMoves = result[0].minMoves || threshold;
+                    return minMoves <= threshold ? threshold : minMoves;
+                }
             }
         }
         

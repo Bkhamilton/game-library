@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity as RNTouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity as RNTouchableOpacity, RefreshControl } from 'react-native';
 import { Text, View, TouchableOpacity } from '@/components/Themed';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { DBContext } from '@/contexts/DBContext';
@@ -67,6 +67,7 @@ export default function AchievementScreen() {
     const [achievements, setAchievements] = useState<any[]>([]);
     const [totalPoints, setTotalPoints] = useState(0);
     const [games, setGames] = useState<any[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
     const { primary, text, background } = useTheme();
 
@@ -79,26 +80,32 @@ export default function AchievementScreen() {
     const tiers = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
     const categories = ['Completion', 'Streak', 'Collection', 'Time-Based', 'Score', 'Skill', 'Social'];
 
-    useEffect(() => {
-        const loadData = async () => {
-            if (db) {
-                try {
-                    const userAchievements = await getUserAchievementsWithGames(db, 1);
-                    setAchievements(userAchievements);
-                    
-                    const points = await getUserTotalPoints(db, 1);
-                    setTotalPoints(points);
+    const loadData = async () => {
+        if (db) {
+            try {
+                const userAchievements = await getUserAchievementsWithGames(db, 1);
+                setAchievements(userAchievements);
+                
+                const points = await getUserTotalPoints(db, 1);
+                setTotalPoints(points);
 
-                    const gamesList = await getGames(db);
-                    setGames(gamesList);
-                } catch (error) {
-                    console.error('Error loading achievements:', error);
-                }
+                const gamesList = await getGames(db);
+                setGames(gamesList);
+            } catch (error) {
+                console.error('Error loading achievements:', error);
             }
-        };
-        
+        }
+    };
+
+    useEffect(() => {
         loadData();
     }, [db]);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadData();
+        setRefreshing(false);
+    };
 
     // Memoize filtered achievements for better performance
     const filteredAchievements = useMemo(() => {
@@ -115,6 +122,13 @@ export default function AchievementScreen() {
         if (selectedCategory !== 'all') {
             filtered = filtered.filter(a => a.category === selectedCategory);
         }
+
+        // Sort so unlocked achievements appear first
+        filtered.sort((a, b) => {
+            if (a.unlocked && !b.unlocked) return -1;
+            if (!a.unlocked && b.unlocked) return 1;
+            return 0;
+        });
 
         return filtered;
     }, [selectedTier, selectedGame, selectedCategory, achievements]);
@@ -320,6 +334,14 @@ export default function AchievementScreen() {
                 windowSize={5}
                 removeClippedSubviews={true}
                 updateCellsBatchingPeriod={50}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={primary}
+                        colors={[primary]}
+                    />
+                }
             />
         </View>
     );

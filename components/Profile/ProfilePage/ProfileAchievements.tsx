@@ -19,7 +19,11 @@ interface AchievementBoxProps {
     unlocked: boolean;
 }
 
-export default function ProfileAchievements() {
+interface ProfileAchievementsProps {
+    onLoadAchievements?: (loadFn: () => Promise<void>) => void;
+}
+
+export default function ProfileAchievements({ onLoadAchievements }: ProfileAchievementsProps) {
 
     const { db } = useContext(DBContext);
     const [achievements, setAchievements] = useState<any[]>([]);
@@ -27,28 +31,31 @@ export default function ProfileAchievements() {
     const router = useRouter();
     const { primary } = useTheme();
 
-    useEffect(() => {
-        const loadAchievements = async () => {
-            if (db) {
-                try {
-                    const userAchievements = await getUserAchievements(db, 1); // userId = 1
-                    
-                    // Show all unlocked achievements plus a few locked ones (max 6 total)
-                    const unlocked = userAchievements.filter(a => a.unlocked);
-                    const locked = userAchievements.filter(a => !a.unlocked).slice(0, Math.max(0, 6 - unlocked.length));
-                    const displayAchievements = [...unlocked, ...locked];
-                    
-                    setAchievements(displayAchievements);
-                    
-                    const points = await getUserTotalPoints(db, 1);
-                    setTotalPoints(points);
-                } catch (error) {
-                    console.error('Error loading achievements:', error);
-                }
+    const loadAchievements = async () => {
+        if (db) {
+            try {
+                const userAchievements = await getUserAchievements(db, 1); // userId = 1
+                
+                // Show all unlocked achievements plus a few locked ones (max 6 total)
+                const unlocked = userAchievements.filter(a => a.unlocked);
+                const locked = userAchievements.filter(a => !a.unlocked).slice(0, Math.max(0, 6 - unlocked.length));
+                const displayAchievements = [...unlocked, ...locked];
+                
+                setAchievements(displayAchievements);
+                
+                const points = await getUserTotalPoints(db, 1);
+                setTotalPoints(points);
+            } catch (error) {
+                console.error('Error loading achievements:', error);
             }
-        };
-        
+        }
+    };
+
+    useEffect(() => {
         loadAchievements();
+        if (onLoadAchievements) {
+            onLoadAchievements(loadAchievements);
+        }
     }, [db]);
 
     const getTierColor = (tier: string) => {

@@ -9,7 +9,7 @@ import MineSweeperHeader from "./MineSweeperHeader";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
-import { insertWin, insertLoss, insertTimeScore } from '@/db/Scores/Scores';
+import { insertWin, insertLoss, insertTimeScore, insertMinesFlagged, insertMistakes } from '@/db/Scores/Scores';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -48,6 +48,8 @@ export default function MineSweeperGame() {
     const { db, curGame } = useContext(DBContext);
 
     const [gameTime, setGameTime] = useState(0);
+    const [minesFlagged, setMinesFlagged] = useState(0);
+    const [incorrectFlags, setIncorrectFlags] = useState(0);
 
     const handleTimeUpdate = useCallback((seconds: number) => {
         setGameTime(seconds);
@@ -65,11 +67,15 @@ export default function MineSweeperGame() {
         setGameState("active");
         setBoard(emptyBoard);
         setMinesCount(minesCount);
+        setMinesFlagged(0);
+        setIncorrectFlags(0);
     }, [difficulty, trigger]);
 
     const handleWin = () => {
         insertWin(db, curGame!.id, difficulty);
         insertTimeScore(db, curGame!.id, gameTime, difficulty);
+        insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
+        insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
         setGameState("won");
         setEndGameResult(true);
         setEndGameModalVisible(true);
@@ -77,6 +83,8 @@ export default function MineSweeperGame() {
 
     const handleLoss = () => {
         insertLoss(db, curGame!.id, difficulty);
+        insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
+        insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
         setGameState("lost");
         setEndGameResult(false);
         setEndGameModalVisible(true);
@@ -97,8 +105,26 @@ export default function MineSweeperGame() {
         if (isLongPress) {
             // Toggle flag
             if (!cell.isRevealed) {
+                const wasAlreadyFlagged = cell.isFlagged;
                 cell.isFlagged = !cell.isFlagged;
                 setMinesCount((prevCount) => (cell.isFlagged ? prevCount - 1 : prevCount + 1));
+                
+                // Track correct and incorrect flags
+                if (cell.isFlagged) {
+                    // Flag was just placed
+                    if (cell.isMine) {
+                        setMinesFlagged((prev) => prev + 1);
+                    } else {
+                        setIncorrectFlags((prev) => prev + 1);
+                    }
+                } else if (wasAlreadyFlagged) {
+                    // Flag was just removed
+                    if (cell.isMine) {
+                        setMinesFlagged((prev) => prev - 1);
+                    } else {
+                        setIncorrectFlags((prev) => prev - 1);
+                    }
+                }
             }
         } else {
             // Reveal cell
