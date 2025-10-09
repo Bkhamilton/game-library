@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, View as RNView } from "react-native";
 import { View, Text } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
@@ -52,7 +52,7 @@ const AnimatedGameTile: React.FC<AnimatedGameTileProps> = ({
     };
     
     return (
-        <View style={[styles.gameItem, { width: width as any }]}>
+        <RNView style={[styles.gameItem, { width: width as any }]}>
             <TouchableOpacity 
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
@@ -74,17 +74,17 @@ const AnimatedGameTile: React.FC<AnimatedGameTileProps> = ({
                         style={styles.gameImageBackground}
                         imageStyle={styles.gameImage}
                     >
-                        <View style={[styles.gradientOverlay, { backgroundColor: `${background}CC` }]} />
-                        <View style={styles.gameInfo}>
+                        <RNView style={[styles.gradientOverlay, { backgroundColor: `${background}CC` }]} />
+                        <RNView style={styles.gameInfo}>
                             <Text style={[styles.gameTitle, { color: text }]}>{game.title}</Text>
                             <Text style={[styles.gameDescription, { color: text }]} numberOfLines={2}>
                                 {game.description}
                             </Text>
-                        </View>
+                        </RNView>
                     </ImageBackground>
                 </Animated.View>
             </TouchableOpacity>
-        </View>
+        </RNView>
     );
 };
 
@@ -102,7 +102,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     };
 
     return (
-        <View style={styles.gameContainer}>
+        <RNView style={styles.gameContainer}>
             {games.map((game, index) => (
                 <AnimatedGameTile
                     key={index}
@@ -115,7 +115,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
                     text={text}
                 />
             ))}
-        </View>
+        </RNView>
     );
 };
 
