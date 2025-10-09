@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, TouchableOpacity } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 
 interface CellProps {
     revealed: boolean;
@@ -16,6 +17,38 @@ interface CellProps {
 const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPress, adjacentMines, size }) => {
 
     const { primary, grayBackground, secondary } = useTheme();
+    
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    useEffect(() => {
+        if (revealed) {
+            // Animate reveal
+            scale.value = withSpring(1.1, {
+                damping: 15,
+                stiffness: 150,
+            }, () => {
+                scale.value = withSpring(1);
+            });
+        }
+    }, [revealed]);
+    
+    useEffect(() => {
+        if (flagged) {
+            // Animate flag placement
+            scale.value = withSpring(1.2, {
+                damping: 10,
+                stiffness: 200,
+            }, () => {
+                scale.value = withSpring(1);
+            });
+        }
+    }, [flagged]);
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
 
     const getCellContent = () => {
         if (flagged) {
@@ -33,7 +66,9 @@ const Cell: React.FC<CellProps> = ({ revealed, flagged, mine, onPress, onLongPre
             onPress={onPress}
             onLongPress={onLongPress}
         >
-            <Text style={[styles.cellText, { fontSize: size * 0.5 }]}>{getCellContent()}</Text>
+            <Animated.View style={animatedStyle}>
+                <Text style={[styles.cellText, { fontSize: size * 0.5 }]}>{getCellContent()}</Text>
+            </Animated.View>
         </TouchableOpacity>
     );
 };

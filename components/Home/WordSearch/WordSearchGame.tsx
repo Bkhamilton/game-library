@@ -13,6 +13,7 @@ import { getRandomColor } from "@/utils/wordSearch";
 import WordSearchHeader from "./WordSearchHeader";
 import WordSearchWords from "./WordSearchWords";
 import WordSearchBoard from "./WordSearchBoard";
+import { GameVictoryConfetti } from '@/components/animations';
 
 interface Cell {
     letter: string;
@@ -41,6 +42,7 @@ export default function WordSearchGame() {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [gameTime, setGameTime] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
+    const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
 
     const { db, curGame } = useContext(DBContext);
     const router = useRouter();
@@ -61,7 +63,11 @@ export default function WordSearchGame() {
         insertTimeScore(db, curGame?.id, gameTime, difficulty);
         insertWordsFound(db, curGame?.id, foundWords.length, difficulty);
         insertHintsUsed(db, curGame?.id, hintsUsed, difficulty);
-        setEndGameModalVisible(true);
+        setShowVictoryConfetti(true);
+        // Delay showing the modal slightly to let confetti play
+        setTimeout(() => {
+            setEndGameModalVisible(true);
+        }, 500);
     };
 
     const initializeGameWithDifficulty = (diff: Difficulty) => {
@@ -135,6 +141,10 @@ export default function WordSearchGame() {
                 game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
+            />
+            <GameVictoryConfetti
+                visible={showVictoryConfetti}
+                onComplete={() => setShowVictoryConfetti(false)}
             />
         </View>
     );
