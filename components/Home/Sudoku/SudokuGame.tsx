@@ -8,6 +8,7 @@ import SudokuHeader from './SudokuHeader';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
 import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
+import { ShakeView, GameVictoryConfetti } from '@/components/animations';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -21,6 +22,9 @@ export default function SudokuGame() {
 
     const [wrongCount, setWrongCount] = useState(0);
     const [lossModalShown, setLossModalShown] = useState(false);
+    
+    const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
+    const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
 
     const [gameTime, setGameTime] = useState(0); // Track game time
 
@@ -34,8 +38,12 @@ export default function SudokuGame() {
         insertWin(db, curGame!.id, difficulty);
         insertTimeScore(db, curGame!.id, gameTime, difficulty);
         insertMistakes(db, curGame!.id, wrongCount, difficulty);
-        setEndGameResult(true);
-        setEndGameModalVisible(true);
+        setShowVictoryConfetti(true);
+        // Delay showing the modal slightly to let confetti play
+        setTimeout(() => {
+            setEndGameResult(true);
+            setEndGameModalVisible(true);
+        }, 500);
     }
 
     const handleLoss = () => {
@@ -61,6 +69,7 @@ export default function SudokuGame() {
             setBoard(newBoard);
         } else {
             setWrongCount(prevCount => prevCount + 1);
+            setErrorShakeTrigger(prev => prev + 1); // Trigger shake animation
         }
         // Check if the board is solved
         if (JSON.stringify(newBoard) === JSON.stringify(solvedBoard)) {
@@ -105,13 +114,15 @@ export default function SudokuGame() {
                 wrongCount={wrongCount}
                 onTimeUpdate={handleTimeUpdate}
             />
-            <SudokuBoard 
-                board={board} 
-                handleInputChange={handleInputChange} 
-                selectedNumber={selectedNumber} 
-                initialNumbers={initialNumbers}
-                selectNumber={handleSelectNumber}
-            />
+            <ShakeView trigger={errorShakeTrigger}>
+                <SudokuBoard 
+                    board={board} 
+                    handleInputChange={handleInputChange} 
+                    selectedNumber={selectedNumber} 
+                    initialNumbers={initialNumbers}
+                    selectNumber={handleSelectNumber}
+                />
+            </ShakeView>
             <EndGameMessage 
                 visible={endGameModalVisible} 
                 close={() => setEndGameModalVisible(false)} 
@@ -119,6 +130,10 @@ export default function SudokuGame() {
                 game={curGame} 
                 initialDifficulty={difficulty} 
                 restartGame={restartGame}
+            />
+            <GameVictoryConfetti
+                visible={showVictoryConfetti}
+                onComplete={() => setShowVictoryConfetti(false)}
             />
         </View>
     );

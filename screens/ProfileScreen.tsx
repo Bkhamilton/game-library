@@ -8,6 +8,7 @@ import ProfileAchievements from '@/components/Profile/ProfilePage//ProfileAchiev
 import { UserContext } from '@/contexts/UserContext';
 import { FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
+import { FadeInView } from '@/components/animations';
 
 export default function ProfileScreen() {
 
@@ -29,32 +30,34 @@ export default function ProfileScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <ProfileHeader />
-            <ScrollView
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        tintColor={primary}
-                        colors={[primary]}
-                    />
-                }
-            >
-                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                    <View style={[styles.profileIcon, { backgroundColor: background, borderColor: text }]}>
-                        <View style={{ marginBottom: -2}}>
-                            <FontAwesome6 name="user-large" size={80} color={text} />
+        <FadeInView duration={400}>
+            <View style={styles.container}>
+                <ProfileHeader />
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            tintColor={primary}
+                            colors={[primary]}
+                        />
+                    }
+                >
+                    <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                        <View style={[styles.profileIcon, { backgroundColor: background, borderColor: text }]}>
+                            <View style={{ marginBottom: -2}}>
+                                <FontAwesome6 name="user-large" size={80} color={text} />
+                            </View>
                         </View>
+                        <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
+                        <Text>{ user ? user.username : '' }</Text>
                     </View>
-                    <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
-                    <Text>{ user ? user.username : '' }</Text>
-                </View>
-                <ProfileStats />
-                <ProfileAchievements onLoadAchievements={handleLoadAchievements} />
-                <View style={{ height: 100 }} />
-            </ScrollView>
-        </View>
+                    <ProfileStats />
+                    <ProfileAchievements onLoadAchievements={handleLoadAchievements} />
+                    <View style={{ height: 100 }} />
+                </ScrollView>
+            </View>
+        </FadeInView>
     );
 }
 

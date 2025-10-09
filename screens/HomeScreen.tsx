@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
 import { GameTitle, Difficulty, Games } from "@/constants/Types";
 import Difficulties from '@/constants/Difficulties';
+import { FadeInView } from "@/components/animations";
 
 export default function HomeScreen() {
 
@@ -55,20 +56,22 @@ export default function HomeScreen() {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <GameSelector
-                handleSelectGame={handleSelectGame}
-            />
-            {selectedGame && (
-                <SelectGame
-                    visible={showSelectGame}
-                    game={selectedGame}
-                    close={handleCloseModal}
-                    difficulties={Difficulties[selectedGame.title as GameTitle]}
-                    selectGame={confirmSelectGame}
+        <FadeInView duration={400}>
+            <ScrollView style={styles.container}>
+                <GameSelector
+                    handleSelectGame={handleSelectGame}
                 />
-            )}
-        </ScrollView>
+                {selectedGame && (
+                    <SelectGame
+                        visible={showSelectGame}
+                        game={selectedGame}
+                        close={handleCloseModal}
+                        difficulties={Difficulties[selectedGame.title as GameTitle]}
+                        selectGame={confirmSelectGame}
+                    />
+                )}
+            </ScrollView>
+        </FadeInView>
     );
 }
 
