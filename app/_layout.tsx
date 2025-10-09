@@ -99,6 +99,14 @@ function RootLayoutNav() {
                     name="memorymatch"
                     options={{ title: "Memory Match", headerBackTitle: "Home" }}
                 />
+                <Stack.Screen
+                    name="simonsays"
+                    options={{ title: "Simon Says", headerBackTitle: "Home" }}
+                />
+                <Stack.Screen
+                    name="connectfour"
+                    options={{ title: "Connect Four", headerBackTitle: "Home" }}
+                />
             </Stack>
         </ThemeProvider>
     );
