@@ -59,7 +59,7 @@ export default function MemoryMatchGame() {
             setCards(hiddenCards);
             setIsPreviewPhase(false);
             setCanFlip(true);
-        }, 1000);
+        }, 1500);
         
         return () => clearTimeout(timer);
     }, [difficulty]);

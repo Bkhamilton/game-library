@@ -64,7 +64,7 @@ export default function SettingsScreen() {
     }
 
     return (
-        <FadeInView duration={400}>
+
             <View style={styles.container}>
                 <AboutModal
                     visible={aboutModalVisible}
@@ -88,19 +88,20 @@ export default function SettingsScreen() {
                     </TouchableOpacity>        
                 </View>
                 <ScrollView>
-                    <View style={styles.settingsHeader}>
-                        <Text style={styles.settingsHeaderText}>Settings</Text>
-                    </View>
-                    <View>
-                        <View style={styles.accountHeader}>
-                            <Text style={styles.accountHeaderText}>Account</Text>
+                    <FadeInView duration={400}>
+                        <View style={styles.settingsHeader}>
+                            <Text style={styles.settingsHeaderText}>Settings</Text>
                         </View>
-                        <AccountInfo/>
-                        <SettingsOptions onSelect={handleSelect} />
-                    </View>
+                        <View>
+                            <View style={styles.accountHeader}>
+                                <Text style={styles.accountHeaderText}>Account</Text>
+                            </View>
+                            <AccountInfo/>
+                            <SettingsOptions onSelect={handleSelect} />
+                        </View>
+                    </FadeInView>                    
                 </ScrollView>
             </View>
-        </FadeInView>
     );
 }
 
