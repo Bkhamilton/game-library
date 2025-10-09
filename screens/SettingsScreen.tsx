@@ -9,6 +9,7 @@ import SettingsOptions from '@/components/Profile/Settings/SettingsOption';
 import AboutModal from '@/components/Modals/AboutModal';
 import HelpModal from '@/components/Modals/HelpModal';
 import ConfirmMessage from '@/components/Modals/ConfirmMessage';
+import { FadeInView } from '@/components/animations';
 
 export default function SettingsScreen() {
 
@@ -63,41 +64,43 @@ export default function SettingsScreen() {
     }
 
     return (
-        <View style={styles.container}>
-            <AboutModal
-                visible={aboutModalVisible}
-                close={closeAboutModal}
-            />
-            <HelpModal
-                visible={helpModalVisible}
-                close={closeHelpModal}
-            />
-            <ConfirmMessage
-                visible={confirmationModalVisible}
-                close={closeConfirmationModal}
-                message={confirmMessage}
-                confirm={onHandleConfirm}
-            />
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                >
-                    <FontAwesome5 name="chevron-left" size={24} color={text} />
-                </TouchableOpacity>        
-            </View>
-            <ScrollView>
-                <View style={styles.settingsHeader}>
-                    <Text style={styles.settingsHeaderText}>Settings</Text>
+        <FadeInView duration={400}>
+            <View style={styles.container}>
+                <AboutModal
+                    visible={aboutModalVisible}
+                    close={closeAboutModal}
+                />
+                <HelpModal
+                    visible={helpModalVisible}
+                    close={closeHelpModal}
+                />
+                <ConfirmMessage
+                    visible={confirmationModalVisible}
+                    close={closeConfirmationModal}
+                    message={confirmMessage}
+                    confirm={onHandleConfirm}
+                />
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                    >
+                        <FontAwesome5 name="chevron-left" size={24} color={text} />
+                    </TouchableOpacity>        
                 </View>
-                <View>
-                    <View style={styles.accountHeader}>
-                        <Text style={styles.accountHeaderText}>Account</Text>
+                <ScrollView>
+                    <View style={styles.settingsHeader}>
+                        <Text style={styles.settingsHeaderText}>Settings</Text>
                     </View>
-                    <AccountInfo/>
-                    <SettingsOptions onSelect={handleSelect} />
-                </View>
-            </ScrollView>
-        </View>
+                    <View>
+                        <View style={styles.accountHeader}>
+                            <Text style={styles.accountHeaderText}>Account</Text>
+                        </View>
+                        <AccountInfo/>
+                        <SettingsOptions onSelect={handleSelect} />
+                    </View>
+                </ScrollView>
+            </View>
+        </FadeInView>
     );
 }
 
