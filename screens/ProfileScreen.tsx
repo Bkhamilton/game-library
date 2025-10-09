@@ -30,34 +30,34 @@ export default function ProfileScreen() {
     };
 
     return (
-        <FadeInView duration={400}>
-            <View style={styles.container}>
-                <ProfileHeader />
-                <ScrollView
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            tintColor={primary}
-                            colors={[primary]}
-                        />
-                    }
-                >
-                    <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                        <View style={[styles.profileIcon, { backgroundColor: background, borderColor: text }]}>
-                            <View style={{ marginBottom: -2}}>
-                                <FontAwesome6 name="user-large" size={80} color={text} />
-                            </View>
+        <View style={styles.container}>
+            <ProfileHeader />
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={primary}
+                        colors={[primary]}
+                    />
+                }
+            >
+                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                    <View style={[styles.profileIcon, { backgroundColor: background, borderColor: text }]}>
+                        <View style={{ marginBottom: -2}}>
+                            <FontAwesome6 name="user-large" size={80} color={text} />
                         </View>
-                        <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
-                        <Text>{ user ? user.username : '' }</Text>
                     </View>
-                    <ProfileStats />
+                    <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
+                    <Text>{ user ? user.username : '' }</Text>
+                </View>
+                <ProfileStats />
+                <FadeInView duration={500} delay={400}>
                     <ProfileAchievements onLoadAchievements={handleLoadAchievements} />
-                    <View style={{ height: 100 }} />
-                </ScrollView>
-            </View>
-        </FadeInView>
+                </FadeInView>
+                <View style={{ height: 100 }} />
+            </ScrollView>
+        </View>
     );
 }
 

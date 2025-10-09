@@ -58,8 +58,8 @@ export default function HomeScreen() {
     };
 
     return (
-        <FadeInView duration={400}>
-            <ScrollView style={styles.container}>
+        <ScrollView style={styles.container}>
+            <FadeInView duration={600}>
                 <GameSelector
                     handleSelectGame={handleSelectGame}
                 />
@@ -72,8 +72,8 @@ export default function HomeScreen() {
                         selectGame={confirmSelectGame}
                     />
                 )}
-            </ScrollView>
-        </FadeInView>
+            </FadeInView>
+        </ScrollView>
     );
 }
 

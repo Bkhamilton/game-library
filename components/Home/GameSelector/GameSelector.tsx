@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         paddingHorizontal: 16,
         paddingTop: 12,
+        backgroundColor: "transparent",
     },
     gameItem: {
         marginBottom: 20,
