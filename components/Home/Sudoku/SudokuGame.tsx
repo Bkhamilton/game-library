@@ -124,7 +124,9 @@ export default function SudokuGame() {
             {isLoading ? (
                 <LoadingSpinner size="large" />
             ) : (
-                <ShakeView trigger={errorShakeTrigger}>
+                <ShakeView 
+                    trigger={errorShakeTrigger}
+                >
                     <SudokuBoard 
                         board={board} 
                         handleInputChange={handleInputChange} 
