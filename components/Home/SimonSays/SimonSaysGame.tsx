@@ -5,6 +5,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
 import ColorTile from "./ColorTile";
+import SimonSaysHeader from "./SimonSaysHeader";
+import useTheme from "@/hooks/useTheme";
 import { 
     getDifficultySettings, 
     getTileColors, 
@@ -14,7 +16,7 @@ import {
     TileColor 
 } from "@/utils/SimonSaysGenerator";
 
-type GameState = 'idle' | 'showing' | 'input' | 'gameover';
+type GameState = 'idle' | 'countdown' | 'showing' | 'input' | 'gameover';
 
 export default function SimonSaysGame() {
     const router = useRouter();
@@ -26,9 +28,11 @@ export default function SimonSaysGame() {
     const [sequence, setSequence] = useState<number[]>([]);
     const [userSequence, setUserSequence] = useState<number[]>([]);
     const [activeTile, setActiveTile] = useState<number | null>(null);
-    const [message, setMessage] = useState<string>("Press Start to begin");
+    const [message, setMessage] = useState<string>("Watch the sequence...");
+    const [countdown, setCountdown] = useState<number | null>(null);
 
     const { db, curGame } = useContext(DBContext);
+    const { primary } = useTheme();
     const settings = getDifficultySettings(difficulty as string);
     const tileColors = getTileColors(difficulty as string);
     const playbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -43,18 +47,33 @@ export default function SimonSaysGame() {
     }, []);
 
     useEffect(() => {
-        if (isGameRunning && gameState === 'idle') {
+        // Start countdown when game state changes to countdown
+        if (gameState === 'countdown' && countdown !== null && countdown > 0) {
+            const timer = setTimeout(() => {
+                setCountdown(countdown - 1);
+            }, 1000);
+            return () => clearTimeout(timer);
+        } else if (gameState === 'countdown' && countdown === 0) {
+            // Countdown finished, start the game
+            setGameState('idle');
+            setCountdown(null);
+        }
+    }, [gameState, countdown]);
+
+    useEffect(() => {
+        if (isGameRunning && gameState === 'idle' && countdown === null) {
             startNewRound();
         }
-    }, [isGameRunning, gameState]);
+    }, [isGameRunning, gameState, countdown]);
 
     const startGame = () => {
         setIsGameRunning(true);
         setRound(0);
         setSequence([]);
         setUserSequence([]);
-        setGameState('idle');
-        setMessage("Watch the sequence...");
+        setGameState('countdown');
+        setCountdown(3);
+        setMessage("Get ready...");
     };
 
     const startNewRound = () => {
@@ -141,7 +160,8 @@ export default function SimonSaysGame() {
         setIsGameRunning(false);
         setEndGameModalVisible(false);
         setGameState('idle');
-        setMessage("Press Start to begin");
+        setCountdown(null);
+        setMessage("Watch the sequence...");
     };
 
     const handleLoss = () => {
@@ -186,22 +206,26 @@ export default function SimonSaysGame() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Simon Says</Text>
-            <Text style={styles.difficulty}>Difficulty: {difficulty}</Text>
-            <Text style={styles.score}>Round: {round}</Text>
-            <Text style={styles.message}>{message}</Text>
+            <SimonSaysHeader 
+                round={round}
+                timerActive={isGameRunning && gameState !== 'gameover'}
+            />
             
-            <View style={styles.board}>
-                {isGameRunning ? renderTiles() : (
-                    <Text style={styles.placeholder}>Game board will appear here</Text>
+            <View style={[styles.board, { borderColor: primary }]}>
+                {gameState === 'countdown' && countdown !== null ? (
+                    <Text style={styles.countdownText}>{countdown}</Text>
+                ) : isGameRunning ? (
+                    <>
+                        {renderTiles()}
+                    </>
+                ) : (
+                    <TouchableOpacity style={styles.startOverlay} onPress={startGame}>
+                        <Text style={styles.startText}>Tap to Start</Text>
+                    </TouchableOpacity>
                 )}
             </View>
 
-            {!isGameRunning && (
-                <TouchableOpacity style={styles.startButton} onPress={startGame}>
-                    <Text style={styles.startText}>Start</Text>
-                </TouchableOpacity>
-            )}
+            <Text style={styles.message}>{message}</Text>
 
             <EndGameMessage
                 visible={endGameModalVisible}
@@ -219,55 +243,40 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    difficulty: {
-        fontSize: 18,
-        marginBottom: 10,
-    },
-    score: {
-        fontSize: 24,
-        marginBottom: 20,
-    },
-    message: {
-        fontSize: 18,
-        marginBottom: 15,
-        fontWeight: "600",
-        textAlign: "center",
+        paddingTop: 24,
     },
     board: {
-        width: 300,
-        height: 300,
-        backgroundColor: "#2c3e50",
-        borderRadius: 10,
+        width: 360,
+        height: 360,
+        borderWidth: 3,
+        borderRadius: 8,
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 20,
+        marginVertical: 20,
     },
     tileRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    placeholder: {
-        fontSize: 16,
-        color: "#ecf0f1",
+    message: {
+        fontSize: 18,
+        fontWeight: "600",
+        textAlign: "center",
+        marginTop: 10,
     },
-    startButton: {
-        backgroundColor: "#33a5ff",
-        padding: 15,
-        paddingHorizontal: 60,
-        borderRadius: 10,
+    countdownText: {
+        fontSize: 80,
+        fontWeight: "bold",
+    },
+    startOverlay: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     startText: {
-        fontSize: 20,
-        color: "#FFF",
-        fontWeight: "bold",
+        fontSize: 24,
+        fontWeight: "600",
     },
 });
