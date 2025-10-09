@@ -1,0 +1,23 @@
+// DolphinDive Type Definitions
+
+export interface DolphinState {
+    y: number;              // Current vertical position
+    velocity: number;       // Current vertical velocity
+    maxDepthReached: number; // Deepest point in current dive
+    isUnderwater: boolean;  // Below water surface
+    isDiving: boolean;      // Tap is held
+}
+
+export interface Obstacle {
+    key: string;
+    x: number;
+    y: number;
+    type: 'underwater' | 'surface' | 'airborne';
+}
+
+export interface Collectible {
+    key: string;
+    x: number;
+    y: number;
+    collected: boolean;
+}

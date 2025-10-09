@@ -50,6 +50,8 @@ export default function HomeScreen() {
                 return router.push(`/simonsays?difficulty=${difficulty}`);
             case "Connect Four":
                 return router.push(`/connectfour?difficulty=${difficulty}`);
+            case "DolphinDive":
+                return router.push(`/dolphindive?difficulty=${difficulty}`);
             default:
                 return "";
         }

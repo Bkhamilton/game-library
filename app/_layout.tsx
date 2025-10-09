@@ -108,6 +108,10 @@ function RootLayoutNav() {
                     options={{ title: "Connect Four", headerBackTitle: "Home" }}
                 />
                 <Stack.Screen
+                    name="dolphindive"
+                    options={{ title: "DolphinDive", headerBackTitle: "Home" }}
+                />
+                <Stack.Screen
                     name="animation-test"
                     options={{ title: "Animation Test", headerBackTitle: "Home" }}
                 />
