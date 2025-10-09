@@ -107,6 +107,10 @@ function RootLayoutNav() {
                     name="connectfour"
                     options={{ title: "Connect Four", headerBackTitle: "Home" }}
                 />
+                <Stack.Screen
+                    name="animation-test"
+                    options={{ title: "Animation Test", headerBackTitle: "Home" }}
+                />
             </Stack>
         </ThemeProvider>
     );
