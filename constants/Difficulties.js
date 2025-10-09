@@ -9,4 +9,5 @@ export default {
     'Memory Match': ['Easy', 'Medium', 'Hard'],
     'Simon Says': ['Easy', 'Medium', 'Hard'],
     'Connect Four': ['Easy', 'Medium', 'Hard'],
+    'DolphinDive': ['Easy', 'Hard'],
 }
