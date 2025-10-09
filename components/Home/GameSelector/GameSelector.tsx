@@ -5,10 +5,88 @@ import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
 import { Games } from "@/constants/Types";
 import { GameLogos } from "@/constants/GameLogos";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 interface GameSelectorProps {
     handleSelectGame: (game: Games) => void;
 }
+
+// Animated game tile component
+interface AnimatedGameTileProps {
+    game: Games;
+    onPress: () => void;
+    width: string;
+    grayBackground: string;
+    grayBorder: string;
+    background: string;
+    text: string;
+}
+
+const AnimatedGameTile: React.FC<AnimatedGameTileProps> = ({ 
+    game, 
+    onPress, 
+    width, 
+    grayBackground, 
+    grayBorder, 
+    background, 
+    text 
+}) => {
+    const scale = useSharedValue(1);
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+    
+    const handlePressIn = () => {
+        scale.value = withSpring(0.95, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    const handlePressOut = () => {
+        scale.value = withSpring(1, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    return (
+        <View style={[styles.gameItem, { width: width as any }]}>
+            <TouchableOpacity 
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                onPress={onPress}
+                activeOpacity={0.8}
+            >
+                <Animated.View
+                    style={[
+                        styles.gameCard,
+                        { 
+                            backgroundColor: grayBackground,
+                            borderColor: grayBorder,
+                        },
+                        animatedStyle,
+                    ]}
+                >
+                    <ImageBackground 
+                        source={GameLogos[game.title as keyof typeof GameLogos]} 
+                        style={styles.gameImageBackground}
+                        imageStyle={styles.gameImage}
+                    >
+                        <View style={[styles.gradientOverlay, { backgroundColor: `${background}CC` }]} />
+                        <View style={styles.gameInfo}>
+                            <Text style={[styles.gameTitle, { color: text }]}>{game.title}</Text>
+                            <Text style={[styles.gameDescription, { color: text }]} numberOfLines={2}>
+                                {game.description}
+                            </Text>
+                        </View>
+                    </ImageBackground>
+                </Animated.View>
+            </TouchableOpacity>
+        </View>
+    );
+};
 
 const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     const { grayBackground, grayBorder, text, background } = useTheme();
@@ -26,33 +104,16 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
     return (
         <View style={styles.gameContainer}>
             {games.map((game, index) => (
-                <View key={index} style={[styles.gameItem, { width: itemWidth }]}>
-                    <TouchableOpacity 
-                        onPress={() => handleGamePress(game)}
-                        activeOpacity={0.7}
-                        style={[
-                            styles.gameCard,
-                            { 
-                                backgroundColor: grayBackground,
-                                borderColor: grayBorder,
-                            }
-                        ]}
-                    >
-                        <ImageBackground 
-                            source={GameLogos[game.title as keyof typeof GameLogos]} 
-                            style={styles.gameImageBackground}
-                            imageStyle={styles.gameImage}
-                        >
-                            <View style={[styles.gradientOverlay, { backgroundColor: `${background}CC` }]} />
-                            <View style={styles.gameInfo}>
-                                <Text style={[styles.gameTitle, { color: text }]}>{game.title}</Text>
-                                <Text style={[styles.gameDescription, { color: text }]} numberOfLines={2}>
-                                    {game.description}
-                                </Text>
-                            </View>
-                        </ImageBackground>
-                    </TouchableOpacity>
-                </View>
+                <AnimatedGameTile
+                    key={index}
+                    game={game}
+                    onPress={() => handleGamePress(game)}
+                    width={itemWidth}
+                    grayBackground={grayBackground}
+                    grayBorder={grayBorder}
+                    background={background}
+                    text={text}
+                />
             ))}
         </View>
     );

@@ -1,76 +1,12 @@
 # Animation Examples
 
-This directory contains test components and reusable animation utilities demonstrating the three animation libraries configured for the game library project.
+This directory contains reusable animation components built with `react-native-reanimated` for the Game Library.
 
-## Directory Structure
+## Available Components
 
-```
-components/animations/
-├── index.tsx                  # Main exports
-├── ReanimatedExamples.tsx    # React Native Reanimated examples
-├── LottieExamples.tsx        # Lottie animation examples
-├── ConfettiExamples.tsx      # Confetti particle effects examples
-└── README.md                 # This file
-```
+### Reusable Components
 
-## Test Screens
-
-Each animation library has a dedicated test screen that can be used to verify installation and see usage examples.
-
-### 1. Reanimated Test Screen
-
-Demonstrates react-native-reanimated capabilities:
-
-```typescript
-import { AnimationTestScreen } from '@/components/animations';
-
-// In your component
-<AnimationTestScreen />
-```
-
-**Features Demonstrated:**
-- Animated button with spring physics
-- Fade-in animations on mount
-- Continuous pulse animations
-- Shake animations for error feedback
-
-### 2. Lottie Test Screen
-
-Demonstrates lottie-react-native capabilities:
-
-```typescript
-import { LottieTestScreen } from '@/components/animations';
-
-// In your component
-<LottieTestScreen />
-```
-
-**Features Demonstrated:**
-- Basic Lottie animation playback
-- Animation control (play, pause, reset)
-- Loop and autoPlay options
-- Animation callbacks
-
-### 3. Confetti Test Screen
-
-Demonstrates react-native-confetti-cannon capabilities:
-
-```typescript
-import { ConfettiTestScreen } from '@/components/animations';
-
-// In your component
-<ConfettiTestScreen />
-```
-
-**Features Demonstrated:**
-- Basic confetti from corners
-- Custom colored confetti
-- Center burst confetti
-- Different explosion patterns
-
-## Reusable Components
-
-### AnimatedButton
+#### AnimatedButton
 
 A button with spring-based press animation.
 
@@ -82,7 +18,7 @@ import { AnimatedButton } from '@/components/animations';
 </AnimatedButton>
 ```
 
-### FadeInView
+#### FadeInView
 
 Automatically fades in content when mounted.
 
@@ -94,7 +30,7 @@ import { FadeInView } from '@/components/animations';
 </FadeInView>
 ```
 
-### PulseView
+#### PulseView
 
 Continuously pulses its children.
 
@@ -108,98 +44,65 @@ import { PulseView } from '@/components/animations';
 </PulseView>
 ```
 
-### ShakeView
+#### ShakeView
 
-Shakes when triggered (useful for error feedback).
+Shakes content when triggered, useful for error feedback.
 
 ```typescript
 import { ShakeView } from '@/components/animations';
 
-const [shakeCount, setShakeCount] = useState(0);
-
-<ShakeView trigger={shakeCount}>
-  <Text>Shake on error</Text>
-</ShakeView>
-
-// Trigger shake:
-setShakeCount(prev => prev + 1);
+function MyComponent() {
+  const [errorTrigger, setErrorTrigger] = useState(0);
+  
+  const handleError = () => {
+    setErrorTrigger(prev => prev + 1);
+  };
+  
+  return (
+    <ShakeView trigger={errorTrigger}>
+      <Text>This will shake on error</Text>
+    </ShakeView>
+  );
+}
 ```
 
-### LoadingSpinner
+#### LoadingSpinner
 
-Lottie-based loading indicator.
+Animated loading spinner.
 
 ```typescript
 import { LoadingSpinner } from '@/components/animations';
 
-<LoadingSpinner visible={isLoading} size={100} />
+<LoadingSpinner size="large" color="#007AFF" />
 ```
 
-### VictoryAnimation
+#### VictoryAnimation
 
-Full-screen victory animation with Lottie.
+Celebration overlay for game completion.
 
 ```typescript
 import { VictoryAnimation } from '@/components/animations';
 
 <VictoryAnimation 
-  visible={gameWon} 
-  onComplete={() => console.log('Animation done')}
-/>
+  visible={gameWon}
+  onComplete={() => console.log('Animation complete')}
+>
+  <Text>You Won!</Text>
+</VictoryAnimation>
 ```
 
-### GameVictoryConfetti
+#### GameVictoryConfetti
 
-Confetti celebration for game completion.
+Confetti animation for game wins.
 
 ```typescript
 import { GameVictoryConfetti } from '@/components/animations';
 
 <GameVictoryConfetti 
-  visible={gameCompleted}
-  onComplete={() => console.log('Celebration done')}
+  visible={gameWon}
+  onComplete={() => console.log('Confetti done')}
 />
 ```
-
-## Testing the Examples
-
-To test these components in your app:
-
-1. **Create a test screen** (e.g., in `app/animation-test.tsx`):
-
-```typescript
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { 
-  AnimationTestScreen, 
-  LottieTestScreen, 
-  ConfettiTestScreen 
-} from '@/components/animations';
-
-export default function AnimationTestPage() {
-  return (
-    <ScrollView style={styles.container}>
-      <AnimationTestScreen />
-      <View style={styles.separator} />
-      <LottieTestScreen />
-      <View style={styles.separator} />
-      <ConfettiTestScreen />
-    </ScrollView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  separator: {
-    height: 40,
-  },
-});
-```
-
-2. **Add a navigation route** to access the test screen
-
-3. **Run the app** and navigate to the test screen
 
 ## Integration into Games
 
@@ -250,37 +153,16 @@ function GameScreen() {
 }
 ```
 
-### Example: Loading State
-
-```typescript
-import { LoadingSpinner } from '@/components/animations';
-
-function GameLoader() {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  return (
-    <View>
-      {isLoading ? (
-        <LoadingSpinner visible={true} size={150} />
-      ) : (
-        <GameContent />
-      )}
-    </View>
-  );
-}
-```
-
 ## Performance Notes
 
-- **Reanimated**: Use native driver where possible for 60fps animations
-- **Lottie**: Keep JSON files under 100KB for best performance
-- **Confetti**: Limit particle count to 100-200 on mobile devices
+- All animations use the native driver for optimal performance
+- Animations target 60fps
+- Use `worklet` directive for animations that run on the UI thread
+- Avoid animating layout properties (width, height) when possible
 
-## Further Reading
+## Best Practices
 
-See the main documentation at `/docs/ANIMATION_LIBRARIES.md` for:
-- Complete API documentation
-- Configuration details
-- Platform-specific considerations
-- Troubleshooting guide
-- Performance optimization tips
+1. **Use appropriate durations**: Fast for feedback (150ms), normal for transitions (300ms), slow for emphasis (500ms+)
+2. **Respect accessibility**: Check for reduced motion preferences
+3. **Clean up animations**: Ensure infinite animations are stopped when components unmount
+4. **Test on devices**: Always test on actual devices, not just simulators

@@ -13,6 +13,7 @@ import { getRandomColor } from "@/utils/wordSearch";
 import WordSearchHeader from "./WordSearchHeader";
 import WordSearchWords from "./WordSearchWords";
 import WordSearchBoard from "./WordSearchBoard";
+import { GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
 
 interface Cell {
     letter: string;
@@ -41,6 +42,8 @@ export default function WordSearchGame() {
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [gameTime, setGameTime] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
+    const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
     const router = useRouter();
@@ -61,19 +64,27 @@ export default function WordSearchGame() {
         insertTimeScore(db, curGame?.id, gameTime, difficulty);
         insertWordsFound(db, curGame?.id, foundWords.length, difficulty);
         insertHintsUsed(db, curGame?.id, hintsUsed, difficulty);
-        setEndGameModalVisible(true);
+        setShowVictoryConfetti(true);
+        // Delay showing the modal slightly to let confetti play
+        setTimeout(() => {
+            setEndGameModalVisible(true);
+        }, 500);
     };
 
     const initializeGameWithDifficulty = (diff: Difficulty) => {
-        const settings = DIFFICULTY_SETTINGS[diff];
-        const wordPool = WORD_POOLS[diff];
-        const selectedWords = [...wordPool].sort(() => Math.random() - 0.5).slice(0, settings.wordCount);
+        setIsLoading(true);
+        setTimeout(() => {
+            const settings = DIFFICULTY_SETTINGS[diff];
+            const wordPool = WORD_POOLS[diff];
+            const selectedWords = [...wordPool].sort(() => Math.random() - 0.5).slice(0, settings.wordCount);
 
-        setFoundWords([]);
-        setWordBank(selectedWords);
+            setFoundWords([]);
+            setWordBank(selectedWords);
 
-        const newGrid = initializeGrid(settings.gridSize, selectedWords);
-        setGrid(newGrid);
+            const newGrid = initializeGrid(settings.gridSize, selectedWords);
+            setGrid(newGrid);
+            setIsLoading(false);
+        }, 300);
     };
 
     const handleCellPress = (row: number, col: number) => {
@@ -119,15 +130,21 @@ export default function WordSearchGame() {
                 foundWords={foundWords.length}
                 onTimeUpdate={handleTimeUpdate}
             />
-            <WordSearchBoard 
-                grid={grid} 
-                handleCellPress={handleCellPress} 
-            />
-            <WordSearchWords 
-                wordBank={wordBank} 
-                foundWords={foundWords} 
-                wordColors={wordColors} 
-            />
+            {isLoading ? (
+                <LoadingSpinner size="large" />
+            ) : (
+                <>
+                    <WordSearchBoard 
+                        grid={grid} 
+                        handleCellPress={handleCellPress} 
+                    />
+                    <WordSearchWords 
+                        wordBank={wordBank} 
+                        foundWords={foundWords} 
+                        wordColors={wordColors} 
+                    />
+                </>
+            )}
             <EndGameMessage
                 visible={endGameModalVisible}
                 close={() => setEndGameModalVisible(false)}
@@ -135,6 +152,10 @@ export default function WordSearchGame() {
                 game={curGame}
                 initialDifficulty={difficulty}
                 restartGame={restartGame}
+            />
+            <GameVictoryConfetti
+                visible={showVictoryConfetti}
+                onComplete={() => setShowVictoryConfetti(false)}
             />
         </View>
     );

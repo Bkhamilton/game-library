@@ -3,14 +3,112 @@ import { StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from
 import { View, Text } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 import { MaterialIcons } from '@expo/vector-icons';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, withSequence } from 'react-native-reanimated';
 
 interface SudokuBoardProps {
     board: number[][],
     handleInputChange: (row: number, col: number, value: string) => void,
     selectedNumber: number | null,
     initialNumbers: { [key: string]: boolean },
-    selectNumber: (value: number) => void,
+    selectNumber: (value: number | null) => void,
 }
+
+// Animated number button component
+interface AnimatedNumberButtonProps {
+    value: number | string;
+    onPress: () => void;
+    backgroundColor: string;
+    isBackspace?: boolean;
+    text: string;
+}
+
+const AnimatedNumberButton: React.FC<AnimatedNumberButtonProps> = ({ value, onPress, backgroundColor, isBackspace, text }) => {
+    const scale = useSharedValue(1);
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+    
+    const handlePressIn = () => {
+        scale.value = withSpring(0.9, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    const handlePressOut = () => {
+        scale.value = withSpring(1, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    return (
+        <TouchableOpacity 
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={onPress}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            activeOpacity={0.8}
+        >
+            <Animated.View style={[styles.numberButton, { backgroundColor }, animatedStyle]}>
+                {isBackspace ? (
+                    <MaterialIcons name="backspace" size={20} color={text} />
+                ) : (
+                    <Text style={styles.numberButtonText}>{value}</Text>
+                )}
+            </Animated.View>
+        </TouchableOpacity>
+    );
+};
+
+// Animated cell component for number placement animation
+interface AnimatedCellProps {
+    value: number;
+    rowIndex: number;
+    colIndex: number;
+    onPress: () => void;
+    cellStyle: any[];
+    isInitial: boolean;
+}
+
+const AnimatedCell: React.FC<AnimatedCellProps> = ({ value, rowIndex, colIndex, onPress, cellStyle, isInitial }) => {
+    const scale = useSharedValue(value === 0 ? 1 : 0);
+    const opacity = useSharedValue(value === 0 ? 1 : 0);
+    
+    useEffect(() => {
+        if (value !== 0 && !isInitial) {
+            // Animate number entry
+            scale.value = withSpring(1, {
+                damping: 10,
+                stiffness: 100,
+            });
+            opacity.value = withTiming(1, { duration: 200 });
+        }
+    }, [value]);
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
+    
+    return (
+        <TouchableOpacity
+            style={cellStyle}
+            onPress={onPress}
+        >
+            {value === 0 ? (
+                <Text style={styles.cellText}></Text>
+            ) : (
+                <Animated.View style={animatedStyle}>
+                    <Text style={[styles.cellText, isInitial ? styles.initialCellText : styles.placedCellText]}>
+                        {value}
+                    </Text>
+                </Animated.View>
+            )}
+        </TouchableOpacity>
+    );
+};
 
 export default function SudokuBoard({ board, handleInputChange, selectedNumber, initialNumbers, selectNumber }: SudokuBoardProps) {
     const [selectedTile, setSelectedTile] = useState<{ row: number, col: number } | null>(null);
@@ -58,37 +156,36 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                 {board.map((row: number[], rowIndex: number) => (
                     <View key={rowIndex} style={styles.row}>
                         {row.map((cell: number, colIndex: number) => (
-                            <TouchableOpacity
+                            <AnimatedCell
                                 key={colIndex}
-                                style={getCellStyle(rowIndex, colIndex)}
+                                value={cell}
+                                rowIndex={rowIndex}
+                                colIndex={colIndex}
                                 onPress={() => handleTilePress(rowIndex, colIndex)}
-                            >
-                                <Text style={[styles.cellText, initialNumbers[`${rowIndex}-${colIndex}`] ? styles.initialCellText : styles.placedCellText]}>
-                                    {cell === 0 ? '' : cell.toString()}
-                                </Text>
-                            </TouchableOpacity>
+                                cellStyle={getCellStyle(rowIndex, colIndex)}
+                                isInitial={initialNumbers[`${rowIndex}-${colIndex}`] || false}
+                            />
                         ))}
                     </View>
                 ))}
             </View>
             <View style={styles.numberContainer}>
                 {[...Array(9)].map((_, index) => (
-                    <TouchableOpacity 
-                        key={index} 
-                        style={[styles.numberButton, { backgroundColor: primary }]}
+                    <AnimatedNumberButton
+                        key={index}
+                        value={index + 1}
                         onPress={() => handlePress(index + 1)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <Text style={styles.numberButtonText}>{index + 1}</Text>
-                    </TouchableOpacity>
+                        backgroundColor={primary}
+                        text={text}
+                    />
                 ))}
-                <TouchableOpacity 
-                    style={[styles.numberButton, { backgroundColor: primary }]}
+                <AnimatedNumberButton
+                    value=""
                     onPress={() => handlePress(-1)}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}    
-                >
-                    <MaterialIcons name="backspace" size={20} color={text} />
-                </TouchableOpacity>
+                    backgroundColor={primary}
+                    isBackspace
+                    text={text}
+                />
             </View>
         </>
 

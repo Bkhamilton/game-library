@@ -59,96 +59,69 @@ export const FAST_TIMING_CONFIG = {
 
 /**
  * Slow timing animation
- * Use for dramatic effects
+ * Use for emphasis
  */
 export const SLOW_TIMING_CONFIG = {
-  duration: 600,
+  duration: 500,
 };
 
 // ============================================================================
-// Animation Helpers
+// Animation Timing Constants
 // ============================================================================
 
 /**
- * Animates a value to a target with spring physics
- * 
- * @param value - The shared value to animate
- * @param toValue - Target value
- * @param config - Spring configuration (optional)
+ * Standard animation durations in milliseconds
  */
-export function animateSpring(
-  value: SharedValue<number>,
-  toValue: number,
-  config = SPRING_CONFIG
-) {
-  'worklet';
-  value.value = withSpring(toValue, config);
-}
+export const DURATIONS = {
+  instant: 0,
+  fast: 150,
+  normal: 300,
+  slow: 600,
+  verySlow: 1000,
+};
 
 /**
- * Animates a value to a target with timing
- * 
- * @param value - The shared value to animate
- * @param toValue - Target value
- * @param config - Timing configuration (optional)
+ * Standard delays in milliseconds
  */
-export function animateTiming(
-  value: SharedValue<number>,
-  toValue: number,
-  config = TIMING_CONFIG
-) {
-  'worklet';
-  value.value = withTiming(toValue, config);
-}
+export const DELAYS = {
+  none: 0,
+  short: 100,
+  medium: 300,
+  long: 500,
+};
+
+// ============================================================================
+// Easing Functions
+// ============================================================================
 
 /**
- * Creates a pulse animation (scale up then down)
- * 
- * @param value - The shared value to animate
- * @param scale - Maximum scale value (default: 1.1)
- * @param duration - Duration per direction in ms (default: 500)
+ * Common easing curves
+ * Note: These are for documentation; use withTiming's easing parameter
  */
-export function animatePulse(
-  value: SharedValue<number>,
-  scale = 1.1,
-  duration = 500
-) {
-  'worklet';
-  value.value = withSequence(
-    withTiming(scale, { duration }),
-    withTiming(1, { duration })
-  );
-}
+export const EASING_CURVES = {
+  easeInOut: 'ease-in-out',
+  easeIn: 'ease-in',
+  easeOut: 'ease-out',
+  linear: 'linear',
+};
+
+// ============================================================================
+// Color Palettes for Animations
+// ============================================================================
 
 /**
- * Creates a shake animation (horizontal wiggle)
- * 
- * @param value - The shared value to animate
- * @param intensity - Maximum displacement in pixels (default: 10)
+ * Predefined color palettes for confetti and particle effects
  */
-export function animateShake(value: SharedValue<number>, intensity = 10) {
-  'worklet';
-  value.value = withSequence(
-    withTiming(-intensity, { duration: 50 }),
-    withTiming(intensity, { duration: 50 }),
-    withTiming(-intensity, { duration: 50 }),
-    withTiming(intensity, { duration: 50 }),
-    withTiming(0, { duration: 50 })
-  );
-}
+export const ANIMATION_COLORS = {
+  default: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
+  victory: ['#FFD700', '#FFA500', '#FF69B4', '#00CED1', '#32CD32'],
+  achievement: ['#FF1744', '#F50057', '#D500F9', '#651FFF', '#3D5AFE'],
+  streak: ['#00E5FF', '#1DE9B6', '#76FF03', '#FFEA00', '#FF9100'],
+};
 
-/**
- * Creates a bounce animation (scale down then up with overshoot)
- * 
- * @param value - The shared value to animate
- */
-export function animateBounce(value: SharedValue<number>) {
-  'worklet';
-  value.value = withSequence(
-    withTiming(0.95, { duration: 100 }),
-    withSpring(1, BOUNCY_SPRING_CONFIG)
-  );
-}
+// ============================================================================
+// Animation Helper Functions
+// ============================================================================
 
 /**
  * Fade in animation
@@ -197,90 +170,35 @@ export function animateScaleOut(value: SharedValue<number>, duration = 200) {
   value.value = withTiming(0, { duration });
 }
 
-// ============================================================================
-// Confetti Configurations
-// ============================================================================
+/**
+ * Shake animation for error feedback
+ * 
+ * @param value - The shared value to animate (translateX)
+ */
+export function animateShake(value: SharedValue<number>) {
+  'worklet';
+  value.value = withSequence(
+    withTiming(-10, { duration: 50 }),
+    withTiming(10, { duration: 50 }),
+    withTiming(-10, { duration: 50 }),
+    withTiming(10, { duration: 50 }),
+    withTiming(0, { duration: 50 })
+  );
+}
 
 /**
- * Standard confetti configuration for game completion
+ * Pulse animation
+ * 
+ * @param value - The shared value to animate (scale)
+ * @param duration - Duration in ms (default: 1000)
  */
-export const VICTORY_CONFETTI_CONFIG = {
-  count: 200,
-  origin: { x: -10, y: 0 },
-  fadeOut: true,
-  explosionSpeed: 350,
-  fallSpeed: 2500,
-};
-
-/**
- * Center burst confetti for dramatic victories
- */
-export const CENTER_BURST_CONFIG = {
-  count: 180,
-  fadeOut: true,
-  explosionSpeed: 400,
-  fallSpeed: 2000,
-};
-
-/**
- * Gentle celebration confetti
- */
-export const GENTLE_CELEBRATION_CONFIG = {
-  count: 100,
-  fadeOut: true,
-  explosionSpeed: 250,
-  fallSpeed: 2000,
-};
-
-/**
- * Theme-specific confetti colors
- */
-export const CONFETTI_COLORS = {
-  default: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'],
-  victory: ['#FFD700', '#FFA500', '#FF6347', '#00FF00', '#00CED1'],
-  achievement: ['#FF1744', '#F50057', '#D500F9', '#651FFF', '#3D5AFE'],
-  streak: ['#00E5FF', '#1DE9B6', '#76FF03', '#FFEA00', '#FF9100'],
-};
-
-// ============================================================================
-// Animation Timing Constants
-// ============================================================================
-
-/**
- * Standard animation durations in milliseconds
- */
-export const DURATIONS = {
-  instant: 0,
-  fast: 150,
-  normal: 300,
-  slow: 600,
-  verySlow: 1000,
-};
-
-/**
- * Standard delays in milliseconds
- */
-export const DELAYS = {
-  none: 0,
-  short: 100,
-  medium: 300,
-  long: 500,
-};
-
-// ============================================================================
-// Easing Functions
-// ============================================================================
-
-/**
- * Common easing curves
- * Note: These are for documentation; use withTiming's easing parameter
- */
-export const EASING_CURVES = {
-  easeInOut: 'ease-in-out',
-  easeIn: 'ease-in',
-  easeOut: 'ease-out',
-  linear: 'linear',
-};
+export function animatePulse(value: SharedValue<number>, duration = 1000) {
+  'worklet';
+  value.value = withSequence(
+    withTiming(1.05, { duration }),
+    withTiming(1, { duration })
+  );
+}
 
 // ============================================================================
 // Animation Presets for Common UI Elements
@@ -332,4 +250,32 @@ export const VICTORY_ANIMATION_PRESET = {
     to: 1,
     duration: 400,
   },
+};
+
+// ============================================================================
+// Confetti Configurations
+// ============================================================================
+
+/**
+ * Standard confetti configuration for game completion
+ */
+export const CONFETTI_CONFIG = {
+  count: 50,
+  spread: 360,
+  startVelocity: 30,
+  decay: 0.9,
+  gravity: 0.6,
+  colors: ANIMATION_COLORS.victory,
+};
+
+/**
+ * Achievement confetti configuration
+ */
+export const ACHIEVEMENT_CONFETTI_CONFIG = {
+  count: 30,
+  spread: 180,
+  startVelocity: 25,
+  decay: 0.85,
+  gravity: 0.7,
+  colors: ANIMATION_COLORS.achievement,
 };

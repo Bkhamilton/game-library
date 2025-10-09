@@ -10,6 +10,7 @@ import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
 import { insertWin, insertLoss, insertTimeScore, insertMinesFlagged, insertMistakes } from '@/db/Scores/Scores';
+import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -44,6 +45,11 @@ export default function MineSweeperGame() {
 
     const [endGameModalVisible, setEndGameModalVisible] = useState(false);
     const [endGameResult, setEndGameResult] = useState<boolean>(false);
+    
+    const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
+    const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
+    
+    const [isLoading, setIsLoading] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
 
@@ -61,14 +67,18 @@ export default function MineSweeperGame() {
     };
 
     useEffect(() => {
-        const emptyBoard = createBoard(difficulty);
-        setFirstMoveMade(false);
-        const minesCount = getMineCount(difficulty);
-        setGameState("active");
-        setBoard(emptyBoard);
-        setMinesCount(minesCount);
-        setMinesFlagged(0);
-        setIncorrectFlags(0);
+        setIsLoading(true);
+        setTimeout(() => {
+            const emptyBoard = createBoard(difficulty);
+            setFirstMoveMade(false);
+            const minesCount = getMineCount(difficulty);
+            setGameState("active");
+            setBoard(emptyBoard);
+            setMinesCount(minesCount);
+            setMinesFlagged(0);
+            setIncorrectFlags(0);
+            setIsLoading(false);
+        }, 300);
     }, [difficulty, trigger]);
 
     const handleWin = () => {
@@ -77,8 +87,12 @@ export default function MineSweeperGame() {
         insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
         insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
         setGameState("won");
-        setEndGameResult(true);
-        setEndGameModalVisible(true);
+        setShowVictoryConfetti(true);
+        // Delay showing the modal slightly to let confetti play
+        setTimeout(() => {
+            setEndGameResult(true);
+            setEndGameModalVisible(true);
+        }, 500);
     }
 
     const handleLoss = () => {
@@ -86,6 +100,7 @@ export default function MineSweeperGame() {
         insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
         insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
         setGameState("lost");
+        setErrorShakeTrigger(prev => prev + 1); // Trigger shake animation on loss
         setEndGameResult(false);
         setEndGameModalVisible(true);
     }
@@ -178,13 +193,19 @@ export default function MineSweeperGame() {
                 trigger={trigger}
                 onTimeUpdate={handleTimeUpdate}
             />
-            <View style={[styles.board, { borderColor: primary }]}>
-                {board.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                        {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
+            {isLoading ? (
+                <LoadingSpinner size="large" />
+            ) : (
+                <ShakeView trigger={errorShakeTrigger}>
+                    <View style={[styles.board, { borderColor: primary }]}>
+                        {board.map((row, rowIndex) => (
+                            <View key={rowIndex} style={styles.row}>
+                                {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
+                            </View>
+                        ))}
                     </View>
-                ))}
-            </View>
+                </ShakeView>
+            )}
             <EndGameMessage 
                 visible={endGameModalVisible} 
                 close={() => setEndGameModalVisible(false)} 
@@ -192,6 +213,10 @@ export default function MineSweeperGame() {
                 game={curGame} 
                 initialDifficulty={difficulty} 
                 restartGame={restartGame}
+            />
+            <GameVictoryConfetti
+                visible={showVictoryConfetti}
+                onComplete={() => setShowVictoryConfetti(false)}
             />
         </View>
     );

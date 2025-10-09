@@ -3,6 +3,43 @@ import { StyleSheet, Modal, TouchableOpacity, Image } from "react-native";
 import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { GameLogos } from "@/constants/GameLogos";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
+// Animated button component for modal
+const AnimatedModalButton = ({ onPress, children, style }) => {
+    const scale = useSharedValue(1);
+    
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+    
+    const handlePressIn = () => {
+        scale.value = withSpring(0.95, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    const handlePressOut = () => {
+        scale.value = withSpring(1, {
+            damping: 15,
+            stiffness: 150,
+        });
+    };
+    
+    return (
+        <TouchableOpacity
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={onPress}
+            activeOpacity={0.8}
+        >
+            <Animated.View style={[styles.button, style, animatedStyle]}>
+                {children}
+            </Animated.View>
+        </TouchableOpacity>
+    );
+};
 
 export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
@@ -56,20 +93,20 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                         </Text>
                     </View>
                     <View style={{ paddingTop: 16 }}>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: grayBackground }]} onPress={openDifficultyModal}>
+                        <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openDifficultyModal}>
                             <Text>
                                 Difficulty: <Text style={{ fontWeight: "bold" }}>{selectedDifficulty}</Text>
                             </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: primary, opacity: 0.5 }]}>
+                        </AnimatedModalButton>
+                        <AnimatedModalButton style={{ backgroundColor: primary, opacity: 0.5 }}>
                             <Text>Continue</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: primary }]} onPress={() => selectGame(game.title, selectedDifficulty)}>
+                        </AnimatedModalButton>
+                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() => selectGame(game.title, selectedDifficulty)}>
                             <Text>New Game</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: grayBackground }]} onPress={close}>
+                        </AnimatedModalButton>
+                        <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={close}>
                             <Text>Close</Text>
-                        </TouchableOpacity>
+                        </AnimatedModalButton>
                     </View>
                 </View>
             </View>
@@ -79,13 +116,13 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                     <View style={styles.innerContainer}>
                         <Text style={{ fontSize: 16, fontWeight: "bold" }}>Select Difficulty</Text>
                         {difficulties.map((difficulty, index) => (
-                            <TouchableOpacity key={index} style={[styles.button, { backgroundColor: grayBackground }]} onPress={() => selectDifficulty(difficulty)}>
+                            <AnimatedModalButton key={index} style={{ backgroundColor: grayBackground }} onPress={() => selectDifficulty(difficulty)}>
                                 <Text>{difficulty}</Text>
-                            </TouchableOpacity>
+                            </AnimatedModalButton>
                         ))}
-                        <TouchableOpacity style={[styles.button, { backgroundColor: primary }]} onPress={closeDifficultyModal}>
+                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={closeDifficultyModal}>
                             <Text>Close</Text>
-                        </TouchableOpacity>
+                        </AnimatedModalButton>
                     </View>
                 </View>
             </Modal>
