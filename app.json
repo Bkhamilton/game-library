@@ -34,7 +34,8 @@
       "expo-router",
       "expo-font",
       "expo-sqlite",
-      "expo-web-browser"
+      "expo-web-browser",
+      "react-native-reanimated/plugin"
     ],
     "experiments": {
       "typedRoutes": true
