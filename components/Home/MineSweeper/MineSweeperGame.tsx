@@ -10,7 +10,7 @@ import EndGameMessage from "@/components/Modals/EndGameMessage";
 import useTheme from "@/hooks/useTheme";
 import { useRouter } from "expo-router";
 import { insertWin, insertLoss, insertTimeScore, insertMinesFlagged, insertMistakes } from '@/db/Scores/Scores';
-import { ShakeView, GameVictoryConfetti } from '@/components/animations';
+import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -48,6 +48,8 @@ export default function MineSweeperGame() {
     
     const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
     const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
+    
+    const [isLoading, setIsLoading] = useState(true);
 
     const { db, curGame } = useContext(DBContext);
 
@@ -65,14 +67,18 @@ export default function MineSweeperGame() {
     };
 
     useEffect(() => {
-        const emptyBoard = createBoard(difficulty);
-        setFirstMoveMade(false);
-        const minesCount = getMineCount(difficulty);
-        setGameState("active");
-        setBoard(emptyBoard);
-        setMinesCount(minesCount);
-        setMinesFlagged(0);
-        setIncorrectFlags(0);
+        setIsLoading(true);
+        setTimeout(() => {
+            const emptyBoard = createBoard(difficulty);
+            setFirstMoveMade(false);
+            const minesCount = getMineCount(difficulty);
+            setGameState("active");
+            setBoard(emptyBoard);
+            setMinesCount(minesCount);
+            setMinesFlagged(0);
+            setIncorrectFlags(0);
+            setIsLoading(false);
+        }, 300);
     }, [difficulty, trigger]);
 
     const handleWin = () => {
@@ -187,15 +193,19 @@ export default function MineSweeperGame() {
                 trigger={trigger}
                 onTimeUpdate={handleTimeUpdate}
             />
-            <ShakeView trigger={errorShakeTrigger}>
-                <View style={[styles.board, { borderColor: primary }]}>
-                    {board.map((row, rowIndex) => (
-                        <View key={rowIndex} style={styles.row}>
-                            {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
-                        </View>
-                    ))}
-                </View>
-            </ShakeView>
+            {isLoading ? (
+                <LoadingSpinner size="large" />
+            ) : (
+                <ShakeView trigger={errorShakeTrigger}>
+                    <View style={[styles.board, { borderColor: primary }]}>
+                        {board.map((row, rowIndex) => (
+                            <View key={rowIndex} style={styles.row}>
+                                {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
+                            </View>
+                        ))}
+                    </View>
+                </ShakeView>
+            )}
             <EndGameMessage 
                 visible={endGameModalVisible} 
                 close={() => setEndGameModalVisible(false)} 

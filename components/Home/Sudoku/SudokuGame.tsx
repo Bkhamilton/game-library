@@ -8,7 +8,7 @@ import SudokuHeader from './SudokuHeader';
 import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
 import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
-import { ShakeView, GameVictoryConfetti } from '@/components/animations';
+import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
 
 export default function SudokuGame() {
     const { difficulty } = useLocalSearchParams();
@@ -25,6 +25,8 @@ export default function SudokuGame() {
     
     const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
     const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
+    
+    const [isLoading, setIsLoading] = useState(true);
 
     const [gameTime, setGameTime] = useState(0); // Track game time
 
@@ -86,18 +88,23 @@ export default function SudokuGame() {
     };
 
     useEffect(() => {
-        const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
-        setBoard(puzzleBoard);
-        setSolvedBoard(completeBoard);
-        const initialNums: { [key: string]: boolean } = {};
-        puzzleBoard.forEach((row: any[], rowIndex: any) => {
-            row.forEach((cell: number, colIndex: any) => {
-                if (cell !== 0) {
-                    initialNums[`${rowIndex}-${colIndex}`] = true;
-                }
+        setIsLoading(true);
+        // Simulate loading time to show spinner
+        setTimeout(() => {
+            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
+            setBoard(puzzleBoard);
+            setSolvedBoard(completeBoard);
+            const initialNums: { [key: string]: boolean } = {};
+            puzzleBoard.forEach((row: any[], rowIndex: any) => {
+                row.forEach((cell: number, colIndex: any) => {
+                    if (cell !== 0) {
+                        initialNums[`${rowIndex}-${colIndex}`] = true;
+                    }
+                });
             });
-        });
-        setInitialNumbers(initialNums);
+            setInitialNumbers(initialNums);
+            setIsLoading(false);
+        }, 300);
     }, [difficulty]);
 
     const router = useRouter();
@@ -114,15 +121,19 @@ export default function SudokuGame() {
                 wrongCount={wrongCount}
                 onTimeUpdate={handleTimeUpdate}
             />
-            <ShakeView trigger={errorShakeTrigger}>
-                <SudokuBoard 
-                    board={board} 
-                    handleInputChange={handleInputChange} 
-                    selectedNumber={selectedNumber} 
-                    initialNumbers={initialNumbers}
-                    selectNumber={handleSelectNumber}
-                />
-            </ShakeView>
+            {isLoading ? (
+                <LoadingSpinner size="large" />
+            ) : (
+                <ShakeView trigger={errorShakeTrigger}>
+                    <SudokuBoard 
+                        board={board} 
+                        handleInputChange={handleInputChange} 
+                        selectedNumber={selectedNumber} 
+                        initialNumbers={initialNumbers}
+                        selectNumber={handleSelectNumber}
+                    />
+                </ShakeView>
+            )}
             <EndGameMessage 
                 visible={endGameModalVisible} 
                 close={() => setEndGameModalVisible(false)} 
