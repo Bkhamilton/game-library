@@ -1,66 +1,16 @@
+
 import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { StyleSheet, FlatList, TouchableOpacity as RNTouchableOpacity, RefreshControl } from 'react-native';
 import { Text, View, TouchableOpacity } from '@/components/Themed';
-import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
+import AchievementBox from '@/components/Achievements/AchievementBox';
 import { DBContext } from '@/contexts/DBContext';
 import ProgressBar from '@/components/Helpers/ProgressBar';
 import { getUserAchievementsWithGames, getUserTotalPoints } from '@/db/Achievements/Achievements';
 import { getGames } from '@/db/Games/Games';
 import { useRouter } from 'expo-router';
 import useTheme from '@/hooks/useTheme';
-
-interface AchievementBoxProps {
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    tier: string;
-    points: number;
-    segment: number;
-    total: number;
-    unlocked: boolean;
-    gameTitle?: string;
-}
-
 type FilterType = 'all' | 'tier' | 'game' | 'category';
-
-// Memoized AchievementBox component for better performance
-const AchievementBox = React.memo(({ icon, title, description, tier, points, segment, total, unlocked, gameTitle }: AchievementBoxProps) => {
-    const getTierColor = (tier: string) => {
-        switch (tier) {
-            case 'Bronze': return '#CD7F32';
-            case 'Silver': return '#C0C0C0';
-            case 'Gold': return '#FFD700';
-            case 'Platinum': return '#E5E4E2';
-            case 'Diamond': return '#B9F2FF';
-            default: return '#CD7F32';
-        }
-    };
-
-    return (
-        <View style={[styles.achievementBox, unlocked && styles.achievementBoxUnlocked]}>
-            <View style={styles.achievementIcon}>
-                {icon}
-            </View>
-            <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={styles.achievementTitle}>{title}</Text>
-                    <Text style={[styles.tierBadge, { backgroundColor: getTierColor(tier) }]}>{tier}</Text>
-                </View>
-                {gameTitle && (
-                    <Text style={styles.gameTitle}>🎮 {gameTitle}</Text>
-                )}
-                <Text style={styles.achievementDescription}>{description}</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, marginTop: 4 }}>
-                    <ProgressBar segment={segment} total={total} />
-                    <Text style={{ paddingLeft: 12, fontSize: 12 }}>{segment}/{total}</Text>
-                </View>
-                <Text style={styles.pointsText}>{points} points</Text>
-            </View>
-        </View>
-    );
-});
-
-AchievementBox.displayName = 'AchievementBox';
 
 export default function AchievementScreen() {
     const { db } = useContext(DBContext);
