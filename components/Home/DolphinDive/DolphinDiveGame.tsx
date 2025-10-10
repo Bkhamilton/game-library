@@ -15,6 +15,7 @@ import {
     SKY_BLUE,
     SCREEN_HEIGHT,
     MAX_DIVE_DEPTH,
+    RESTING_DEPTH,
 } from './constants';
 
 export default function DolphinDiveGame() {
@@ -25,10 +26,10 @@ export default function DolphinDiveGame() {
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
     const [gameState, setGameState] = useState<DolphinState>({
-        y: WATER_SURFACE_Y,
+        y: WATER_SURFACE_Y + RESTING_DEPTH,
         velocity: 0,
         maxDepthReached: 0,
-        isUnderwater: false,
+        isUnderwater: true,
         isDiving: false,
     });
 
@@ -37,10 +38,10 @@ export default function DolphinDiveGame() {
         setIsGameRunning(true);
         setScore(0);
         setGameState({
-            y: WATER_SURFACE_Y,
+            y: WATER_SURFACE_Y + RESTING_DEPTH,
             velocity: 0,
             maxDepthReached: 0,
-            isUnderwater: false,
+            isUnderwater: true,
             isDiving: false,
         });
     };

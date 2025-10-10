@@ -11,6 +11,7 @@ import {
     WATER_SURFACE_Y,
     MAX_DIVE_DEPTH,
     JUMP_MOMENTUM_MULTIPLIER,
+    RESTING_DEPTH,
 } from './constants';
 
 /**
@@ -29,11 +30,20 @@ export const updatePhysics = (state: DolphinState, isDiving: boolean): DolphinSt
     
     if (state.isUnderwater) {
         // Underwater physics
+        const restingY = WATER_SURFACE_Y + RESTING_DEPTH;
+        const distanceFromRest = state.y - restingY;
+        
         if (isDiving) {
+            // Player is pressing - push dolphin down
             newVelocity += DIVE_FORCE;
         } else {
-            newVelocity += BUOYANCY;
+            // Not pressing - buoyancy pulls toward resting position
+            // Apply stronger buoyancy force when far from resting position
+            const buoyancyMultiplier = 1 + Math.max(0, distanceFromRest / 100);
+            newVelocity += BUOYANCY * buoyancyMultiplier;
         }
+        
+        // Always apply gravity underwater
         newVelocity += GRAVITY_UNDERWATER;
         newVelocity *= WATER_RESISTANCE;
     } else {
