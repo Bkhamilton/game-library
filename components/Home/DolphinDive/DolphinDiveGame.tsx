@@ -99,7 +99,7 @@ export default function DolphinDiveGame() {
                 // Apply jump velocity when surfacing
                 let finalVelocity = newState.velocity;
                 if (wasUnderwater && !isNowUnderwater && maxDepth > 0) {
-                    finalVelocity = calculateJumpVelocity(maxDepth);
+                    finalVelocity = calculateJumpVelocity(maxDepth, newState.velocity);
                     maxDepth = 0; // Reset max depth after jump
                 }
 
