@@ -1192,7 +1192,7 @@
     "description": "Win a 2048 game in under 200 moves",
     "tier": "Gold",
     "points": 50,
-    "icon": "target",
+    "icon": "bullseye",
     "category": "Skill",
     "criteria": {
       "game": "2048",
