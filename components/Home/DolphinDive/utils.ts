@@ -15,11 +15,16 @@ import {
 } from './constants';
 
 /**
- * Calculate jump velocity based on dive depth
+ * Calculate jump velocity based on dive depth and exit velocity
  */
-export const calculateJumpVelocity = (maxDepth: number): number => {
+export const calculateJumpVelocity = (maxDepth: number, exitVelocity: number): number => {
     const depthFactor = Math.min(maxDepth / MAX_DIVE_DEPTH, 1.0);
-    return -15 * (1 + depthFactor * JUMP_MOMENTUM_MULTIPLIER);
+    // Base jump velocity from depth
+    const baseJumpVelocity = -15 * (1 + depthFactor * JUMP_MOMENTUM_MULTIPLIER);
+    // Add a factor based on how fast the dolphin was rising when it left the water
+    // exitVelocity is negative when moving upward, so we subtract it to add to the jump
+    const velocityBonus = exitVelocity * 0.5; // 50% of the exit velocity contributes to jump
+    return baseJumpVelocity + velocityBonus;
 };
 
 /**
