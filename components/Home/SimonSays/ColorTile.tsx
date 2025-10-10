@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { Pressable, StyleSheet, Animated } from 'react-native';
 import { TileColor, getColorHex, getLightColorHex } from '@/utils/SimonSaysGenerator';
 
 interface ColorTileProps {
@@ -14,19 +14,17 @@ const ColorTile: React.FC<ColorTileProps> = ({ color, isActive, onPress, disable
     const backgroundColor = isActive ? getLightColorHex(color) : getColorHex(color);
 
     return (
-        <TouchableOpacity
+        <Pressable
             style={[
                 styles.tile,
                 {
                     backgroundColor,
                     width: size,
                     height: size,
-                    opacity: isActive ? 1 : 0.7,
                 }
             ]}
             onPress={onPress}
             disabled={disabled}
-            activeOpacity={0.9}
         />
     );
 };

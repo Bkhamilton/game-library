@@ -103,15 +103,15 @@ export const getColorHex = (color: TileColor): string => {
 // Get lighter color for active/highlight state
 export const getLightColorHex = (color: TileColor): string => {
     const lightColorMap: Record<TileColor, string> = {
-        red: '#FF8888',
-        blue: '#8888FF',
-        green: '#88FF88',
-        yellow: '#FFFF88',
-        purple: '#CC88FF',
-        orange: '#FFAA88',
-        pink: '#FF88CC',
-        cyan: '#88FFFF',
-        lime: '#CCFF88',
+        red: '#FFAAAA',
+        blue: '#AAAAFF',
+        green: '#AAFFAA',
+        yellow: '#FFFFAA',
+        purple: '#DDAAFF',
+        orange: '#FFCCAA',
+        pink: '#FFAADD',
+        cyan: '#AAFFFF',
+        lime: '#DDFFAA',
     };
     return lightColorMap[color];
 };
