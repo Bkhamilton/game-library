@@ -8,6 +8,7 @@ import twoZeroFourEightLogo from "@/assets/images/gamelogo/2048Logo.jpg";
 import memoryMatchLogo from "@/assets/images/gamelogo/memoryMatchLogo.jpg";
 import connectFourLogo from "@/assets/images/gamelogo/connectFourLogo.jpg";
 import dolphinDiveLogo from "@/assets/images/gamelogo/dolphinDiveLogo.jpg";
+import simonSaysLogo from "@/assets/images/gamelogo/simonSaysLogo.jpg";
 
 export const GameLogos = {
     Sudoku: sudokuLogo,
@@ -20,4 +21,5 @@ export const GameLogos = {
     "Memory Match": memoryMatchLogo,
     "Connect Four": connectFourLogo,
     DolphinDive: dolphinDiveLogo,
+    "Simon Says": simonSaysLogo,
 };
