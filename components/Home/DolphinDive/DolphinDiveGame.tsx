@@ -103,6 +103,11 @@ export default function DolphinDiveGame() {
                     maxDepth = 0; // Reset max depth after jump
                 }
 
+                // Dampen velocity when landing in water
+                if (!wasUnderwater && isNowUnderwater) {
+                    finalVelocity *= 0.4; // Reduce downward speed sharply
+                }                
+
                 return {
                     y: newY,
                     velocity: finalVelocity,
