@@ -51,7 +51,7 @@ export const updatePhysics = (state: DolphinState, isDiving: boolean): DolphinSt
             newVelocity += DIVE_FORCE;
         } else {
             // Buoyancy increases with depth below surface
-            const dynamicBuoyancy = BUOYANCY * (1 + depthBelowSurface / MAX_DIVE_DEPTH);
+            const dynamicBuoyancy = BUOYANCY * (1 + Math.pow(depthBelowSurface / MAX_DIVE_DEPTH, 2) * 2.2);
             if (distanceFromRest > 5) {
                 newVelocity += dynamicBuoyancy;
             } else if (distanceFromRest < -5) {
