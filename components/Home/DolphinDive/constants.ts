@@ -15,7 +15,7 @@ export const RESTING_DEPTH = 30;              // How far below surface the dolph
 
 // Momentum-to-jump conversion
 export const JUMP_MOMENTUM_MULTIPLIER = 2.0;  // Converts dive depth to jump height
-export const MAX_DIVE_DEPTH = 200;            // Maximum depth in pixels
+export const MAX_DIVE_DEPTH = 250;            // Maximum depth in pixels
 export const WATER_SURFACE_Y = 300;           // Y position of water surface
 export const MAX_JUMP_HEIGHT = 250;    
 

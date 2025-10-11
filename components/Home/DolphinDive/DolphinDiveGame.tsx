@@ -79,8 +79,8 @@ export default function DolphinDiveGame() {
                 if (newY < 50) {
                     newY = 50;
                 }
-                if (newY > SCREEN_HEIGHT - 50) {
-                    newY = SCREEN_HEIGHT - 50;
+                if (newY > SCREEN_HEIGHT - 10) {
+                    newY = SCREEN_HEIGHT - 10;
                 }
 
                 // Check if crossing water surface
