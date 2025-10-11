@@ -15,7 +15,7 @@ export default function ConnectFourBoard({ board, onColumnPress, isGameRunning }
     
     // Calculate cell size based on screen dimensions
     const screenWidth = Dimensions.get('window').width;
-    const maxBoardWidth = screenWidth - 40; // Account for padding
+    const maxBoardWidth = screenWidth - 24; // Account for padding
     const cellSize = Math.min(maxBoardWidth / (COLS + 1), 50); // Leave space for gaps
     const boardWidth = cellSize * COLS + (COLS - 1) * 4; // Cells + gaps
     const boardHeight = cellSize * ROWS + (ROWS - 1) * 4; // Cells + gaps
@@ -73,11 +73,12 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 8,
+        paddingTop: 40,
     },
     board: {
         borderRadius: 10,
-        padding: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
     },
     row: {
         flexDirection: 'row',
-        gap: 4,
+        gap: 1,
         marginBottom: 4,
     },
     cell: {
