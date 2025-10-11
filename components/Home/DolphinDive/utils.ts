@@ -19,12 +19,13 @@ import {
  */
 export const calculateJumpVelocity = (maxDepth: number, exitVelocity: number): number => {
     const depthFactor = Math.min(maxDepth / MAX_DIVE_DEPTH, 1.0);
-    // Base jump velocity from depth
-    const baseJumpVelocity = -15 * (1 + depthFactor * JUMP_MOMENTUM_MULTIPLIER);
-    // Add a factor based on how fast the dolphin was rising when it left the water
-    // exitVelocity is negative when moving upward, so we subtract it to add to the jump
-    const velocityBonus = exitVelocity * 0.5; // 50% of the exit velocity contributes to jump
-    return baseJumpVelocity + velocityBonus;
+    let baseJumpVelocity = -15 * (1 + depthFactor * JUMP_MOMENTUM_MULTIPLIER);
+    const velocityBonus = exitVelocity * 0.5;
+    let jumpVelocity = baseJumpVelocity + velocityBonus;
+    // Clamp jump velocity to prevent excessive height
+    jumpVelocity = Math.max(jumpVelocity, -25); // max upward speed
+    jumpVelocity = Math.min(jumpVelocity, -8);  // min upward speed
+    return jumpVelocity;
 };
 
 /**
@@ -34,31 +35,23 @@ export const updatePhysics = (state: DolphinState, isDiving: boolean): DolphinSt
     let newVelocity = state.velocity;
     
     if (state.isUnderwater) {
-        // Underwater physics
         const restingY = WATER_SURFACE_Y + RESTING_DEPTH;
         const distanceFromRest = state.y - restingY;
-        
+        const depthBelowSurface = Math.max(state.y - WATER_SURFACE_Y, 0);
+
         if (isDiving) {
-            // Player is pressing - push dolphin down
             newVelocity += DIVE_FORCE;
         } else {
-            // Not pressing - apply buoyancy based on position relative to resting depth
-            // When below resting depth: strong upward force
-            // When at resting depth: minimal force (equilibrium)
-            // When above resting depth: downward force to sink back
+            // Buoyancy increases with depth below surface
+            const dynamicBuoyancy = BUOYANCY * (1 + depthBelowSurface / MAX_DIVE_DEPTH);
             if (distanceFromRest > 5) {
-                // Below resting depth - buoyancy pulls upward
-                newVelocity += BUOYANCY;
+                newVelocity += dynamicBuoyancy;
             } else if (distanceFromRest < -5) {
-                // Above resting depth - sink back down (reverse buoyancy)
-                newVelocity -= BUOYANCY;
+                newVelocity -= dynamicBuoyancy;
             } else {
-                // Near resting depth - very gentle upward force to maintain position
-                newVelocity += BUOYANCY * 0.3;
+                newVelocity += dynamicBuoyancy * 0.3;
             }
         }
-        
-        // Apply water resistance
         newVelocity *= WATER_RESISTANCE;
     } else {
         // Airborne physics
