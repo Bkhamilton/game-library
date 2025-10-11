@@ -12,19 +12,27 @@ import {
     MAX_DIVE_DEPTH,
     JUMP_MOMENTUM_MULTIPLIER,
     RESTING_DEPTH,
+    MIN_JUMP_SPEED,
+    MAX_JUMP_SPEED,
+    EXIT_VELOCITY_INFLUENCE,    
 } from './constants';
 
 /**
  * Calculate jump velocity based on dive depth and exit velocity
  */
 export const calculateJumpVelocity = (maxDepth: number, exitVelocity: number): number => {
-    const depthFactor = Math.min(maxDepth / MAX_DIVE_DEPTH, 1.0);
-    let baseJumpVelocity = -15 * (1 + depthFactor * JUMP_MOMENTUM_MULTIPLIER);
-    const velocityBonus = exitVelocity * 0.5;
-    let jumpVelocity = baseJumpVelocity + velocityBonus;
-    // Clamp jump velocity to prevent excessive height
-    jumpVelocity = Math.max(jumpVelocity, -25); // max upward speed
-    jumpVelocity = Math.min(jumpVelocity, -8);  // min upward speed
+    const depthFactor = Math.min(maxDepth / MAX_DIVE_DEPTH, 1.0); // 0..1
+    const exitSpeed = Math.max(0, -exitVelocity); // magnitude of upward speed at exit
+
+    // Base speed scales with depth, then add contribution from exit speed
+    // Choose a base that doesn't instantly saturate typical dives
+    const baseFromDepth = 8 + depthFactor * 10; // 8..18
+    let jumpSpeed = baseFromDepth + exitSpeed * EXIT_VELOCITY_INFLUENCE; // positive speed
+
+    // Clamp to a wide range so shallow vs deep dives remain distinct
+    jumpSpeed = Math.max(MIN_JUMP_SPEED, Math.min(jumpSpeed, MAX_JUMP_SPEED));
+
+    const jumpVelocity = -jumpSpeed; // negative = upward
     return jumpVelocity;
 };
 

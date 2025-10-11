@@ -17,7 +17,12 @@ export const RESTING_DEPTH = 30;              // How far below surface the dolph
 export const JUMP_MOMENTUM_MULTIPLIER = 2.0;  // Converts dive depth to jump height
 export const MAX_DIVE_DEPTH = 200;            // Maximum depth in pixels
 export const WATER_SURFACE_Y = 300;           // Y position of water surface
-export const MAX_JUMP_HEIGHT = 250;           // Maximum height above water
+export const MAX_JUMP_HEIGHT = 250;    
+
+// Add tunables for jump behavior
+export const MIN_JUMP_SPEED = 6;              // px/frame (upward)
+export const MAX_JUMP_SPEED = 28;             // px/frame (upward)
+export const EXIT_VELOCITY_INFLUENCE = 0.8;   // Maximum height above water
 
 // Dolphin properties
 export const DOLPHIN_WIDTH = 60;
