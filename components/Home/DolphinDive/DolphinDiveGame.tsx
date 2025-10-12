@@ -168,7 +168,7 @@ export default function DolphinDiveGame() {
             {!isGameRunning ? (
                     <Text style={{ fontSize: 40, fontWeight: '800', color: OCEAN_BLUE, textAlign: 'center', marginTop: 60 }}>Dolphin Dive</Text>
                 ) : (
-                    <FadeOutView duration={300} delay={0}>
+                    <FadeOutView duration={600} delay={0}>
                         <Text style={{ fontSize: 40, fontWeight: '800', color: OCEAN_BLUE, textAlign: 'center', marginTop: 60 }}>Dolphin Dive</Text>
                     </FadeOutView>
                 )

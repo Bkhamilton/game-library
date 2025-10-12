@@ -26,7 +26,7 @@ export const calculateJumpVelocity = (maxDepth: number, exitVelocity: number): n
 
     // Base speed scales with depth, then add contribution from exit speed
     // Choose a base that doesn't instantly saturate typical dives
-    const baseFromDepth = 8 + depthFactor * 10; // 8..18
+    const baseFromDepth = 5 + depthFactor * 12; // 12..22
     let jumpSpeed = baseFromDepth + exitSpeed * EXIT_VELOCITY_INFLUENCE; // positive speed
 
     // Clamp to a wide range so shallow vs deep dives remain distinct
@@ -51,7 +51,7 @@ export const updatePhysics = (state: DolphinState, isDiving: boolean): DolphinSt
             newVelocity += DIVE_FORCE;
         } else {
             // Buoyancy increases with depth below surface
-            const dynamicBuoyancy = BUOYANCY * (1 + Math.pow(depthBelowSurface / MAX_DIVE_DEPTH, 2) * 2.2);
+            const dynamicBuoyancy = BUOYANCY * (1 + Math.pow(depthBelowSurface / MAX_DIVE_DEPTH, 2) * 2.4);
             if (distanceFromRest > 5) {
                 newVelocity += dynamicBuoyancy;
             } else if (distanceFromRest < -5) {
