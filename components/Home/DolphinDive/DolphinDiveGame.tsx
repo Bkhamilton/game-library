@@ -46,6 +46,21 @@ export default function DolphinDiveGame() {
         });
     };
 
+    const TWIST_DURATION = 20; // frames (~0.33s at 60fps)
+
+    const handleTwist = () => {
+        setGameState(prev => {
+            if (!prev.isUnderwater && !prev.isTwisting) {
+                return {
+                    ...prev,
+                    isTwisting: true,
+                    twistTimer: TWIST_DURATION,
+                };
+            }
+            return prev;
+        });
+    };    
+
     // Handle tap down - start diving
     const handlePressIn = () => {
         if (!isGameRunning) {
@@ -103,9 +118,25 @@ export default function DolphinDiveGame() {
                     maxDepth = 0; // Reset max depth after jump
                 }
 
+                // --- Twist logic ---
+                let isTwisting = prev.isTwisting ?? false;
+                let twistTimer = prev.twistTimer ?? 0;
+
                 // Dampen velocity when landing in water
                 if (!wasUnderwater && isNowUnderwater) {
                     finalVelocity *= 0.4; // Reduce downward speed sharply
+                    // Reset twist if landing
+                    isTwisting = false;
+                    twistTimer = 0;                    
+                }
+
+                // Only twist if airborne
+                if (isTwisting && !isNowUnderwater && twistTimer > 0) {
+                    finalVelocity = 0; // Hover: cancel gravity
+                    twistTimer -= 1;
+                    if (twistTimer === 0) {
+                        isTwisting = false;
+                    }
                 }                
 
                 return {
@@ -114,6 +145,8 @@ export default function DolphinDiveGame() {
                     maxDepthReached: maxDepth,
                     isUnderwater: isNowUnderwater,
                     isDiving: prev.isDiving,
+                    isTwisting: isTwisting,
+                    twistTimer: twistTimer,
                 };
             });
         }, 16); // ~60 FPS
@@ -127,6 +160,7 @@ export default function DolphinDiveGame() {
             activeOpacity={1}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
+            onPress={handleTwist}
         >
             {/* Sky */}
             <View style={[styles.sky, { backgroundColor: SKY_BLUE }]} />

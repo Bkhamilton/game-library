@@ -6,6 +6,8 @@ export interface DolphinState {
     maxDepthReached: number; // Deepest point in current dive
     isUnderwater: boolean;  // Below water surface
     isDiving: boolean;      // Tap is held
+    isTwisting?: boolean;    // Is the dolphin twisting?
+    twistTimer?: number;     // Timer for twist animation
 }
 
 export interface Obstacle {
