@@ -17,6 +17,7 @@ import {
     MAX_DIVE_DEPTH,
     RESTING_DEPTH,
 } from './constants';
+import { FadeOutView } from '@/components/animations/ReanimatedExamples';
 
 export default function DolphinDiveGame() {
     const router = useRouter();
@@ -91,8 +92,8 @@ export default function DolphinDiveGame() {
                 let newY = prev.y + newState.velocity;
                 
                 // Constrain to screen bounds
-                if (newY < 50) {
-                    newY = 50;
+                if (newY < 20) {
+                    newY = 20;
                 }
                 if (newY > SCREEN_HEIGHT - 10) {
                     newY = SCREEN_HEIGHT - 10;
@@ -164,7 +165,15 @@ export default function DolphinDiveGame() {
         >
             {/* Sky */}
             <View style={[styles.sky, { backgroundColor: SKY_BLUE }]} />
-            
+            {!isGameRunning ? (
+                    <Text style={{ fontSize: 40, fontWeight: '800', color: OCEAN_BLUE, textAlign: 'center', marginTop: 60 }}>Dolphin Dive</Text>
+                ) : (
+                    <FadeOutView duration={300} delay={0}>
+                        <Text style={{ fontSize: 40, fontWeight: '800', color: OCEAN_BLUE, textAlign: 'center', marginTop: 60 }}>Dolphin Dive</Text>
+                    </FadeOutView>
+                )
+            }
+ 
             {/* Ocean */}
             <View style={[styles.ocean, { backgroundColor: OCEAN_BLUE, top: WATER_SURFACE_Y }]} />
             
@@ -244,5 +253,6 @@ const styles = StyleSheet.create({
         textShadowColor: '#000',
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 3,
+        padding: 4,
     },
 });

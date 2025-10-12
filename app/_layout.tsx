@@ -109,7 +109,7 @@ function RootLayoutNav() {
                 />
                 <Stack.Screen
                     name="dolphindive"
-                    options={{ title: "DolphinDive", headerBackTitle: "Home" }}
+                    options={{ title: "DolphinDive", headerBackTitle: "Home", headerShown: false }}
                 />
                 <Stack.Screen
                     name="animation-test"

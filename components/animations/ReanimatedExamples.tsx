@@ -64,6 +64,12 @@ interface FadeInViewProps {
   delay?: number;
 }
 
+interface FadeOutViewProps {
+  children: React.ReactNode;
+  duration?: number;
+  delay?: number;
+}
+
 export function FadeInView({ children, duration = 300, delay = 0 }: FadeInViewProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -78,6 +84,26 @@ export function FadeInView({ children, duration = 300, delay = 0 }: FadeInViewPr
     transform: [{ translateY: translateY.value }],
   }));
   
+  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
+}
+
+export function FadeOutView({ children, duration = 300, delay = 0 }: FadeOutViewProps) {
+  const opacity = useSharedValue(1);
+  const translateY = useSharedValue(0);
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      opacity.value = withTiming(0, { duration });
+      translateY.value = withTiming(20, { duration });
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
   return <Animated.View style={animatedStyle}>{children}</Animated.View>;
 }
 
