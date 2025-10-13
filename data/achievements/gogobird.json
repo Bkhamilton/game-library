@@ -1,0 +1,114 @@
+[
+  {
+    "id": 6,
+    "title": "Score a 10 in GoGoBird",
+    "description": "Score a 10 in GoGoBird",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "highScore",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 601,
+    "title": "Bird Flyer",
+    "description": "Score 50 in GoGoBird",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "highScore",
+      "threshold": 50
+    }
+  },
+  {
+    "id": 602,
+    "title": "Bird Soarer",
+    "description": "Score 100 in GoGoBird",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "highScore",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 603,
+    "title": "Bird Champion",
+    "description": "Score 200 in GoGoBird",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "highScore",
+      "threshold": 200
+    }
+  },
+  {
+    "id": 604,
+    "title": "Bird Legend",
+    "description": "Score 500 in GoGoBird",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "highScore",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1201,
+    "title": "Bird Distance Champion",
+    "description": "Travel 1000 total distance in GoGoBird",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "map",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "totalDistance",
+      "threshold": 1000
+    }
+  },
+  {
+    "id": 1202,
+    "title": "Bird Obstacle Master",
+    "description": "Avoid 500 obstacles in GoGoBird",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "shield-alt",
+    "category": "Skill",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "totalObstaclesAvoided",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1203,
+    "title": "Bird Flap Master",
+    "description": "Make 1000 flaps in GoGoBird",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "feather-alt",
+    "category": "Score",
+    "criteria": {
+      "game": "GoGoBird",
+      "metric": "totalFlaps",
+      "threshold": 1000
+    }
+  }
+]

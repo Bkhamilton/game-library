@@ -1,0 +1,143 @@
+[
+  {
+    "id": 4,
+    "title": "First Crossword Win",
+    "description": "Win your first game of Crossword",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 401,
+    "title": "Crossword Novice",
+    "description": "Win 5 Crossword games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 402,
+    "title": "Crossword Enthusiast",
+    "description": "Win 25 Crossword games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 403,
+    "title": "Crossword Expert",
+    "description": "Win 100 Crossword games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 404,
+    "title": "Crossword Master",
+    "description": "Win 250 Crossword games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 250
+    }
+  },
+  {
+    "id": 405,
+    "title": "Crossword Legend",
+    "description": "Win 500 Crossword games",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Completion",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "result",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1001,
+    "title": "Crossword Speed Solver",
+    "description": "Complete a Crossword in under 3 minutes",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "time",
+      "threshold": 180,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1002,
+    "title": "Crossword No Hints",
+    "description": "Win 10 Crossword games without using hints",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "lightbulb",
+    "category": "Skill",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "noHints",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 1003,
+    "title": "Crossword Wordsmith",
+    "description": "Fill in 500 correct words across all Crossword games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "book",
+    "category": "Score",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "totalCorrectWords",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1308,
+    "title": "Crossword Streak Master",
+    "description": "Win 5 Crossword games in a row",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Crossword",
+      "metric": "gameStreak",
+      "threshold": 5
+    }
+  }
+]

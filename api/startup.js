@@ -1,6 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import games from '@/data/games.json';
-import achievements from '@/data/achievements.json';
+import sudokuAchievements from '@/data/achievements/sudoku.json';
+import minesweeperAchievements from '@/data/achievements/minesweeper.json';
+import wordSearchAchievements from '@/data/achievements/word-search.json';
+import crosswordAchievements from '@/data/achievements/crossword.json';
+import ostrichHaulAchievements from '@/data/achievements/ostrich-haul.json';
+import gogobirdAchievements from '@/data/achievements/gogobird.json';
+import game2048Achievements from '@/data/achievements/2048.json';
+import generalAchievements from '@/data/achievements/general.json';
 import { insertGame } from '@/db/Games/Games';
 import { insertUser } from '@/db/Users/Users';
 import { insertAchievement } from '@/db/Achievements/Achievements';
@@ -74,7 +81,17 @@ export const syncData = async (db) => {
     }
 
     // Add achievements data to the database
-    const achievementsData = achievements;
+    // Combine all achievement files into one array
+    const achievementsData = [
+        ...sudokuAchievements,
+        ...minesweeperAchievements,
+        ...wordSearchAchievements,
+        ...crosswordAchievements,
+        ...ostrichHaulAchievements,
+        ...gogobirdAchievements,
+        ...game2048Achievements,
+        ...generalAchievements
+    ];
     for (const achievement of achievementsData) {
         await insertAchievement(db, achievement);
     }
