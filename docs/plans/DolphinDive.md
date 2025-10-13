@@ -574,143 +574,179 @@ data/
 
 ## Implementation Phases
 
-### Phase 1: Foundation (Week 1)
+### Phase 1: Foundation (Week 1) - IN PROGRESS
 
 **Goal:** Basic dolphin movement and water physics
 
 **Tasks:**
-1. **Create Component Structure**
+1. **Create Component Structure** ✅ COMPLETED
    - Main game component setup
-   - Dolphin component with sprite rendering
+   - Dolphin component with sprite rendering (using black box placeholder)
    - Constants file with physics values
    - Types file for interfaces
    
-2. **Implement Core Physics**
+2. **Implement Core Physics** ✅ COMPLETED
    - Gravity system (underwater vs. airborne)
-   - Buoyancy mechanics
+   - Buoyancy mechanics (dynamic buoyancy that increases with depth)
    - Dive force on tap-and-hold
    - Water surface detection
+   - Underwater resting depth behavior
    
-3. **Basic Rendering**
-   - Dolphin sprite with position
-   - Water surface line
-   - Blue gradient background
-   - Simple depth indicator
+3. **Basic Rendering** ⚠️ PARTIALLY COMPLETED
+   - ✅ Dolphin placeholder (black box) with position tracking
+   - ✅ Water surface line
+   - ✅ Blue gradient background (sky and ocean colors)
+   - ❌ Simple depth indicator (component file created but not implemented)
+   - ❌ No sprites added yet
 
-4. **Game Loop**
+4. **Game Loop** ✅ COMPLETED
    - 60 FPS update interval
    - Physics updates
    - Position tracking
    - Start/restart functionality
+   - Screen bounds constraints
 
 **Deliverables:**
-- Dolphin responds to tap-and-hold
-- Smooth diving and rising
-- Water surface transition works
-- Basic physics feel good
+- ✅ Dolphin responds to tap-and-hold
+- ✅ Smooth diving and rising
+- ✅ Water surface transition works
+- ✅ Basic physics feel good
 
-### Phase 2: Momentum System (Week 2)
+**What's Left:**
+- Add dolphin sprite animations (swimming, diving, jumping poses)
+- Implement depth indicator UI
+- Fine-tune physics constants if needed
+
+### Phase 2: Momentum System (Week 2) - MOSTLY COMPLETED
 
 **Goal:** Implement dive-to-jump momentum mechanics
 
 **Tasks:**
-1. **Momentum Tracking**
-   - Track maximum dive depth
-   - Calculate jump velocity from depth
-   - Reset momentum on water re-entry
+1. **Momentum Tracking** ✅ COMPLETED
+   - ✅ Track maximum dive depth (maxDepthReached in DolphinState)
+   - ✅ Calculate jump velocity from depth (calculateJumpVelocity function)
+   - ✅ Exit velocity influence on jump height
+   - ✅ Reset momentum on water re-entry
    
-2. **Jump Mechanics**
-   - Surface-breaking detection
-   - Momentum-to-velocity conversion
-   - Airborne physics
-   - Landing back in water
+2. **Jump Mechanics** ✅ COMPLETED
+   - ✅ Surface-breaking detection (crossing WATER_SURFACE_Y)
+   - ✅ Momentum-to-velocity conversion (depth factor + exit speed)
+   - ✅ Airborne physics (separate gravity for air vs water)
+   - ✅ Landing back in water (velocity dampening on re-entry)
+   - ✅ **BONUS:** Twist feature - allows dolphin to twist mid-air and maintain vertical momentum (cancels gravity temporarily)
 
-3. **Visual Feedback**
-   - Momentum meter UI
-   - Depth indicator enhancement
-   - Trajectory prediction (optional)
-   - Screen tint based on depth
+3. **Visual Feedback** ❌ NOT COMPLETED
+   - ❌ Momentum meter UI (component file exists but not implemented)
+   - ❌ Depth indicator enhancement (component file exists but not implemented)
+   - ❌ Trajectory prediction (optional)
+   - ❌ Screen tint based on depth
 
-4. **Testing and Tuning**
-   - Adjust physics constants
-   - Test different dive depths
-   - Ensure satisfying jump feel
-   - Balance risk/reward
+4. **Testing and Tuning** ✅ COMPLETED
+   - ✅ Physics constants adjusted (MIN_JUMP_SPEED, MAX_JUMP_SPEED, EXIT_VELOCITY_INFLUENCE)
+   - ✅ Tested different dive depths
+   - ✅ Jump feel is satisfying
+   - ✅ Depth-based dynamic buoyancy implemented
 
 **Deliverables:**
-- Deeper dives result in higher jumps
-- Momentum system feels intuitive
-- Visual feedback is clear
-- Physics are balanced
+- ✅ Deeper dives result in higher jumps
+- ✅ Momentum system feels intuitive
+- ❌ Visual feedback is clear (UI elements not implemented yet)
+- ✅ Physics are balanced
 
-### Phase 3: Obstacles and Collectibles (Week 3)
+**What's Left:**
+- Implement momentum meter UI to show jump potential
+- Implement depth indicator UI to show current/max dive depth
+- Optional: Add trajectory prediction arc
+- Optional: Add screen tint effects based on depth
+
+### Phase 3: Obstacles and Collectibles (Week 3) - NOT STARTED
 
 **Goal:** Add obstacles, collectibles, and collision detection
 
 **Tasks:**
-1. **Obstacle System**
+1. **Obstacle System** ❌ NOT STARTED
    - Multiple obstacle types
    - Spawn logic with timing
    - Animated movement
    - Off-screen cleanup
+   - Note: Obstacle.tsx component file created but only contains placeholder
 
-2. **Collectible System**
+2. **Collectible System** ❌ NOT STARTED
    - Multiple collectible types
    - Strategic placement
    - Collection detection
    - Visual pickup effects
+   - Note: Collectible.tsx component file created but only contains placeholder
 
-3. **Collision Detection**
+3. **Collision Detection** ❌ NOT STARTED
    - Dolphin vs. obstacles
    - Dolphin vs. collectibles
    - Tolerance adjustments
    - Game over trigger
+   - Note: checkCollision function exists in utils.ts but not implemented
 
-4. **Scoring**
+4. **Scoring** ❌ NOT STARTED
    - Score calculation
    - Obstacle clear points
    - Collectible points
    - Bonus calculations
 
 **Deliverables:**
-- Obstacles spawn and move correctly
-- Collision detection works accurately
-- Collectibles can be picked up
-- Score increases properly
+- ❌ Obstacles spawn and move correctly
+- ❌ Collision detection works accurately
+- ❌ Collectibles can be picked up
+- ❌ Score increases properly
 
-### Phase 4: Visual Polish (Week 4)
+**What's Needed:**
+- Implement obstacle generation and spawning system
+- Implement collectible generation and spawning system
+- Complete collision detection logic
+- Add scoring mechanics
+- Create obstacle and collectible sprites
+
+### Phase 4: Visual Polish (Week 4) - NOT STARTED
 
 **Goal:** Enhance visual presentation and effects
 
 **Tasks:**
-1. **Animation System**
+1. **Animation System** ❌ NOT STARTED
    - Dolphin swimming animation
    - Dolphin jump/dive poses
    - Smooth state transitions
+   - Note: No sprites added yet, using black box placeholder
    
-2. **Environmental Effects**
+2. **Environmental Effects** ❌ NOT STARTED
    - Animated water surface
    - Rising bubbles
    - Light rays from surface
    - Splash effects on surface break
+   - Note: ParticleSystem.tsx component file created but only contains placeholder
 
-3. **Background Layers**
+3. **Background Layers** ❌ NOT STARTED
    - Parallax scrolling
    - Underwater gradient
    - Sky and clouds above water
    - Decorative elements
+   - Note: BackgroundLayer.tsx component file created but only contains placeholder
 
-4. **UI Enhancement**
+4. **UI Enhancement** ❌ NOT STARTED
    - Score display styling
    - High score indicator
    - Depth meter design
    - Momentum meter design
 
 **Deliverables:**
-- Animated sprites
-- Particle effects working
-- Layered backgrounds
-- Professional UI design
+- ❌ Animated sprites
+- ❌ Particle effects working
+- ❌ Layered backgrounds
+- ❌ Professional UI design
+
+**What's Needed:**
+- Create or obtain dolphin sprite assets (swim cycle, jump, dive poses)
+- Implement sprite animation system
+- Implement particle effects (bubbles, splash)
+- Create parallax background layers
+- Design and implement UI components (depth meter, momentum meter)
 
 ### Phase 5: Difficulty and Balance (Week 5)
 
@@ -1060,29 +1096,29 @@ Before starting development, consider:
 
 ## Implementation Progress
 
-### Phase 1: Foundation - Initial Setup (COMPLETED)
+### Phase 1: Foundation - MOSTLY COMPLETED
 
 **Date:** December 2024
 
 **Completed Tasks:**
 
-1. **Component Structure Created**
+1. **Component Structure Created** ✅
    - ✅ Created `components/Home/DolphinDive/` directory
    - ✅ Created all necessary component files following the planned structure:
      - `DolphinDiveGame.tsx` - Main game component with basic game loop
      - `Dolphin.tsx` - Dolphin character component (black box placeholder)
-     - `Obstacle.tsx` - Obstacle component (placeholder)
-     - `Collectible.tsx` - Collectible item component (placeholder)
+     - `Obstacle.tsx` - Obstacle component (placeholder only)
+     - `Collectible.tsx` - Collectible item component (placeholder only)
      - `WaterSurface.tsx` - Water surface line visualization
-     - `ParticleSystem.tsx` - Particle effects (placeholder)
-     - `DepthIndicator.tsx` - Depth indicator UI (placeholder)
-     - `MomentumMeter.tsx` - Momentum meter UI (placeholder)
-     - `BackgroundLayer.tsx` - Background layers (placeholder)
+     - `ParticleSystem.tsx` - Particle effects (placeholder only)
+     - `DepthIndicator.tsx` - Depth indicator UI (placeholder only)
+     - `MomentumMeter.tsx` - Momentum meter UI (placeholder only)
+     - `BackgroundLayer.tsx` - Background layers (placeholder only)
      - `constants.ts` - Game constants and physics values
      - `types.ts` - TypeScript interfaces for game state
      - `utils.ts` - Physics calculations and helper functions
 
-2. **Navigation and Routing**
+2. **Navigation and Routing** ✅
    - ✅ Created `app/dolphindive.tsx` screen entry point
    - ✅ Added DolphinDive to `data/games.json` (ID: 11)
    - ✅ Updated `constants/Types.ts` to include "DolphinDive" in GameTitle
@@ -1091,32 +1127,71 @@ Before starting development, consider:
    - ✅ Added routing case in `screens/HomeScreen.tsx`
    - ✅ Added Stack.Screen in `app/_layout.tsx`
 
-3. **Basic Game Prototype**
+3. **Core Physics System** ✅
    - ✅ Implemented game loop running at ~60 FPS
-   - ✅ Created basic physics system with gravity and buoyancy
-   - ✅ Implemented dolphin movement (tap-and-hold to dive)
+   - ✅ Created physics system with:
+     - Separate gravity for underwater vs. airborne
+     - Buoyancy mechanics (dynamic buoyancy that increases with depth)
+     - Dive force on tap-and-hold
+     - Water surface detection and crossing
+     - Resting depth behavior (dolphin naturally stays slightly below surface)
+     - Velocity dampening on water re-entry
+     - Screen bounds constraints
+   - ✅ Implemented dolphin movement (tap-and-hold to dive, release to rise)
+
+4. **Momentum & Jump System** ✅
+   - ✅ Track maximum dive depth during each dive
+   - ✅ Calculate jump velocity based on:
+     - Depth reached (deeper = higher jump)
+     - Exit velocity when breaking surface
+     - Clamped to MIN_JUMP_SPEED and MAX_JUMP_SPEED
+   - ✅ Reset momentum on water re-entry
+   - ✅ **BONUS FEATURE:** Twist mechanic - tap while airborne to twist and maintain vertical momentum temporarily
+
+5. **Basic Rendering** ✅
    - ✅ Created visual representation with:
      - Sky Blue (#87CEEB) for the sky
      - Ocean Blue (#006994) for the ocean
      - Black box for dolphin placeholder
-     - Water surface line at y=300
+     - Water surface line at y=400
    - ✅ Added start screen with instructions
    - ✅ Added basic score display
 
 **Current State:**
-- Game is navigable from home screen
+- Game is fully navigable from home screen
 - Basic prototype is functional and playable
-- Dolphin responds to tap-and-hold input
-- Physics system is implemented but needs tuning
-- All placeholder files are in place for future development
+- Dolphin responds to tap-and-hold input with smooth physics
+- Gravity mechanics for diving deeper into water are working
+- Jump height based on dive depth is implemented and tuned
+- Twist feature allows maintaining vertical momentum while in air
+- Physics system feels good and is balanced
+- All component files are created and in place
+- **NO SPRITES ADDED YET** - using black box placeholder
 
-**Next Steps for Phase 1 Continuation:**
-- Fine-tune physics constants for better "feel"
-- Add proper collision detection
-- Implement obstacle spawning system
-- Add depth indicator UI
-- Add momentum meter UI
-- Test and iterate on gameplay mechanics
+**What's Left in Touched Phases:**
+
+**Phase 1 Remaining:**
+- ❌ Add dolphin sprite assets and animation
+- ❌ Implement depth indicator UI component
+- ❌ Implement momentum meter UI component
+
+**Phase 2 Remaining:**
+- ❌ Implement visual momentum meter UI
+- ❌ Implement depth indicator UI with current/max depth display
+- ❌ Optional: Add trajectory prediction arc
+- ❌ Optional: Add screen tint effects based on depth
+
+**Phase 3: Not Started**
+- Need to implement obstacle spawning and movement
+- Need to implement collectible spawning
+- Need to complete collision detection
+- Need to add proper scoring mechanics
+
+**Phase 4: Not Started**
+- Need to add sprite animations
+- Need to implement particle effects
+- Need to add background layers
+- Need to enhance UI components
 
 **Files Modified:**
 - `data/games.json`
