@@ -70,7 +70,7 @@ export default function SettingsScreen() {
                 break;
             case 'Support Us':
                 alert('Support us by giving a 5 star rating!');
-                break
+                break;
             default:
                 break;
         }
