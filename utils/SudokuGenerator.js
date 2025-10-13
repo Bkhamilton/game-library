@@ -35,7 +35,14 @@ const fillBoard = (board) => {
     if (!emptyPos) return true;
 
     const [row, col] = emptyPos;
-    for (let num = 1; num <= 9; num++) {
+    // Shuffle numbers 1-9 to avoid predictable patterns
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    for (let i = numbers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
+    
+    for (let num of numbers) {
         if (isValid(num, [row, col])) {
             board[row][col] = num;
             if (fillBoard(board)) return true;
