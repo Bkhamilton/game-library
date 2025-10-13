@@ -13,10 +13,11 @@ Each file contains achievements for a specific game or category:
 - **ostrich-haul.json** - 8 Ostrich Haul achievements (IDs: 5, 501-504, 1101-1103)
 - **gogobird.json** - 8 GoGoBird achievements (IDs: 6, 601-604, 1201-1203)
 - **2048.json** - 17 2048 achievements (IDs: 7, 1501-1516)
+- **memory-match.json** - 17 Memory Match achievements (IDs: 8, 1601-1616)
 - **general.json** - 17 general achievements (IDs: 1301-1413)
   - Includes: Streaks, Collections, and Meta achievements
 
-**Total: 90 achievements**
+**Total: 107 achievements**
 
 ## Achievement Schema
 
