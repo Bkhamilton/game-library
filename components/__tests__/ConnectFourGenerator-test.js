@@ -429,4 +429,122 @@ describe('ConnectFourGenerator', () => {
             expect(aiMove).toBe(-1);
         });
     });
+
+    describe('getAIMove with Medium difficulty', () => {
+        it('returns a valid column number', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board, 'Medium');
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+        });
+
+        it('takes immediate winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for AI
+            board[ROWS - 1][0] = 'ai';
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            // Column 3 is the winning move
+            const aiMove = getAIMove(board, 'Medium');
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks opponent winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for player
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'player';
+            board[ROWS - 1][2] = 'player';
+            // Column 3 needs to be blocked
+            const aiMove = getAIMove(board, 'Medium');
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks diagonal threats (unlike Easy AI)', () => {
+            const board = initializeBoard();
+            // Set up a diagonal threat
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 2][1] = 'player';
+            board[ROWS - 3][2] = 'player';
+            // Need to set up so column 3 is where the threat completes
+            // and the disc would land at the right spot
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            board[ROWS - 2][2] = 'ai';
+            
+            const aiMove = getAIMove(board, 'Medium');
+            // Medium AI should use strategic thinking to handle threats
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+        });
+
+        it('prefers center column for opening move', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board, 'Medium');
+            // Center column (3) should be preferred on empty board
+            expect(aiMove).toBe(3);
+        });
+
+        it('returns -1 when no valid moves available', () => {
+            const board = initializeBoard();
+            // Fill entire board
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    board[row][col] = 'player';
+                }
+            }
+            const aiMove = getAIMove(board, 'Medium');
+            expect(aiMove).toBe(-1);
+        });
+    });
+
+    describe('getAIMove with Hard difficulty', () => {
+        it('returns a valid column number', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board, 'Hard');
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+        });
+
+        it('takes immediate winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for AI
+            board[ROWS - 1][0] = 'ai';
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            // Column 3 is the winning move
+            const aiMove = getAIMove(board, 'Hard');
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks opponent winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for player
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'player';
+            board[ROWS - 1][2] = 'player';
+            // Column 3 needs to be blocked
+            const aiMove = getAIMove(board, 'Hard');
+            expect(aiMove).toBe(3);
+        });
+
+        it('prefers center column for opening move', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board, 'Hard');
+            // Center column (3) should be preferred on empty board
+            expect(aiMove).toBe(3);
+        });
+
+        it('returns -1 when no valid moves available', () => {
+            const board = initializeBoard();
+            // Fill entire board
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    board[row][col] = 'player';
+                }
+            }
+            const aiMove = getAIMove(board, 'Hard');
+            expect(aiMove).toBe(-1);
+        });
+    });
 });

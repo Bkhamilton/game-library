@@ -365,14 +365,8 @@ const getEasyAIMove = (board: Board): number => {
     return validMoves[Math.floor(Math.random() * validMoves.length)];
 };
 
-// Get the best move for AI based on difficulty
-export const getAIMove = (board: Board, difficulty: Difficulty = 'Medium'): number => {
-    // Use easy AI for Easy difficulty
-    if (difficulty === 'Easy') {
-        return getEasyAIMove(board);
-    }
-    
-    // Use advanced AI for Medium and Hard difficulties
+// Medium AI: uses MinMax with reduced depth for intermediate difficulty
+const getMediumAIMove = (board: Board): number => {
     const validMoves = getValidMoves(board);
     
     if (validMoves.length === 0) {
@@ -404,7 +398,73 @@ export const getAIMove = (board: Board, difficulty: Difficulty = 'Medium'): numb
         }
     }
     
-    // Set depth based on difficulty and board state
+    // Use MinMax with reduced depth (3) for medium difficulty
+    // This makes it strategic but beatable
+    const depth = 3;
+    
+    // Use MinMax to find best move
+    let bestScore = -Infinity;
+    let bestCol = validMoves[0];
+    
+    for (const col of validMoves) {
+        const newBoard = placeDisc(board, col, 'ai');
+        if (newBoard) {
+            const score = minimax(newBoard, depth - 1, -Infinity, Infinity, false);
+            if (score > bestScore) {
+                bestScore = score;
+                bestCol = col;
+            }
+        }
+    }
+    
+    return bestCol;
+};
+
+// Get the best move for AI based on difficulty
+export const getAIMove = (board: Board, difficulty: Difficulty = 'Medium'): number => {
+    // Use easy AI for Easy difficulty
+    if (difficulty === 'Easy') {
+        return getEasyAIMove(board);
+    }
+    
+    // Use medium AI for Medium difficulty
+    if (difficulty === 'Medium') {
+        return getMediumAIMove(board);
+    }
+    
+    // Use advanced AI for Hard difficulty
+    const validMoves = getValidMoves(board);
+    
+    if (validMoves.length === 0) {
+        return -1; // No valid moves
+    }
+    
+    // Opening move - prefer center column
+    const totalMoves = ROWS * COLS - validMoves.length;
+    if (totalMoves <= 1) {
+        const centerCol = Math.floor(COLS / 2);
+        if (validMoves.includes(centerCol)) {
+            return centerCol;
+        }
+    }
+    
+    // Check for immediate winning move
+    for (const col of validMoves) {
+        const newBoard = placeDisc(board, col, 'ai');
+        if (newBoard && checkWinner(newBoard) === 'ai') {
+            return col;
+        }
+    }
+    
+    // Check for blocking opponent's winning move
+    for (const col of validMoves) {
+        const newBoard = placeDisc(board, col, 'player');
+        if (newBoard && checkWinner(newBoard) === 'player') {
+            return col;
+        }
+    }
+    
+    // Set depth based on board state for Hard difficulty
     // Lower depth for early game to speed up computation
     let depth = 5;
     if (totalMoves < 10) {
