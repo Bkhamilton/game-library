@@ -275,8 +275,104 @@ export const minimax = (
     }
 };
 
-// Get the best move for AI using MinMax with Alpha-Beta pruning
+// Check if there are 3 player discs in a row (horizontal or vertical) that need blocking
+const findSimpleBlockingMove = (board: Board, validMoves: number[]): number | null => {
+    // Check horizontal threats (3 in a row with an empty spot)
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col <= COLS - 4; col++) {
+            const window = [board[row][col], board[row][col + 1], board[row][col + 2], board[row][col + 3]];
+            const playerCount = window.filter(cell => cell === 'player').length;
+            const emptyCount = window.filter(cell => cell === 'empty').length;
+            
+            if (playerCount === 3 && emptyCount === 1) {
+                // Find the empty spot and check if it's a valid move
+                for (let i = 0; i < 4; i++) {
+                    const checkCol = col + i;
+                    if (board[row][checkCol] === 'empty') {
+                        // Check if this column can be played (need to check if disc would land at this row)
+                        const nextRow = getNextAvailableRow(board, checkCol);
+                        if (nextRow === row && validMoves.includes(checkCol)) {
+                            return checkCol;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Check vertical threats (3 in a column with an empty spot on top)
+    for (let col = 0; col < COLS; col++) {
+        for (let row = 0; row <= ROWS - 4; row++) {
+            const window = [board[row][col], board[row + 1][col], board[row + 2][col], board[row + 3][col]];
+            const playerCount = window.filter(cell => cell === 'player').length;
+            const emptyCount = window.filter(cell => cell === 'empty').length;
+            
+            if (playerCount === 3 && emptyCount === 1) {
+                // Find the empty spot (should be at the top of the 4-window)
+                for (let i = 0; i < 4; i++) {
+                    const checkRow = row + i;
+                    if (board[checkRow][col] === 'empty') {
+                        // Check if this is the next available row in this column
+                        const nextRow = getNextAvailableRow(board, col);
+                        if (nextRow === checkRow && validMoves.includes(col)) {
+                            return col;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return null;
+};
+
+// Easy AI: blocks simple threats and makes random moves
+const getEasyAIMove = (board: Board): number => {
+    const validMoves = getValidMoves(board);
+    
+    if (validMoves.length === 0) {
+        return -1;
+    }
+    
+    // Check for immediate winning move (still takes wins)
+    for (const col of validMoves) {
+        const newBoard = placeDisc(board, col, 'ai');
+        if (newBoard && checkWinner(newBoard) === 'ai') {
+            return col;
+        }
+    }
+    
+    // Block simple horizontal and vertical 3-in-a-row threats
+    const blockingMove = findSimpleBlockingMove(board, validMoves);
+    if (blockingMove !== null) {
+        return blockingMove;
+    }
+    
+    // Make a random move with slight preference for center columns
+    const centerCol = Math.floor(COLS / 2);
+    
+    // 40% chance to play center columns (3, 2, 4) if available
+    if (Math.random() < 0.4) {
+        const centerColumns = [centerCol, centerCol - 1, centerCol + 1].filter(
+            col => validMoves.includes(col)
+        );
+        if (centerColumns.length > 0) {
+            return centerColumns[Math.floor(Math.random() * centerColumns.length)];
+        }
+    }
+    
+    // Otherwise, random move
+    return validMoves[Math.floor(Math.random() * validMoves.length)];
+};
+
+// Get the best move for AI based on difficulty
 export const getAIMove = (board: Board, difficulty: Difficulty = 'Medium'): number => {
+    // Use easy AI for Easy difficulty
+    if (difficulty === 'Easy') {
+        return getEasyAIMove(board);
+    }
+    
+    // Use advanced AI for Medium and Hard difficulties
     const validMoves = getValidMoves(board);
     
     if (validMoves.length === 0) {
