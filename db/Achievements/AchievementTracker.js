@@ -69,7 +69,7 @@ const checkCriteria = async (db, criteria) => {
                     return result[0].minMoves && result[0].minMoves <= threshold;
                 }
             } else if (metric === 'totalScore') {
-                // Sum all scores with the totalScore metric
+                // Get the highest totalScore in a single game
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
                 const result = await db.getAllAsync(query, [gameId]);
                 return (result[0].maxScore || 0) >= threshold;
