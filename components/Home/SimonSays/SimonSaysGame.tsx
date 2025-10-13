@@ -62,7 +62,9 @@ export default function SimonSaysGame() {
 
     useEffect(() => {
         if (isGameRunning && gameState === 'idle' && countdown === null) {
-            startNewRound();
+            setTimeout(() => {
+                startNewRound();
+            }, 200);
         }
     }, [isGameRunning, gameState, countdown]);
 
@@ -248,8 +250,6 @@ const styles = StyleSheet.create({
     board: {
         width: 360,
         height: 360,
-        borderWidth: 3,
-        borderRadius: 8,
         justifyContent: "center",
         alignItems: "center",
         marginVertical: 20,
