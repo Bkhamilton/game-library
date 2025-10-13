@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Modal, TouchableOpacity, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Text, View, TextInput } from '@/components/Themed';
 import useTheme from '@/hooks/useTheme';
 
@@ -31,6 +31,7 @@ export default function EditProfileModal({
 
     const handleSave = () => {
         if (name.trim() === '' || username.trim() === '') {
+            Alert.alert('Validation Error', 'Name and username cannot be empty.');
             return;
         }
         onSave(name.trim(), username.trim());
@@ -56,7 +57,7 @@ export default function EditProfileModal({
                         <View style={[styles.modalContent, { backgroundColor: background }]}>
                             <Text style={styles.title}>Edit Profile</Text>
                             
-                            <View style={{ width: '100%', marginVertical: 12 }}>
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.label}>Name</Text>
                                 <TextInput
                                     style={[styles.input, { borderColor: grayBorder, backgroundColor: grayBackground }]}
@@ -67,7 +68,7 @@ export default function EditProfileModal({
                                 />
                             </View>
 
-                            <View style={{ width: '100%', marginVertical: 12 }}>
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.label}>Username</Text>
                                 <TextInput
                                     style={[styles.input, { borderColor: grayBorder, backgroundColor: grayBackground }]}
@@ -117,6 +118,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '600',
         marginBottom: 8,
+    },
+    inputContainer: {
+        width: '100%',
+        marginVertical: 12,
     },
     label: {
         fontSize: 14,

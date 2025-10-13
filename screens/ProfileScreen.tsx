@@ -55,11 +55,11 @@ export default function ProfileScreen() {
                             <FontAwesome6 name="user-large" size={80} color={text} />
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={styles.profileNameContainer}>
                         <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
                         <TouchableOpacity 
                             onPress={() => setIsEditModalVisible(true)}
-                            style={{ padding: 4 }}
+                            style={styles.editButton}
                         >
                             <FontAwesome6 name="pencil" size={18} color={text} />
                         </TouchableOpacity>
@@ -99,9 +99,17 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
         overflow: 'hidden'
     },
+    profileNameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
     profileName: {
         fontSize: 24,
         fontWeight: '500',
         marginBottom: 8,
+    },
+    editButton: {
+        padding: 4,
     },
 });
