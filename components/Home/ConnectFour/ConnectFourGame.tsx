@@ -11,6 +11,7 @@ import {
     placeDisc, 
     checkWinner, 
     isDraw,
+    getAIMove,
     Board,
     Player 
 } from "@/utils/ConnectFourGenerator";
@@ -89,12 +90,43 @@ export default function ConnectFourGame() {
             return;
         }
 
-        // Switch to AI turn (placeholder - AI not implemented yet)
+        // Switch to AI turn
         setCurrentPlayer('ai');
         
-        // For now, immediately switch back to player
-        // In the future, this is where AI logic will go
+        // AI makes its move after a short delay
         setTimeout(() => {
+            const aiCol = getAIMove(newBoard, difficulty as string);
+            
+            if (aiCol === -1) {
+                // No valid moves, game is a draw
+                handleLoss();
+                return;
+            }
+            
+            const aiBoard = placeDisc(newBoard, aiCol, 'ai');
+            
+            if (!aiBoard) {
+                // Should not happen, but handle gracefully
+                setCurrentPlayer('player');
+                return;
+            }
+            
+            setBoard(aiBoard);
+            
+            // Check if AI won
+            const aiWinner = checkWinner(aiBoard);
+            if (aiWinner === 'ai') {
+                handleLoss();
+                return;
+            }
+            
+            // Check for draw
+            if (isDraw(aiBoard)) {
+                handleLoss();
+                return;
+            }
+            
+            // Switch back to player
             setCurrentPlayer('player');
         }, 500);
     };

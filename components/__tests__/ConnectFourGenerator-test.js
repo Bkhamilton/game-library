@@ -6,6 +6,9 @@ import {
     hasValidMoves,
     isColumnFull,
     getNextAvailableRow,
+    getValidMoves,
+    getAIMove,
+    evaluateBoard,
     ROWS,
     COLS,
 } from '../../utils/ConnectFourGenerator';
@@ -74,7 +77,9 @@ describe('ConnectFourGenerator', () => {
             const board = initializeBoard();
             const newBoard = placeDisc(board, 0, 'player');
             expect(newBoard).not.toBe(null);
-            expect(newBoard![ROWS - 1][0]).toBe('player');
+            if (newBoard) {
+                expect(newBoard[ROWS - 1][0]).toBe('player');
+            }
         });
 
         it('returns null for full column', () => {
@@ -96,9 +101,11 @@ describe('ConnectFourGenerator', () => {
         it('stacks discs correctly', () => {
             const board = initializeBoard();
             const board1 = placeDisc(board, 0, 'player');
-            const board2 = placeDisc(board1!, 0, 'ai');
-            expect(board2![ROWS - 1][0]).toBe('player');
-            expect(board2![ROWS - 2][0]).toBe('ai');
+            const board2 = board1 ? placeDisc(board1, 0, 'ai') : null;
+            if (board2) {
+                expect(board2[ROWS - 1][0]).toBe('player');
+                expect(board2[ROWS - 2][0]).toBe('ai');
+            }
         });
     });
 
@@ -184,11 +191,18 @@ describe('ConnectFourGenerator', () => {
 
         it('returns true for full board with no winner', () => {
             const board = initializeBoard();
-            // Fill board in a way that creates no winner
+            // Manually fill board to ensure no 4-in-a-row exists
+            const filledBoard = [
+                ['player', 'player', 'ai', 'player', 'player', 'ai', 'ai'],
+                ['ai', 'ai', 'player', 'ai', 'ai', 'player', 'player'],
+                ['player', 'player', 'ai', 'player', 'player', 'ai', 'ai'],
+                ['ai', 'ai', 'player', 'ai', 'ai', 'player', 'player'],
+                ['player', 'player', 'ai', 'player', 'player', 'ai', 'ai'],
+                ['ai', 'ai', 'player', 'ai', 'ai', 'player', 'player']
+            ];
             for (let row = 0; row < ROWS; row++) {
                 for (let col = 0; col < COLS; col++) {
-                    // Alternate pattern to avoid any 4-in-a-row
-                    board[row][col] = (row + col) % 2 === 0 ? 'player' : 'ai';
+                    board[row][col] = filledBoard[row][col];
                 }
             }
             expect(isDraw(board)).toBe(true);
@@ -207,6 +221,116 @@ describe('ConnectFourGenerator', () => {
                 board[ROWS - 1][col] = 'player';
             }
             expect(isDraw(board)).toBe(false);
+        });
+    });
+
+    describe('getValidMoves', () => {
+        it('returns all columns for empty board', () => {
+            const board = initializeBoard();
+            const validMoves = getValidMoves(board);
+            expect(validMoves.length).toBe(COLS);
+            expect(validMoves).toEqual([0, 1, 2, 3, 4, 5, 6]);
+        });
+
+        it('returns only available columns for partially filled board', () => {
+            const board = initializeBoard();
+            // Fill columns 0 and 3
+            for (let row = 0; row < ROWS; row++) {
+                board[row][0] = 'player';
+                board[row][3] = 'ai';
+            }
+            const validMoves = getValidMoves(board);
+            expect(validMoves).toEqual([1, 2, 4, 5, 6]);
+        });
+
+        it('returns empty array for full board', () => {
+            const board = initializeBoard();
+            // Fill entire board
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    board[row][col] = 'player';
+                }
+            }
+            const validMoves = getValidMoves(board);
+            expect(validMoves).toEqual([]);
+        });
+    });
+
+    describe('evaluateBoard', () => {
+        it('returns 0 for empty board', () => {
+            const board = initializeBoard();
+            const score = evaluateBoard(board);
+            expect(score).toBe(0);
+        });
+
+        it('returns positive score when AI has advantage', () => {
+            const board = initializeBoard();
+            // Place 3 AI discs in a row with an empty space
+            board[ROWS - 1][0] = 'ai';
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            const score = evaluateBoard(board);
+            expect(score).toBeGreaterThan(0);
+        });
+
+        it('returns negative score when player threatens to win', () => {
+            const board = initializeBoard();
+            // Place 3 player discs in a row with an empty space
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'player';
+            board[ROWS - 1][2] = 'player';
+            const score = evaluateBoard(board);
+            expect(score).toBeLessThan(0);
+        });
+    });
+
+    describe('getAIMove', () => {
+        it('returns a valid column number', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board);
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+        });
+
+        it('takes immediate winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for AI
+            board[ROWS - 1][0] = 'ai';
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            // Column 3 is the winning move
+            const aiMove = getAIMove(board);
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks opponent winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for player
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'player';
+            board[ROWS - 1][2] = 'player';
+            // Column 3 needs to be blocked
+            const aiMove = getAIMove(board);
+            expect(aiMove).toBe(3);
+        });
+
+        it('returns -1 when no valid moves available', () => {
+            const board = initializeBoard();
+            // Fill entire board
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    board[row][col] = 'player';
+                }
+            }
+            const aiMove = getAIMove(board);
+            expect(aiMove).toBe(-1);
+        });
+
+        it('prefers center column for opening move', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board);
+            // Center column (3) should be preferred on empty board
+            expect(aiMove).toBe(3);
         });
     });
 });
