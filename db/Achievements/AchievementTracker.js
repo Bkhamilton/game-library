@@ -70,11 +70,13 @@ const checkCriteria = async (db, criteria) => {
                 }
             } else if (metric === 'totalScore') {
                 // Get the highest totalScore in a single game
+                // Note: For Memory Match, totalScore stores the number of matches in a game
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
                 const result = await db.getAllAsync(query, [gameId]);
                 return (result[0].maxScore || 0) >= threshold;
             } else if (metric === 'totalMatches') {
-                // Sum all matches across all games (stored as totalScore)
+                // Sum all matches across all games
+                // Note: This sums up all totalScore entries, which represent matches per game
                 query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
                 const result = await db.getAllAsync(query, [gameId]);
                 return (result[0].total || 0) >= threshold;
@@ -166,11 +168,13 @@ const getProgressForAchievement = async (db, criteria) => {
                 }
             } else if (metric === 'totalScore') {
                 // Get the highest totalScore achieved
+                // Note: For Memory Match, totalScore stores the number of matches in a game
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
                 const result = await db.getAllAsync(query, [gameId]);
                 return Math.min(result[0].maxScore || 0, threshold);
             } else if (metric === 'totalMatches') {
-                // Sum all matches across all games (stored as totalScore)
+                // Sum all matches across all games
+                // Note: This sums up all totalScore entries, which represent matches per game
                 query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
                 const result = await db.getAllAsync(query, [gameId]);
                 return Math.min(result[0].total || 0, threshold);
