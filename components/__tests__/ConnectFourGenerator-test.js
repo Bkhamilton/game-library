@@ -333,4 +333,100 @@ describe('ConnectFourGenerator', () => {
             expect(aiMove).toBe(3);
         });
     });
+
+    describe('getAIMove with Easy difficulty', () => {
+        it('returns a valid column number', () => {
+            const board = initializeBoard();
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+        });
+
+        it('takes immediate winning move', () => {
+            const board = initializeBoard();
+            // Set up a winning scenario for AI
+            board[ROWS - 1][0] = 'ai';
+            board[ROWS - 1][1] = 'ai';
+            board[ROWS - 1][2] = 'ai';
+            // Column 3 is the winning move
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks horizontal 3-in-a-row threat', () => {
+            const board = initializeBoard();
+            // Set up a horizontal threat
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'player';
+            board[ROWS - 1][2] = 'player';
+            // Column 3 should be blocked
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBe(3);
+        });
+
+        it('blocks vertical 3-in-a-row threat', () => {
+            const board = initializeBoard();
+            // Set up a vertical threat in column 2
+            board[ROWS - 1][2] = 'player';
+            board[ROWS - 2][2] = 'player';
+            board[ROWS - 3][2] = 'player';
+            // Column 2 should be blocked (row ROWS-4)
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBe(2);
+        });
+
+        it('does NOT block diagonal threats (only horizontal and vertical)', () => {
+            const board = initializeBoard();
+            // Set up a diagonal threat that Easy AI should NOT block
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 2][1] = 'player';
+            board[ROWS - 3][2] = 'player';
+            // The AI should make a move, but not necessarily block column 3
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBeGreaterThanOrEqual(0);
+            expect(aiMove).toBeLessThan(COLS);
+            // We don't assert it blocks the diagonal - just that it makes a valid move
+        });
+
+        it('makes random moves when no immediate threats exist', () => {
+            const board = initializeBoard();
+            // Place one disc to avoid opening move logic
+            board[ROWS - 1][0] = 'player';
+            board[ROWS - 1][1] = 'ai';
+            
+            // Run AI move multiple times to ensure it returns valid moves
+            const moves = new Set();
+            for (let i = 0; i < 10; i++) {
+                const aiMove = getAIMove(board, 'Easy');
+                expect(aiMove).toBeGreaterThanOrEqual(0);
+                expect(aiMove).toBeLessThan(COLS);
+                moves.add(aiMove);
+            }
+            // Should have some variety in moves (not always the same)
+            expect(moves.size).toBeGreaterThan(1);
+        });
+
+        it('blocks horizontal threat in middle of board', () => {
+            const board = initializeBoard();
+            // Set up a horizontal threat at the bottom row
+            board[ROWS - 1][3] = 'player';
+            board[ROWS - 1][4] = 'player';
+            board[ROWS - 1][5] = 'player';
+            // Both columns 2 and 6 would complete it - AI should block one of them
+            const aiMove = getAIMove(board, 'Easy');
+            expect([2, 6]).toContain(aiMove);
+        });
+
+        it('returns -1 when no valid moves available', () => {
+            const board = initializeBoard();
+            // Fill entire board
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    board[row][col] = 'player';
+                }
+            }
+            const aiMove = getAIMove(board, 'Easy');
+            expect(aiMove).toBe(-1);
+        });
+    });
 });
