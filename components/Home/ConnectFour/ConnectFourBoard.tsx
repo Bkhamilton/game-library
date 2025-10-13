@@ -23,7 +23,7 @@ export default function ConnectFourBoard({ board, onColumnPress, isGameRunning }
     // Get disc color based on cell value
     const getDiscColor = (cell: Cell): string => {
         if (cell === 'player') return '#ff4757'; // Red for player
-        if (cell === 'ai') return '#ffd700'; // Yellow for AI
+        if (cell === 'ai') return '#0ab2dbff'; // Yellow for AI
         return '#ecf0f1'; // Empty/white
     };
     
