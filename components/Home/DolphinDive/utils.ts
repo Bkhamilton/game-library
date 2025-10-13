@@ -80,3 +80,69 @@ export const checkCollision = (dolphinY: number, obstacle: any): boolean => {
     // TODO: Implement collision detection
     return false;
 };
+
+/**
+ * Generate a random obstacle based on the game difficulty
+ */
+export const generateObstacle = (screenWidth: number): any => {
+    const types = ['boat', 'seagull', 'buoy', 'rock', 'jellyfish'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    let y: number;
+    let width: number;
+    let height: number;
+    let color: string;
+    
+    switch(type) {
+        case 'boat':
+            // Sits on water surface, dolphin must go completely under
+            y = WATER_SURFACE_Y - 40;  // Partially in water
+            width = 120;
+            height = 80;
+            color = '#D32F2F'; // Red
+            break;
+        case 'seagull':
+            // High in air, requires deep dive to jump over
+            y = WATER_SURFACE_Y - 200;
+            width = 50;
+            height = 40;
+            color = '#1976D2'; // Blue
+            break;
+        case 'buoy':
+            // At surface level, can go under or shallow jump over
+            y = WATER_SURFACE_Y - 30;
+            width = 40;
+            height = 60;
+            color = '#FBC02D'; // Yellow
+            break;
+        case 'rock':
+            // Underwater obstacle, must avoid while diving
+            y = WATER_SURFACE_Y + 75;
+            width = 60;
+            height = 50;
+            color = '#757575'; // Gray
+            break;
+        case 'jellyfish':
+            // Deep underwater, forces player to stay shallow
+            y = WATER_SURFACE_Y + 150;
+            width = 55;
+            height = 65;
+            color = '#9C27B0'; // Purple
+            break;
+        default:
+            y = WATER_SURFACE_Y;
+            width = 50;
+            height = 50;
+            color = '#000000';
+    }
+    
+    return {
+        key: Math.random().toString(),
+        x: screenWidth,
+        y,
+        type,
+        width,
+        height,
+        color,
+    };
+};

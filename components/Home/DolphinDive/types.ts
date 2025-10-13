@@ -10,11 +10,16 @@ export interface DolphinState {
     twistTimer?: number;     // Timer for twist animation
 }
 
+export type ObstacleType = 'boat' | 'seagull' | 'buoy' | 'rock' | 'jellyfish';
+
 export interface Obstacle {
     key: string;
     x: number;
     y: number;
-    type: 'underwater' | 'surface' | 'airborne';
+    type: ObstacleType;
+    width: number;
+    height: number;
+    color: string;
 }
 
 export interface Collectible {

@@ -1,21 +1,22 @@
-// DolphinDive Main Game Component
-
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Text } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DBContext } from '@/contexts/DBContext';
-import { DolphinState } from './types';
+import { DolphinState, Obstacle as ObstacleType } from './types';
 import { Dolphin } from './Dolphin';
+import { Obstacle } from './Obstacle';
 import { WaterSurface } from './WaterSurface';
-import { updatePhysics, calculateJumpVelocity } from './utils';
+import { updatePhysics, calculateJumpVelocity, generateObstacle } from './utils';
 import {
     WATER_SURFACE_Y,
     OCEAN_BLUE,
     SKY_BLUE,
     SCREEN_HEIGHT,
+    SCREEN_WIDTH,
     MAX_DIVE_DEPTH,
     RESTING_DEPTH,
+    DIFFICULTY_SETTINGS,
 } from './constants';
 import { FadeOutView } from '@/components/animations/ReanimatedExamples';
 
@@ -26,6 +27,7 @@ export default function DolphinDiveGame() {
 
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
+    const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
     const [gameState, setGameState] = useState<DolphinState>({
         y: WATER_SURFACE_Y + RESTING_DEPTH,
         velocity: 0,
@@ -34,10 +36,13 @@ export default function DolphinDiveGame() {
         isDiving: false,
     });
 
+    const settings = DIFFICULTY_SETTINGS[difficulty as string] || DIFFICULTY_SETTINGS.Easy;
+
     // Start game
     const startGame = () => {
         setIsGameRunning(true);
         setScore(0);
+        setObstacles([]);
         setGameState({
             y: WATER_SURFACE_Y + RESTING_DEPTH,
             velocity: 0,
@@ -155,6 +160,43 @@ export default function DolphinDiveGame() {
         return () => clearInterval(gameLoop);
     }, [isGameRunning]);
 
+    // Obstacle spawning system
+    useEffect(() => {
+        if (!isGameRunning) return;
+
+        let spawnTimeout: NodeJS.Timeout;
+
+        const spawnObstacle = () => {
+            const newObstacle = generateObstacle(SCREEN_WIDTH);
+            setObstacles((prev) => [...prev, newObstacle]);
+
+            const randomSpawnRate = settings.obstacleSpawnRate + Math.random() * 1000;
+            spawnTimeout = setTimeout(spawnObstacle, randomSpawnRate);
+        };
+
+        spawnObstacle();
+
+        return () => clearTimeout(spawnTimeout);
+    }, [isGameRunning, settings]);
+
+    // Obstacle movement system
+    useEffect(() => {
+        if (!isGameRunning) return;
+
+        const moveInterval = setInterval(() => {
+            setObstacles((prev) => {
+                return prev
+                    .map((obstacle) => ({
+                        ...obstacle,
+                        x: obstacle.x - settings.obstacleSpeed,
+                    }))
+                    .filter((obstacle) => obstacle.x > -150); // Remove off-screen obstacles
+            });
+        }, 16); // ~60 FPS
+
+        return () => clearInterval(moveInterval);
+    }, [isGameRunning, settings]);
+
     return (
         <TouchableOpacity
             style={styles.container}
@@ -179,6 +221,11 @@ export default function DolphinDiveGame() {
             
             {/* Water Surface Line */}
             <WaterSurface />
+
+            {/* Obstacles */}
+            {obstacles.map((obstacle) => (
+                <Obstacle key={obstacle.key} obstacle={obstacle} />
+            ))}
 
             {/* Dolphin */}
             <Dolphin y={gameState.y} />
