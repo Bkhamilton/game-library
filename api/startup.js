@@ -63,8 +63,11 @@ export const createTables = async (db) => {
 export const dropTables = async (db) => {
     // Your table deletion logic here
     await db.execAsync(`
+        DROP TABLE IF EXISTS Users;
         DROP TABLE IF EXISTS Games;
         DROP TABLE IF EXISTS Scores;
+        DROP TABLE IF EXISTS Achievements;
+        DROP TABLE IF EXISTS UserAchievements;
     `);
 };
 
@@ -102,6 +105,7 @@ export const syncData = async (db) => {
 
 export const setupDatabase = async (db) => {
     // Your database setup logic here
+    await dropTables(db);
     await createTables(db);
     await syncData(db);
 };

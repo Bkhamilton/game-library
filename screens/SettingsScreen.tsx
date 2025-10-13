@@ -41,7 +41,8 @@ export default function SettingsScreen() {
             // Clear AsyncStorage to reset the database on next launch
             await AsyncStorage.clear();
             // Exit the app
-            BackHandler.exitApp();
+            // BackHandler.exitApp();
+            alert('Data cleared. Please restart the app.');
         } catch (error) {
             console.error('Error clearing data:', error);
             alert('Error clearing data. Please try again.');
