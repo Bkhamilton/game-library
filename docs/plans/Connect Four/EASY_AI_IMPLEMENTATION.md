@@ -107,19 +107,20 @@ Players who understand Connect Four should have a **high winrate** (60-80%+) aga
 
 | Feature | Easy | Medium | Hard |
 |---------|------|--------|------|
-| Algorithm | Simple blocking + random | MinMax (depth 4-5) | MinMax (depth 4-5) |
+| Algorithm | Simple blocking + random | MinMax (depth 3) | MinMax (depth 4-5) |
 | Blocks horizontal threats | ✅ | ✅ | ✅ |
 | Blocks vertical threats | ✅ | ✅ | ✅ |
 | Blocks diagonal threats | ❌ | ✅ | ✅ |
-| Strategic planning | ❌ | ✅ | ✅ |
-| Multi-move ahead thinking | ❌ | ✅ | ✅ |
-| Expected player winrate | 60-80% | 10-20% | <5% |
+| Strategic planning | ❌ | ✅ (3 moves) | ✅ (4-5 moves) |
+| Multi-move ahead thinking | ❌ | Limited | Extensive |
+| Expected player winrate | 60-80% | 30-50% | <10% |
 
 ## Usage
 
 Players can select difficulty when starting a game:
-- Select "Easy" for beginners or casual play
-- Select "Medium" or "Hard" for challenging AI opponents
+- Select **"Easy"** for beginners or casual play
+- Select **"Medium"** for an intermediate challenge (see MEDIUM_AI_IMPLEMENTATION.md)
+- Select **"Hard"** for challenging AI opponents (see CONNECT_FOUR_AI_IMPLEMENTATION.md)
 
 The AI automatically uses the appropriate strategy based on the selected difficulty.
 
