@@ -85,7 +85,7 @@ export const checkCollision = (dolphinY: number, obstacle: any): boolean => {
  * Generate a random obstacle based on the game difficulty
  */
 export const generateObstacle = (screenWidth: number): any => {
-    const types = ['boat', 'seagull', 'buoy', 'rock', 'jellyfish'];
+    const types = ['boat', 'seagull', 'buoy', 'rock', 'jellyfish', 'bigBoat'];
     const type = types[Math.floor(Math.random() * types.length)];
     
     let y: number;
@@ -100,6 +100,13 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 120;
             height = 80;
             color = '#D32F2F'; // Red
+            break;
+        case 'bigBoat':
+            // Large boat obstacle, requires significant vertical movement
+            y = WATER_SURFACE_Y - 50;
+            width = 180;
+            height = 100;
+            color = '#C2185B'; // Pink
             break;
         case 'seagull':
             // High in air, requires deep dive to jump over
