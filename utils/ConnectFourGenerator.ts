@@ -398,7 +398,7 @@ const getMediumAIMove = (board: Board): number => {
         }
     }
     
-    // Use MinMax with reduced depth (2-3) for medium difficulty
+    // Use MinMax with reduced depth (3) for medium difficulty
     // This makes it strategic but beatable
     const depth = 3;
     
