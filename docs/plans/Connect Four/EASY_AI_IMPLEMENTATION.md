@@ -27,9 +27,11 @@ This limited blocking makes the AI much more beatable, as players can win using 
 ### 3. Random Move Selection
 
 When no immediate win or simple threat exists:
-- 40% chance to prefer center columns (columns 2, 3, 4)
+- 40% chance to prefer center columns (columns 2, 3, 4 in 0-indexed terms)
 - 60% chance to pick any random valid column
 - This adds unpredictability while maintaining some strategic awareness
+
+Note: Connect Four uses a 7-column board (columns 0-6), where column 3 is the true center.
 
 ## Code Implementation
 
