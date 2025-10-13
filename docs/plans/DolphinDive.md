@@ -144,14 +144,15 @@ const onSurfaceBreak = (state: DolphinState): DolphinState => {
 
 **Obstacle Types:**
 
-| Type | Location | Avoidance Strategy | Sprite |
-|------|----------|-------------------|--------|
-| **Seagulls** | High in air (200-250px above water) | Deep dive required | Bird sprite |
-| **Boats** | Medium height (100-150px above water) | Moderate dive | Boat silhouette |
-| **Buoys** | Surface level (0-50px above water) | Shallow dive or go under | Buoy sprite |
-| **Rocks** | Underwater (50-100px below surface) | Stay above or time dive | Rock formations |
-| **Jellyfish** | Deep underwater (100-150px below) | Avoid deep dives in this area | Animated jellyfish |
-| **Fishing Nets** | Mid-depth underwater (50-100px below) | Navigate around carefully | Net texture |
+| Type | Location | Avoidance Strategy | Sprite | Implementation Status |
+|------|----------|-------------------|--------|----------------------|
+| **Seagulls** | High in air (200px above water) | Deep dive required | Blue box (#1976D2, 50x40px) | ✅ IMPLEMENTED |
+| **Boats** | Medium height (40px above water) | Go completely under | Red box (#D32F2F, 120x80px) | ✅ IMPLEMENTED |
+| **Buoys** | Surface level (30px above water) | Shallow dive or go under | Yellow box (#FBC02D, 40x60px) | ✅ IMPLEMENTED |
+| **Rocks** | Underwater (75px below surface) | Stay above or time dive | Gray box (#757575, 60x50px) | ✅ IMPLEMENTED |
+| **Jellyfish** | Deep underwater (150px below) | Avoid deep dives in this area | Purple box (#9C27B0, 55x65px) | ✅ IMPLEMENTED |
+
+**Note:** Currently using colored boxes instead of sprites as per initial implementation requirements.
 
 **Collectibles:**
 
@@ -659,18 +660,19 @@ data/
 - Optional: Add trajectory prediction arc
 - Optional: Add screen tint effects based on depth
 
-### Phase 3: Obstacles and Collectibles (Week 3) - NOT STARTED
+### Phase 3: Obstacles and Collectibles (Week 3) - IN PROGRESS
 
 **Goal:** Add obstacles, collectibles, and collision detection
 
 **Tasks:**
-1. **Obstacle System** ❌ NOT STARTED
-   - Multiple obstacle types
-   - Spawn logic with timing
-   - Animated movement
-   - Off-screen cleanup
-   - Note: Obstacle.tsx component file created but only contains placeholder
-
+1. **Obstacle System** ✅ MOSTLY COMPLETED
+   - ✅ Multiple obstacle types (5 types: boat, seagull, buoy, rock, jellyfish)
+   - ✅ Spawn logic with timing (random intervals based on difficulty)
+   - ✅ Animated movement (obstacles move left across screen)
+   - ✅ Off-screen cleanup (obstacles removed when x < -150)
+   - ✅ Colored box rendering (different colors for each type)
+   - ❌ Sprite graphics (using colored boxes as per requirement)
+   
 2. **Collectible System** ❌ NOT STARTED
    - Multiple collectible types
    - Strategic placement
@@ -692,17 +694,16 @@ data/
    - Bonus calculations
 
 **Deliverables:**
-- ❌ Obstacles spawn and move correctly
+- ✅ Obstacles spawn and move correctly
 - ❌ Collision detection works accurately
 - ❌ Collectibles can be picked up
 - ❌ Score increases properly
 
 **What's Needed:**
-- Implement obstacle generation and spawning system
-- Implement collectible generation and spawning system
-- Complete collision detection logic
-- Add scoring mechanics
-- Create obstacle and collectible sprites
+- ❌ Complete collision detection logic
+- ❌ Implement collectible generation and spawning system
+- ❌ Add scoring mechanics
+- ❌ (Optional) Replace colored boxes with sprite graphics
 
 ### Phase 4: Visual Polish (Week 4) - NOT STARTED
 
