@@ -36,7 +36,9 @@ export default function DolphinDiveGame() {
         isDiving: false,
     });
 
-    const settings = DIFFICULTY_SETTINGS[difficulty as string] || DIFFICULTY_SETTINGS.Easy;
+    type Difficulty = keyof typeof DIFFICULTY_SETTINGS;
+    const difficultyKey: Difficulty = (difficulty === 'Hard' ? 'Hard' : 'Easy');
+    const settings = DIFFICULTY_SETTINGS[difficultyKey];
 
     // Start game
     const startGame = () => {
@@ -164,7 +166,7 @@ export default function DolphinDiveGame() {
     useEffect(() => {
         if (!isGameRunning) return;
 
-        let spawnTimeout: NodeJS.Timeout;
+        let spawnTimeout: number;
 
         const spawnObstacle = () => {
             const newObstacle = generateObstacle(SCREEN_WIDTH);

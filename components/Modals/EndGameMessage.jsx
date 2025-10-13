@@ -8,6 +8,7 @@ import Difficulties from '@/constants/Difficulties';
 import { getGameScores, getHighScoreByGame, getWinLossCountByGame } from '@/db/Scores/Results';
 import { checkAchievementsAfterGame } from '@/db/Achievements/AchievementTracker';
 import { getUserTotalPoints } from '@/db/Achievements/Achievements';
+import { useRouter } from 'expo-router';
 
 export default function EndGameMessage({ visible, close, win, game, initialDifficulty, restartGame }) {
 
@@ -46,6 +47,13 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
     const handleRestartGame = () => {
         // if restartGame is passed as a prop, call it with selectedDifficulty
         if (restartGame) restartGame(selectedDifficulty);
+        close();
+    }
+
+    const router = useRouter();
+
+    const handleRouteHome = () => {
+        router.replace('/(tabs)');
         close();
     }
 
@@ -183,6 +191,12 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                         <View style={{ paddingTop: 16 }}>
                             <TouchableOpacity
                                 style={[styles.button, { backgroundColor: grayBackground }]}
+                                onPress={handleRouteHome}
+                            >
+                                <Text>Go Home</Text>
+                            </TouchableOpacity>                                
+                            <TouchableOpacity
+                                style={[styles.button, { backgroundColor: grayBackground }]}
                                 onPress={openDifficultyModal}
                             >
                                 <Text>Difficulty: <Text style={{ fontWeight: 'bold' }}>{selectedDifficulty}</Text></Text>
@@ -192,7 +206,7 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                                 onPress={handleRestartGame}
                             >
                                 <Text>New Game</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>                        
                             <TouchableOpacity
                                 style={[styles.button, { backgroundColor: grayBackground }]}
                                 onPress={close}
