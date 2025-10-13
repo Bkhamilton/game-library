@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, BackHandler } from 'react-native';
 import { Text, View, TouchableOpacity } from '@/components/Themed';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import useTheme from '@/hooks/useTheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccountInfo from '@/components/Profile/Settings/AccountInfo';
 import SettingsOptions from '@/components/Profile/Settings/SettingsOption';
 import AboutModal from '@/components/Modals/AboutModal';
@@ -13,7 +14,7 @@ import { FadeInView } from '@/components/animations';
 
 export default function SettingsScreen() {
 
-    const { text } = useTheme();
+    const { text, grayBackground, grayBorder } = useTheme();
 
     const router = useRouter();
 
@@ -34,9 +35,17 @@ export default function SettingsScreen() {
         setConfirmationModalVisible(false);
     }
 
-    const onHandleConfirm = () => {
+    const onHandleConfirm = async () => {
         setConfirmationModalVisible(false);
-        alert('User data cleared!');
+        try {
+            // Clear AsyncStorage to reset the database on next launch
+            await AsyncStorage.clear();
+            // Exit the app
+            BackHandler.exitApp();
+        } catch (error) {
+            console.error('Error clearing data:', error);
+            alert('Error clearing data. Please try again.');
+        }
     }
 
     const handleConfirmation = (message: string) => {
@@ -44,10 +53,14 @@ export default function SettingsScreen() {
         setConfirmationModalVisible(true);
     }
 
+    const handleClearAllData = () => {
+        handleConfirmation('Clear all data? This action cannot be undone and the app will close.');
+    }
+
     const handleSelect = (option: string) => {
         switch (option) {
             case 'Clear User Data':
-                handleConfirmation('clear all user data? This action cannot be undone.');
+                alert('This feature is not yet implemented.');
                 break;
             case 'Help':
                 setHelpModalVisible(true);
@@ -57,7 +70,7 @@ export default function SettingsScreen() {
                 break;
             case 'Support Us':
                 alert('Support us by giving a 5 star rating!');
-                break
+                break;
             default:
                 break;
         }
@@ -98,6 +111,14 @@ export default function SettingsScreen() {
                             </View>
                             <AccountInfo/>
                             <SettingsOptions onSelect={handleSelect} />
+                        </View>
+                        <View style={styles.clearDataContainer}>
+                            <TouchableOpacity 
+                                style={[styles.clearDataButton, { borderColor: grayBorder, backgroundColor: grayBackground }]}
+                                onPress={handleClearAllData}
+                            >
+                                <Text style={styles.clearDataText}>Clear All Data</Text>
+                            </TouchableOpacity>
                         </View>
                     </FadeInView>                    
                 </ScrollView>
@@ -146,5 +167,20 @@ const styles = StyleSheet.create({
     aboutText: {
         fontSize: 16,
         marginBottom: 8,
+    },
+    clearDataContainer: {
+        paddingHorizontal: 20,
+        paddingVertical: 40,
+    },
+    clearDataButton: {
+        padding: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        alignItems: 'center',
+    },
+    clearDataText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#FF3B30',
     },
 });
