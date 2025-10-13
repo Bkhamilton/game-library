@@ -1,0 +1,143 @@
+[
+  {
+    "id": 1,
+    "title": "First Sudoku Win",
+    "description": "Win your first game of Sudoku",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 101,
+    "title": "Sudoku Novice",
+    "description": "Win 5 Sudoku games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 102,
+    "title": "Sudoku Enthusiast",
+    "description": "Win 25 Sudoku games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 103,
+    "title": "Sudoku Expert",
+    "description": "Win 100 Sudoku games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 104,
+    "title": "Sudoku Master",
+    "description": "Win 250 Sudoku games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 250
+    }
+  },
+  {
+    "id": 105,
+    "title": "Sudoku Legend",
+    "description": "Win 500 Sudoku games",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Completion",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "result",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 701,
+    "title": "Sudoku Speed Demon",
+    "description": "Complete a Sudoku puzzle in under 5 minutes",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "time",
+      "threshold": 300,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 702,
+    "title": "Sudoku Perfectionist",
+    "description": "Win 10 Sudoku games without any mistakes",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "star",
+    "category": "Skill",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "perfectGames",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 703,
+    "title": "Sudoku No Hints",
+    "description": "Win 10 Sudoku games without using hints",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "lightbulb",
+    "category": "Skill",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "noHints",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 1305,
+    "title": "Sudoku Streak Master",
+    "description": "Win 5 Sudoku games in a row",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Sudoku",
+      "metric": "gameStreak",
+      "threshold": 5
+    }
+  }
+]

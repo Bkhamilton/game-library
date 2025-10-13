@@ -1,0 +1,143 @@
+[
+  {
+    "id": 2,
+    "title": "First Minesweeper Win",
+    "description": "Win your first game of Minesweeper",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 201,
+    "title": "Minesweeper Novice",
+    "description": "Win 5 Minesweeper games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 202,
+    "title": "Minesweeper Enthusiast",
+    "description": "Win 25 Minesweeper games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 203,
+    "title": "Minesweeper Expert",
+    "description": "Win 100 Minesweeper games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 204,
+    "title": "Minesweeper Master",
+    "description": "Win 250 Minesweeper games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 250
+    }
+  },
+  {
+    "id": 205,
+    "title": "Minesweeper Legend",
+    "description": "Win 500 Minesweeper games",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Completion",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "result",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 801,
+    "title": "Minesweeper Speed Demon",
+    "description": "Clear a Minesweeper board in under 2 minutes",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "time",
+      "threshold": 120,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 802,
+    "title": "Minesweeper Perfectionist",
+    "description": "Win 10 Minesweeper games without any mistakes",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "star",
+    "category": "Skill",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "perfectGames",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 803,
+    "title": "Minesweeper Flagging Expert",
+    "description": "Flag 100 mines correctly across all games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "flag",
+    "category": "Skill",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "totalMinesFlagged",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 1306,
+    "title": "Minesweeper Streak Master",
+    "description": "Win 5 Minesweeper games in a row",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Minesweeper",
+      "metric": "gameStreak",
+      "threshold": 5
+    }
+  }
+]
