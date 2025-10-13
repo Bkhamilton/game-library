@@ -173,7 +173,7 @@ export default function SimonSaysGame() {
 
     const renderTiles = () => {
         const { rows, cols } = settings.gridLayout;
-        const tileSize = Math.min(280 / cols, 280 / rows) - 10;
+        const tileSize = Math.min(320 / cols, 320 / rows);
 
         // Render tiles in rows
         const tileRows = [];
