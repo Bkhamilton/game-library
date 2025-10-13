@@ -3,6 +3,24 @@ import {
     checkMove,
 } from '../../utils/SudokuGenerator';
 
+// Helper function to count empty cells in a board
+const countEmptyCells = (board) => {
+    let count = 0;
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            if (board[row][col] === 0) count++;
+        }
+    }
+    return count;
+};
+
+// Helper function to generate a valid solved board for testing
+const generateTestSolvedBoard = () => {
+    return Array.from({ length: 9 }, (_, row) => 
+        Array.from({ length: 9 }, (_, col) => ((row * 3 + Math.floor(row / 3) + col) % 9) + 1)
+    );
+};
+
 describe('SudokuGenerator', () => {
     describe('generateSudokuPuzzle', () => {
         it('generates a valid complete board', () => {
@@ -21,35 +39,17 @@ describe('SudokuGenerator', () => {
 
         it('generates a puzzle board with correct number of empty cells for Easy', () => {
             const { puzzleBoard } = generateSudokuPuzzle('Easy');
-            let emptyCells = 0;
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    if (puzzleBoard[row][col] === 0) emptyCells++;
-                }
-            }
-            expect(emptyCells).toBe(30);
+            expect(countEmptyCells(puzzleBoard)).toBe(30);
         });
 
         it('generates a puzzle board with correct number of empty cells for Medium', () => {
             const { puzzleBoard } = generateSudokuPuzzle('Medium');
-            let emptyCells = 0;
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    if (puzzleBoard[row][col] === 0) emptyCells++;
-                }
-            }
-            expect(emptyCells).toBe(40);
+            expect(countEmptyCells(puzzleBoard)).toBe(40);
         });
 
         it('generates a puzzle board with correct number of empty cells for Hard', () => {
             const { puzzleBoard } = generateSudokuPuzzle('Hard');
-            let emptyCells = 0;
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    if (puzzleBoard[row][col] === 0) emptyCells++;
-                }
-            }
-            expect(emptyCells).toBe(60);
+            expect(countEmptyCells(puzzleBoard)).toBe(60);
         });
 
         it('validates rows contain all numbers 1-9', () => {
@@ -142,16 +142,12 @@ describe('SudokuGenerator', () => {
 
     describe('checkMove', () => {
         it('returns true for correct move', () => {
-            const solvedBoard = Array.from({ length: 9 }, (_, row) => 
-                Array.from({ length: 9 }, (_, col) => ((row * 3 + Math.floor(row / 3) + col) % 9) + 1)
-            );
+            const solvedBoard = generateTestSolvedBoard();
             expect(checkMove(solvedBoard, 0, 0, solvedBoard[0][0])).toBe(true);
         });
 
         it('returns false for incorrect move', () => {
-            const solvedBoard = Array.from({ length: 9 }, (_, row) => 
-                Array.from({ length: 9 }, (_, col) => ((row * 3 + Math.floor(row / 3) + col) % 9) + 1)
-            );
+            const solvedBoard = generateTestSolvedBoard();
             const wrongValue = solvedBoard[0][0] === 9 ? 1 : solvedBoard[0][0] + 1;
             expect(checkMove(solvedBoard, 0, 0, wrongValue)).toBe(false);
         });
