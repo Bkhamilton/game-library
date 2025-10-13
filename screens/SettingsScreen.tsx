@@ -39,7 +39,7 @@ export default function SettingsScreen() {
         setConfirmationModalVisible(false);
         try {
             // Clear AsyncStorage to reset the database on next launch
-            await AsyncStorage.removeItem('isFirstLaunch');
+            await AsyncStorage.clear();
             // Exit the app
             BackHandler.exitApp();
         } catch (error) {
@@ -54,13 +54,13 @@ export default function SettingsScreen() {
     }
 
     const handleClearAllData = () => {
-        handleConfirmation('clear all data? This action cannot be undone and the app will close.');
+        handleConfirmation('Clear all data? This action cannot be undone and the app will close.');
     }
 
     const handleSelect = (option: string) => {
         switch (option) {
             case 'Clear User Data':
-                handleConfirmation('clear all user data? This action cannot be undone.');
+                alert('This feature is not yet implemented.');
                 break;
             case 'Help':
                 setHelpModalVisible(true);
