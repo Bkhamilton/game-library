@@ -81,7 +81,7 @@ The following games are planned for future releases:
 
 ## 🏆 Achievement System
 
-Game Library features a comprehensive achievement system with **73 total achievements** worth **3,805 points**!
+Game Library features a comprehensive achievement system with **90 total achievements** worth **4,825 points**!
 
 ### Achievement Categories
 
@@ -203,7 +203,7 @@ The app tracks comprehensive statistics for each game:
 ## 🎨 Features
 
 - **Multiple Difficulty Levels**: Each game offers 2-4 difficulty settings
-- **Achievement System**: 73 unique achievements across 6 categories
+- **Achievement System**: 90 unique achievements across 6 categories
 - **Progress Tracking**: SQLite database stores all game statistics
 - **Responsive Design**: Optimized for various screen sizes
 - **Dark/Light Mode**: Automatic UI style based on system preferences

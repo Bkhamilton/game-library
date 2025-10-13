@@ -57,7 +57,7 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
         close();
     }
 
-    const typeAGames = ['Sudoku', 'Minesweeper', 'Word Search', 'Crossword'];
+    const typeAGames = ['Sudoku', 'Minesweeper', 'Word Search', 'Crossword', 'Connect Four'];
     const typeBGames = ['GoGoBird', 'Ostrich Haul'];
     
     const handleGameBoxInfo = () => {

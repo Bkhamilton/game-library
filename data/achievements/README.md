@@ -14,10 +14,11 @@ Each file contains achievements for a specific game or category:
 - **gogobird.json** - 8 GoGoBird achievements (IDs: 6, 601-604, 1201-1203)
 - **2048.json** - 17 2048 achievements (IDs: 7, 1501-1516)
 - **memory-match.json** - 17 Memory Match achievements (IDs: 8, 1601-1616)
+- **connect-four.json** - 17 Connect Four achievements (IDs: 10, 1701-1716)
 - **general.json** - 17 general achievements (IDs: 1301-1413)
   - Includes: Streaks, Collections, and Meta achievements
 
-**Total: 107 achievements**
+**Total: 124 achievements**
 
 ## Achievement Schema
 
