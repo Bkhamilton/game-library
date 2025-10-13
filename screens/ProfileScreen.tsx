@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef } from 'react';
-import { StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ProfileHeader from '@/components/Profile/ProfilePage/ProfileHeader';
 import ProfileStats from '@/components/Profile/ProfilePage//ProfileStats';
@@ -9,12 +9,14 @@ import { UserContext } from '@/contexts/UserContext';
 import { FontAwesome6 } from '@expo/vector-icons';
 import useTheme from '@/hooks/useTheme';
 import { FadeInView } from '@/components/animations';
+import EditProfileModal from '@/components/Modals/EditProfileModal';
 
 export default function ProfileScreen() {
 
-    const { user } = useContext(UserContext);
+    const { user, updateUserInfo } = useContext(UserContext);
     const { text, background, primary } = useTheme();
     const [refreshing, setRefreshing] = useState(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const loadAchievementsRef = useRef<(() => Promise<void>) | null>(null);
 
     const onRefresh = async () => {
@@ -27,6 +29,11 @@ export default function ProfileScreen() {
 
     const handleLoadAchievements = (loadFn: () => Promise<void>) => {
         loadAchievementsRef.current = loadFn;
+    };
+
+    const handleSaveProfile = (name: string, username: string) => {
+        const updatedUser = { ...user, name, username };
+        updateUserInfo(updatedUser);
     };
 
     return (
@@ -48,7 +55,15 @@ export default function ProfileScreen() {
                             <FontAwesome6 name="user-large" size={80} color={text} />
                         </View>
                     </View>
-                    <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <Text style={styles.profileName}>{ user ? user.name : '' }</Text>
+                        <TouchableOpacity 
+                            onPress={() => setIsEditModalVisible(true)}
+                            style={{ padding: 4 }}
+                        >
+                            <FontAwesome6 name="pencil" size={18} color={text} />
+                        </TouchableOpacity>
+                    </View>
                     <Text>{ user ? user.username : '' }</Text>
                 </View>
                 <ProfileStats />
@@ -57,6 +72,13 @@ export default function ProfileScreen() {
                 </FadeInView>
                 <View style={{ height: 100 }} />
             </ScrollView>
+            <EditProfileModal
+                visible={isEditModalVisible}
+                close={() => setIsEditModalVisible(false)}
+                currentName={user?.name || ''}
+                currentUsername={user?.username || ''}
+                onSave={handleSaveProfile}
+            />
         </View>
     );
 }
