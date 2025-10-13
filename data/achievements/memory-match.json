@@ -1,0 +1,246 @@
+[
+  {
+    "id": 8,
+    "title": "First Memory Match Win",
+    "description": "Win your first game of Memory Match",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 1601,
+    "title": "Memory Match Novice",
+    "description": "Win 5 Memory Match games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 1602,
+    "title": "Memory Match Enthusiast",
+    "description": "Win 25 Memory Match games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 1603,
+    "title": "Memory Match Expert",
+    "description": "Win 100 Memory Match games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 1604,
+    "title": "Memory Match Master",
+    "description": "Win 250 Memory Match games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 250
+    }
+  },
+  {
+    "id": 1605,
+    "title": "Memory Match Legend",
+    "description": "Win 500 Memory Match games",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1606,
+    "title": "Quick Recall",
+    "description": "Complete an Easy game in under 60 seconds",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "time",
+      "threshold": 60,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1607,
+    "title": "Speed Matcher",
+    "description": "Complete a Medium game in under 2 minutes",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "time",
+      "threshold": 120,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1608,
+    "title": "Lightning Memory",
+    "description": "Complete a Hard game in under 5 minutes",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "time",
+      "threshold": 300,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1609,
+    "title": "Perfect Match",
+    "description": "Win a game with 8 or more matches",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "star",
+    "category": "Score",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "totalScore",
+      "threshold": 8
+    }
+  },
+  {
+    "id": 1610,
+    "title": "Master Matcher",
+    "description": "Win a game with 18 or more matches",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "star",
+    "category": "Score",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "totalScore",
+      "threshold": 18
+    }
+  },
+  {
+    "id": 1611,
+    "title": "Ultimate Memory",
+    "description": "Win a game with 32 matches",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "star",
+    "category": "Score",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "totalScore",
+      "threshold": 32
+    }
+  },
+  {
+    "id": 1612,
+    "title": "Easy Difficulty Champion",
+    "description": "Win 50 Easy difficulty games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Easy"
+    }
+  },
+  {
+    "id": 1613,
+    "title": "Medium Difficulty Champion",
+    "description": "Win 50 Medium difficulty games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Medium"
+    }
+  },
+  {
+    "id": 1614,
+    "title": "Hard Difficulty Champion",
+    "description": "Win 50 Hard difficulty games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Hard"
+    }
+  },
+  {
+    "id": 1615,
+    "title": "Memory Streak Master",
+    "description": "Win 5 Memory Match games in a row",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "gameStreak",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 1616,
+    "title": "Card Collector",
+    "description": "Find 1000 total matches across all games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "collection",
+    "category": "Collection",
+    "criteria": {
+      "game": "Memory Match",
+      "metric": "totalMatches",
+      "threshold": 1000
+    }
+  }
+]

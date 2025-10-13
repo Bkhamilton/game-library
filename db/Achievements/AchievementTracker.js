@@ -9,7 +9,7 @@ import {
 // Function to check if criteria is met
 const checkCriteria = async (db, criteria) => {
     try {
-        const { game, metric, threshold, operator } = criteria;
+        const { game, metric, threshold, operator, difficulty } = criteria;
         
         // Handle metrics that require game ID
         if (game) {
@@ -18,9 +18,15 @@ const checkCriteria = async (db, criteria) => {
             let query;
             if (metric === 'result') {
                 // Count wins (score > 0)
-                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
-                const result = await db.getAllAsync(query, [gameId, metric]);
-                return result[0].count >= threshold;
+                if (difficulty) {
+                    query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?`;
+                    const result = await db.getAllAsync(query, [gameId, metric, difficulty]);
+                    return result[0].count >= threshold;
+                } else {
+                    query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId, metric]);
+                    return result[0].count >= threshold;
+                }
             } else if (metric === 'highScore') {
                 // Check if there's a high score above threshold
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
@@ -62,6 +68,23 @@ const checkCriteria = async (db, criteria) => {
                     const result = await db.getAllAsync(query, [gameId]);
                     return result[0].minMoves && result[0].minMoves <= threshold;
                 }
+            } else if (metric === 'totalScore') {
+                // Get the highest totalScore in a single game
+                // Note: For Memory Match, totalScore stores the number of matches in a game
+                query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].maxScore || 0) >= threshold;
+            } else if (metric === 'totalMatches') {
+                // Sum all matches across all games
+                // Note: This sums up all totalScore entries, which represent matches per game
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return (result[0].total || 0) >= threshold;
+            } else if (metric === 'gameStreak') {
+                // For streaks, we need special handling - not implemented yet
+                // This would require tracking consecutive wins/losses
+                console.log(`Metric 'gameStreak' requires special streak tracking logic`);
+                return false;
             }
         }
         
@@ -78,7 +101,7 @@ const checkCriteria = async (db, criteria) => {
 // Function to get current progress for an achievement
 const getProgressForAchievement = async (db, criteria) => {
     try {
-        const { game, metric, threshold, operator } = criteria;
+        const { game, metric, threshold, operator, difficulty } = criteria;
         
         // Handle metrics that require game ID
         if (game) {
@@ -87,9 +110,15 @@ const getProgressForAchievement = async (db, criteria) => {
             let query;
             if (metric === 'result') {
                 // Count wins (score > 0)
-                query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
-                const result = await db.getAllAsync(query, [gameId, metric]);
-                return Math.min(result[0].count, threshold);
+                if (difficulty) {
+                    query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?`;
+                    const result = await db.getAllAsync(query, [gameId, metric, difficulty]);
+                    return Math.min(result[0].count, threshold);
+                } else {
+                    query = `SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0`;
+                    const result = await db.getAllAsync(query, [gameId, metric]);
+                    return Math.min(result[0].count, threshold);
+                }
             } else if (metric === 'highScore') {
                 // Get the highest score
                 query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = ?`;
@@ -137,6 +166,22 @@ const getProgressForAchievement = async (db, criteria) => {
                     const minMoves = result[0].minMoves || threshold;
                     return minMoves <= threshold ? threshold : minMoves;
                 }
+            } else if (metric === 'totalScore') {
+                // Get the highest totalScore achieved
+                // Note: For Memory Match, totalScore stores the number of matches in a game
+                query = `SELECT MAX(score) as maxScore FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].maxScore || 0, threshold);
+            } else if (metric === 'totalMatches') {
+                // Sum all matches across all games
+                // Note: This sums up all totalScore entries, which represent matches per game
+                query = `SELECT SUM(score) as total FROM Scores WHERE gameId = ? AND metric = 'totalScore'`;
+                const result = await db.getAllAsync(query, [gameId]);
+                return Math.min(result[0].total || 0, threshold);
+            } else if (metric === 'gameStreak') {
+                // For streaks, we need special handling - not implemented yet
+                // This would require tracking consecutive wins/losses
+                return 0;
             }
         }
         
