@@ -117,7 +117,7 @@ export const generateObstacle = (screenWidth: number): any => {
             break;
         case 'rock':
             // Underwater obstacle, must avoid while diving
-            y = WATER_SURFACE_Y + 75;
+            y = WATER_SURFACE_Y + 50;
             width = 60;
             height = 50;
             color = '#757575'; // Gray
