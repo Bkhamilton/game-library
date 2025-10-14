@@ -1,0 +1,247 @@
+[
+  {
+    "id": 10,
+    "title": "First Connect Four Win",
+    "description": "Win your first game of Connect Four",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 1701,
+    "title": "Connect Four Novice",
+    "description": "Win 5 Connect Four games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 1702,
+    "title": "Connect Four Enthusiast",
+    "description": "Win 25 Connect Four games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 1703,
+    "title": "Connect Four Expert",
+    "description": "Win 100 Connect Four games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 1704,
+    "title": "Connect Four Master",
+    "description": "Win 250 Connect Four games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 250
+    }
+  },
+  {
+    "id": 1705,
+    "title": "Connect Four Legend",
+    "description": "Win 500 Connect Four games",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1706,
+    "title": "Easy Difficulty Champion",
+    "description": "Win 50 Easy difficulty games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Easy"
+    }
+  },
+  {
+    "id": 1707,
+    "title": "Medium Difficulty Champion",
+    "description": "Win 50 Medium difficulty games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Medium"
+    }
+  },
+  {
+    "id": 1708,
+    "title": "Hard Difficulty Champion",
+    "description": "Win 50 Hard difficulty games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "medal",
+    "category": "Completion",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 50,
+      "difficulty": "Hard"
+    }
+  },
+  {
+    "id": 1709,
+    "title": "Quick Victory",
+    "description": "Win a game in under 2 minutes",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "time",
+      "threshold": 120,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1710,
+    "title": "Lightning Fast",
+    "description": "Win a game in under 1 minute",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "clock",
+    "category": "Time-Based",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "time",
+      "threshold": 60,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1711,
+    "title": "Efficient Strategist",
+    "description": "Win a game in 10 moves or less",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "bullseye",
+    "category": "Skill",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "moves",
+      "threshold": 10,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1712,
+    "title": "Perfect Victory",
+    "description": "Win a game in 7 moves or less",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Skill",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "moves",
+      "threshold": 7,
+      "operator": "less_than"
+    }
+  },
+  {
+    "id": 1713,
+    "title": "Connect Four Streak Master",
+    "description": "Win 5 Connect Four games in a row",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "gameStreak",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 1714,
+    "title": "Unstoppable",
+    "description": "Win 10 Connect Four games in a row",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "gameStreak",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 1715,
+    "title": "Four in a Row Champion",
+    "description": "Win 20 Connect Four games in a row",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "fire",
+    "category": "Streak",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "gameStreak",
+      "threshold": 20
+    }
+  },
+  {
+    "id": 1716,
+    "title": "AI Dominator",
+    "description": "Win 100 games across all difficulty levels",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Collection",
+    "criteria": {
+      "game": "Connect Four",
+      "metric": "result",
+      "threshold": 100
+    }
+  }
+]

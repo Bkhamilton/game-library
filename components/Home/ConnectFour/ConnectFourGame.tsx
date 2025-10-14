@@ -4,6 +4,7 @@ import { View, Text } from "@/components/Themed";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import EndGameMessage from "@/components/Modals/EndGameMessage";
 import { DBContext } from "@/contexts/DBContext";
+import { insertWin, insertLoss, insertMoves, insertTimeScore } from "@/db/Scores/Scores";
 import ConnectFourBoard from "@/components/Home/ConnectFour/ConnectFourBoard";
 import ConnectFourHeader from "@/components/Home/ConnectFour/ConnectFourHeader";
 import { 
@@ -57,12 +58,26 @@ export default function ConnectFourGame() {
     const handleWin = () => {
         setIsGameRunning(false);
         setGameResult(true);
+        
+        // Save game results to database
+        if (db && curGame) {
+            insertWin(db, curGame.id, String(difficulty || 'Medium'));
+            insertMoves(db, curGame.id, score, String(difficulty || 'Medium'));
+            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Medium'));
+        }
+        
         setEndGameModalVisible(true);
     };
 
     const handleLoss = () => {
         setIsGameRunning(false);
         setGameResult(false);
+        
+        // Save game results to database
+        if (db && curGame) {
+            insertLoss(db, curGame.id, String(difficulty || 'Medium'));
+        }
+        
         setEndGameModalVisible(true);
     };
 
