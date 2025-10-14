@@ -125,15 +125,18 @@ export default function AchievementFilterSection({
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         data={[{ id: 'all', title: 'All Games' }, ...games]}
-                        renderItem={({ item }) => (
-                            <FilterButton
-                                label={item.title}
-                                isActive={selectedGame === (item.id === 'all' ? 'all' : item.title)}
-                                onPress={() => setSelectedGame(item.id === 'all' ? 'all' : item.title)}
-                                primary={primary}
-                                background={background}
-                            />
-                        )}
+                        renderItem={({ item }) => {
+                            const gameValue = item.id === 'all' ? 'all' : item.title;
+                            return (
+                                <FilterButton
+                                    label={item.title}
+                                    isActive={selectedGame === gameValue}
+                                    onPress={() => setSelectedGame(gameValue)}
+                                    primary={primary}
+                                    background={background}
+                                />
+                            );
+                        }}
                         keyExtractor={item => `game-${item.id}`}
                     />
                 </View>
