@@ -11,6 +11,18 @@ import { getUserTotalPoints } from '@/db/Achievements/Achievements';
 import { useRouter } from 'expo-router';
 import { FontAwesome5 } from '@expo/vector-icons';
 
+// Helper function to get tier colors
+const getTierColor = (tier) => {
+    switch (tier) {
+        case 'Bronze': return '#CD7F32';
+        case 'Silver': return '#C0C0C0';
+        case 'Gold': return '#FFD700';
+        case 'Platinum': return '#E5E4E2';
+        case 'Diamond': return '#B9F2FF';
+        default: return '#CD7F32';
+    }
+};
+
 export default function EndGameMessage({ visible, close, win, game, initialDifficulty, restartGame }) {
 
     const titleMessage = win ? '🎉You Win!🎉' : 'You Lose!';
@@ -40,18 +52,6 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
     const [totalPoints, setTotalPoints] = useState(0);
 
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
-
-    // Helper function to get tier colors
-    const getTierColor = (tier) => {
-        switch (tier) {
-            case 'Bronze': return '#CD7F32';
-            case 'Silver': return '#C0C0C0';
-            case 'Gold': return '#FFD700';
-            case 'Platinum': return '#E5E4E2';
-            case 'Diamond': return '#B9F2FF';
-            default: return '#CD7F32';
-        }
-    };
 
     useEffect(() => {
         setSelectedDifficulty(initialDifficulty);
