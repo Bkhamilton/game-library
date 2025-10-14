@@ -111,5 +111,8 @@ const styles = StyleSheet.create({
     },
     editButton: {
         padding: 4,
+        position: 'absolute',
+        right: -32,
+        top: -10,
     },
 });
