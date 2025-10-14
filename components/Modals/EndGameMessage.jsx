@@ -9,6 +9,7 @@ import { getGameScores, getHighScoreByGame, getWinLossCountByGame } from '@/db/S
 import { checkAchievementsAfterGame } from '@/db/Achievements/AchievementTracker';
 import { getUserTotalPoints } from '@/db/Achievements/Achievements';
 import { useRouter } from 'expo-router';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function EndGameMessage({ visible, close, win, game, initialDifficulty, restartGame }) {
 
@@ -39,6 +40,18 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
     const [totalPoints, setTotalPoints] = useState(0);
 
     const [selectedDifficulty, setSelectedDifficulty] = useState('');
+
+    // Helper function to get tier colors
+    const getTierColor = (tier) => {
+        switch (tier) {
+            case 'Bronze': return '#CD7F32';
+            case 'Silver': return '#C0C0C0';
+            case 'Gold': return '#FFD700';
+            case 'Platinum': return '#E5E4E2';
+            case 'Diamond': return '#B9F2FF';
+            default: return '#CD7F32';
+        }
+    };
 
     useEffect(() => {
         setSelectedDifficulty(initialDifficulty);
@@ -151,25 +164,58 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
                                 <ClearView style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                                     <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>🏆Achievements Unlocked!🏆</Text>
                                 </ClearView>
-                                {newlyUnlockedAchievements.map((achievement, index) => (
-                                    <View key={index} style={[styles.achievementItem, { borderColor: primary }]}>
+                                {newlyUnlockedAchievements.length === 1 ? (
+                                    // Single achievement - show full detail
+                                    <View style={[styles.achievementItem, { borderColor: primary }]}>
                                         <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                                            <Text style={{ fontSize: 24, marginRight: 8 }}>{achievement.icon}</Text>
+                                            <View style={{ marginRight: 8 }}>
+                                                <FontAwesome5 
+                                                    name={newlyUnlockedAchievements[0].icon || 'trophy'} 
+                                                    size={24} 
+                                                    color={getTierColor(newlyUnlockedAchievements[0].tier)} 
+                                                />
+                                            </View>
                                             <ClearView style={{ flex: 1 }}>
-                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{achievement.title}</Text>
-                                                <Text style={{ fontSize: 12, opacity: 0.7 }}>{achievement.description}</Text>
+                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{newlyUnlockedAchievements[0].title}</Text>
+                                                <Text style={{ fontSize: 12, opacity: 0.7 }}>{newlyUnlockedAchievements[0].description}</Text>
                                             </ClearView>
                                         </ClearView>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <Text style={{ fontSize: 12, fontWeight: '600', color: primary }}>
-                                                {achievement.tier} Tier
+                                                {newlyUnlockedAchievements[0].tier} Tier
                                             </Text>
                                             <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                                +{achievement.points} pts
+                                                +{newlyUnlockedAchievements[0].points} pts
                                             </Text>
                                         </View>
                                     </View>
-                                ))}
+                                ) : (
+                                    // Multiple achievements - show condensed view
+                                    <View style={styles.condensedAchievementView}>
+                                        <Text style={{ fontSize: 14, fontWeight: '600', marginBottom: 8, textAlign: 'center' }}>
+                                            {newlyUnlockedAchievements.length} Achievements Earned!
+                                        </Text>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
+                                            {newlyUnlockedAchievements.map((achievement, index) => (
+                                                <View key={index} style={{ margin: 4 }}>
+                                                    <FontAwesome5 
+                                                        name={achievement.icon || 'trophy'} 
+                                                        size={28} 
+                                                        color={getTierColor(achievement.tier)} 
+                                                    />
+                                                </View>
+                                            ))}
+                                        </View>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 4 }}>
+                                            <View style={{ alignItems: 'center' }}>
+                                                <Text style={{ fontSize: 12, opacity: 0.7 }}>Total Points</Text>
+                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+                                                    +{newlyUnlockedAchievements.reduce((sum, a) => sum + a.points, 0)}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
                                 <Text style={{ fontSize: 14, fontWeight: '600', marginTop: 8, opacity: 0.8 }}>
                                     Total Points: {totalPoints}
                                 </Text>
@@ -269,6 +315,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         maxWidth: 400,
         width: '90%',
+        maxHeight: '85%',
     },
     button: {
         padding: 10,
@@ -297,8 +344,9 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 12,
         paddingVertical: 16,
+        paddingHorizontal: 12,
         marginVertical: 12,
-        width: 320,
+        width: 340,
         maxWidth: '95%',
     },
     achievementItem: {
@@ -306,6 +354,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         marginVertical: 6,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    condensedAchievementView: {
+        padding: 8,
+        borderRadius: 8,
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
     },
 });
