@@ -46,19 +46,37 @@ Navigate a bird through obstacles in this fast-paced action game.
 - **Game Type**: Action/Arcade
 - **Achievements**: 10+ including high score milestones, skill challenges
 
-### Games in Development
-
 #### 7. **2048** 🎲
 A sliding tile puzzle where you combine numbered tiles to reach 2048.
-- **Planned Difficulty Levels**: Easy, Medium, Hard
+- **Difficulty Levels**: Easy, Medium, Hard
 - **Game Type**: Puzzle
-- **Status**: Partially implemented
+- **Achievements**: 12+ including First Win, tile milestones, score achievements
 
 #### 8. **Memory Match** 🃏
 A card-flipping game where you match pairs of identical cards.
-- **Planned Difficulty Levels**: Easy, Medium, Hard
+- **Difficulty Levels**: Easy, Medium, Hard
 - **Game Type**: Memory Puzzle
-- **Status**: Partially implemented
+- **Achievements**: 12+ including First Win, perfect matches, speed completions
+
+#### 9. **Connect Four** 🔴🟡
+Strategic two-player game where you drop colored discs to get four in a row.
+- **Difficulty Levels**: Easy, Medium, Hard (AI Opponent)
+- **Game Type**: Strategy/Board Game
+- **Achievements**: In development (gameplay fully functional)
+
+#### 10. **Simon Says** 🎨
+Memory game where you repeat increasingly longer sequences of colored tiles.
+- **Difficulty Levels**: Easy, Medium, Hard
+- **Game Type**: Memory/Pattern Recognition
+- **Achievements**: Partially implemented (gameplay fully functional)
+
+### Games in Development
+
+#### 11. **Dolphin Dive** 🐬
+An endless runner where a dolphin dives underwater to build momentum for jumps.
+- **Planned Difficulty Levels**: Easy, Hard
+- **Game Type**: Action/Endless Runner
+- **Status**: Early development - basic physics implemented, sprites and gameplay in progress
 
 ## 🚀 Planned Features
 
@@ -66,14 +84,15 @@ A card-flipping game where you match pairs of identical cards.
 
 The following games are planned for future releases:
 
-**Phase 1 (Quick Wins):**
-- ✅ Memory Match - Card-flipping memory game
-- Simon Says - Pattern memory game
-- ✅ 2048 - Popular tile-merging puzzle
+**Phase 1 (Quick Wins) - COMPLETED:**
+- ✅ Memory Match - Card-flipping memory game (Fully functional with achievements)
+- ✅ Simon Says - Pattern memory game (Fully functional, achievements being perfected)
+- ✅ 2048 - Popular tile-merging puzzle (Fully functional with achievements)
 
 **Phase 2 (Medium Effort):**
-- Connect Four - Strategic two-player game with AI
+- ✅ Connect Four - Strategic two-player game with AI (Fully functional, achievements planned)
 - Tetris - Classic falling block game
+- 🚧 Dolphin Dive - Endless runner with momentum mechanics (In development)
 
 **Phase 3 (High Effort):**
 - Solitaire (Klondike) - Classic card game
