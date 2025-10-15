@@ -30,6 +30,7 @@ export default function AchievementScreen() {
         setSelectedCategory,
         resetFilters,
         filteredAchievements,
+        activeFilterCount,
     } = useAchievementFilters(achievements);
 
     // Render item function for FlatList
@@ -78,6 +79,7 @@ export default function AchievementScreen() {
                 resetFilters={resetFilters}
                 primary={primary}
                 background={background}
+                activeFilterCount={activeFilterCount}
             />
         </>
     ), [
@@ -90,7 +92,8 @@ export default function AchievementScreen() {
         games, 
         resetFilters, 
         primary, 
-        background
+        background,
+        activeFilterCount
     ]);
 
     const ListEmptyComponent = useCallback(() => (

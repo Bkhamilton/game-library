@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FilterButton from './FilterButton';
 import { FilterType } from '@/utils/achievementFilters';
@@ -18,6 +18,7 @@ interface AchievementFilterSectionProps {
     resetFilters: () => void;
     primary: string;
     background: string;
+    activeFilterCount: number;
 }
 
 /**
@@ -36,12 +37,35 @@ export default function AchievementFilterSection({
     resetFilters,
     primary,
     background,
+    activeFilterCount,
 }: AchievementFilterSectionProps) {
     return (
         <>
             {/* Filter Type Selector */}
             <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Filter By:</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <Text style={{ fontSize: 16, fontWeight: '600' }}>Filter By:</Text>
+                    {activeFilterCount > 0 && (
+                        <TouchableOpacity
+                            onPress={resetFilters}
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 12,
+                                paddingVertical: 6,
+                                backgroundColor: primary,
+                                borderRadius: 16,
+                            }}
+                        >
+                            <Text style={{ fontSize: 12, fontWeight: '600', color: background, marginRight: 4 }}>
+                                {activeFilterCount}
+                            </Text>
+                            <Text style={{ fontSize: 12, fontWeight: '600', color: background }}>
+                                Clear All
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -101,15 +125,18 @@ export default function AchievementFilterSection({
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         data={[{ id: 'all', title: 'All Games' }, ...games]}
-                        renderItem={({ item }) => (
-                            <FilterButton
-                                label={item.title}
-                                isActive={selectedGame === item.title}
-                                onPress={() => setSelectedGame(item.title)}
-                                primary={primary}
-                                background={background}
-                            />
-                        )}
+                        renderItem={({ item }) => {
+                            const gameValue = item.id === 'all' ? 'all' : item.title;
+                            return (
+                                <FilterButton
+                                    label={item.title}
+                                    isActive={selectedGame === gameValue}
+                                    onPress={() => setSelectedGame(gameValue)}
+                                    primary={primary}
+                                    background={background}
+                                />
+                            );
+                        }}
                         keyExtractor={item => `game-${item.id}`}
                     />
                 </View>

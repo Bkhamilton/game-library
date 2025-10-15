@@ -17,6 +17,11 @@ export const useAchievementFilters = (achievements: Achievement[]) => {
         setFilterType('all');
     }, []);
 
+    // Count active filters (excluding 'all' values)
+    const activeFilterCount = useMemo(() => {
+        return [selectedTier, selectedGame, selectedCategory].filter(value => value !== 'all').length;
+    }, [selectedTier, selectedGame, selectedCategory]);
+
     // Memoize filtered and sorted achievements for better performance
     const filteredAchievements = useMemo(() => {
         const filtered = filterAchievements(
@@ -39,5 +44,6 @@ export const useAchievementFilters = (achievements: Achievement[]) => {
         setSelectedCategory,
         resetFilters,
         filteredAchievements,
+        activeFilterCount,
     };
 };
