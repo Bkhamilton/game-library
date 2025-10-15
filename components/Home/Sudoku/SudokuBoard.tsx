@@ -156,5 +156,6 @@ const styles = StyleSheet.create({
     },
     numberButtonText: {
         fontSize: 16,
+        fontWeight: '800',
     },
 });
