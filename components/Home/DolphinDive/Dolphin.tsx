@@ -29,5 +29,6 @@ const styles = StyleSheet.create({
         height: DOLPHIN_HEIGHT,
         backgroundColor: DOLPHIN_COLOR,
         borderRadius: 5,
+        zIndex: 5,
     },
 });
