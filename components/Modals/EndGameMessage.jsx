@@ -71,7 +71,7 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
     }
 
     const typeAGames = ['Sudoku', 'Minesweeper', 'Word Search', 'Crossword', 'Connect Four'];
-    const typeBGames = ['GoGoBird', 'Ostrich Haul'];
+    const typeBGames = ['GoGoBird', 'Ostrich Haul', 'Dolphin Dive', '2048'];
     
     const handleGameBoxInfo = () => {
         if (typeAGames.includes(game.title)) {
@@ -149,119 +149,116 @@ export default function EndGameMessage({ visible, close, win, game, initialDiffi
             onRequestClose={close}
         >
             <View style={styles.container}>
-                <ScrollView 
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View style={styles.innerContainer}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 8 }}>
-                            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{titleMessage}</Text>
-                        </View>
-
+                <View style={styles.innerContainer}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 8 }}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{titleMessage}</Text>
+                    </View>
+                    {/* Game Stats Section */}
+                    <View style={[styles.gameBox, { borderColor: primary }]}>
+                        <ClearView style={{ paddingBottom: 8 }}>
+                            <Text style={{ fontSize: 18, fontWeight: '600' }}>🎮 {game.title} 🎮</Text>
+                        </ClearView>
                         {/* Achievements Section */}
-                        {newlyUnlockedAchievements.length > 0 && (
-                            <View style={[styles.achievementSection, { borderColor: primary, backgroundColor: secondary }]}>
-                                <ClearView style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-                                    <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>🏆Achievements Unlocked!🏆</Text>
-                                </ClearView>
-                                {newlyUnlockedAchievements.length === 1 ? (
-                                    // Single achievement - show full detail
-                                    <View style={[styles.achievementItem, { borderColor: primary }]}>
-                                        <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                                            <View style={{ marginRight: 8 }}>
-                                                <FontAwesome5 
-                                                    name={newlyUnlockedAchievements[0].icon || 'trophy'} 
-                                                    size={24} 
-                                                    color={getTierColor(newlyUnlockedAchievements[0].tier)} 
-                                                />
-                                            </View>
-                                            <ClearView style={{ flex: 1 }}>
-                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{newlyUnlockedAchievements[0].title}</Text>
-                                                <Text style={{ fontSize: 12, opacity: 0.7 }}>{newlyUnlockedAchievements[0].description}</Text>
-                                            </ClearView>
-                                        </ClearView>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Text style={{ fontSize: 12, fontWeight: '600', color: primary }}>
-                                                {newlyUnlockedAchievements[0].tier} Tier
-                                            </Text>
-                                            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                                +{newlyUnlockedAchievements[0].points} pts
-                                            </Text>
-                                        </View>
-                                    </View>
-                                ) : (
-                                    // Multiple achievements - show condensed view
-                                    <View style={styles.condensedAchievementView}>
-                                        <Text style={{ fontSize: 14, fontWeight: '600', marginBottom: 8, textAlign: 'center' }}>
-                                            {newlyUnlockedAchievements.length} Achievements Earned!
-                                        </Text>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
-                                            {newlyUnlockedAchievements.map((achievement, index) => (
-                                                <View key={index} style={{ margin: 4 }}>
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {newlyUnlockedAchievements.length > 0 && (
+                                <View style={[styles.achievementSection, { borderColor: primary, backgroundColor: secondary }]}>
+                                    <ClearView style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                                        <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>🏆Achievements Unlocked!🏆</Text>
+                                    </ClearView>
+                                    {newlyUnlockedAchievements.length === 1 ? (
+                                        // Single achievement - show full detail
+                                        <View style={[styles.achievementItem, { borderColor: primary }]}>
+                                            <ClearView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                                                <ClearView style={{ marginRight: 8 }}>
                                                     <FontAwesome5 
-                                                        name={achievement.icon || 'trophy'} 
-                                                        size={28} 
-                                                        color={getTierColor(achievement.tier)} 
+                                                        name={newlyUnlockedAchievements[0].icon || 'trophy'} 
+                                                        size={24} 
+                                                        color={getTierColor(newlyUnlockedAchievements[0].tier)} 
                                                     />
-                                                </View>
-                                            ))}
-                                        </View>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 4 }}>
-                                            <View style={{ alignItems: 'center' }}>
-                                                <Text style={{ fontSize: 12, opacity: 0.7 }}>Total Points</Text>
-                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-                                                    +{newlyUnlockedAchievements.reduce((sum, a) => sum + a.points, 0)}
+                                                </ClearView>
+                                                <ClearView style={{ flex: 1 }}>
+                                                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{newlyUnlockedAchievements[0].title}</Text>
+                                                    <Text style={{ fontSize: 12, opacity: 0.7 }}>{newlyUnlockedAchievements[0].description}</Text>
+                                                </ClearView>
+                                            </ClearView>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Text style={{ fontSize: 12, fontWeight: '600', color: primary }}>
+                                                    {newlyUnlockedAchievements[0].tier} Tier
+                                                </Text>
+                                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                                    +{newlyUnlockedAchievements[0].points} pts
                                                 </Text>
                                             </View>
                                         </View>
-                                    </View>
-                                )}
-                                <Text style={{ fontSize: 14, fontWeight: '600', marginTop: 8, opacity: 0.8 }}>
-                                    Total Points: {totalPoints}
-                                </Text>
-                            </View>
-                        )}
-
-                        {/* Game Stats Section */}
-                        <View style={[styles.gameBox, { borderColor: primary }]}>
-                            <ClearView style={{ paddingVertical: 8 }}>
-                                <Text style={{ fontSize: 18, fontWeight: '600' }}>🎮 {game.title} 🎮</Text>
-                            </ClearView>
+                                    ) : (
+                                        // Multiple achievements - show condensed view
+                                        <View style={styles.condensedAchievementView}>
+                                            <Text style={{ fontSize: 14, fontWeight: '600', marginBottom: 8, textAlign: 'center' }}>
+                                                {newlyUnlockedAchievements.length} Achievements Earned!
+                                            </Text>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginBottom: 8 }}>
+                                                {newlyUnlockedAchievements.map((achievement, index) => (
+                                                    <ClearView key={index} style={{ margin: 4 }}>
+                                                        <FontAwesome5 
+                                                            name={achievement.icon || 'trophy'} 
+                                                            size={28} 
+                                                            color={getTierColor(achievement.tier)} 
+                                                        />
+                                                    </ClearView>
+                                                ))}
+                                            </View>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 4 }}>
+                                                <View style={{ alignItems: 'center' }}>
+                                                    <Text style={{ fontSize: 12, opacity: 0.7 }}>Total Points</Text>
+                                                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+                                                        +{newlyUnlockedAchievements.reduce((sum, a) => sum + a.points, 0)}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    )}
+                                    <Text style={{ fontSize: 14, fontWeight: '600', marginTop: 8, opacity: 0.8 }}>
+                                        Total Points: {totalPoints}
+                                    </Text>
+                                </View>
+                            )}
                             <ClearView style={styles.gameBoxInfo}>
                                 {gameStats.length > 0 && handleGameBoxInfo()}
                             </ClearView>
-                            <Text style={{ fontSize: 14, fontWeight: '500', opacity: 0.7 }}>Play Again?</Text>
-                        </View>
-
-                        {/* Buttons */}
-                        <View style={{ paddingTop: 16 }}>
-                            <TouchableOpacity
-                                style={[styles.button, { backgroundColor: grayBackground }]}
-                                onPress={handleRouteHome}
-                            >
-                                <Text>Go Home</Text>
-                            </TouchableOpacity>                                
-                            <TouchableOpacity
-                                style={[styles.button, { backgroundColor: grayBackground }]}
-                                onPress={openDifficultyModal}
-                            >
-                                <Text>Difficulty: <Text style={{ fontWeight: 'bold' }}>{selectedDifficulty}</Text></Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.button, { backgroundColor: primary }]}
-                                onPress={handleRestartGame}
-                            >
-                                <Text>New Game</Text>
-                            </TouchableOpacity>                        
-                            <TouchableOpacity
-                                style={[styles.button, { backgroundColor: grayBackground }]}
-                                onPress={close}
-                            >
-                                <Text>Close</Text>
-                            </TouchableOpacity>
-                        </View>
+                        </ScrollView>
+                        <Text style={{ fontSize: 14, fontWeight: '500', opacity: 0.7 }}>Play Again?</Text>
                     </View>
-                </ScrollView>
+
+                    {/* Buttons */}
+                    <View style={{ paddingTop: 16 }}>
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: grayBackground }]}
+                            onPress={handleRouteHome}
+                        >
+                            <Text>Go Home</Text>
+                        </TouchableOpacity>                                
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: grayBackground }]}
+                            onPress={openDifficultyModal}
+                        >
+                            <Text>Difficulty: <Text style={{ fontWeight: 'bold' }}>{selectedDifficulty}</Text></Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: primary }]}
+                            onPress={handleRestartGame}
+                        >
+                            <Text>New Game</Text>
+                        </TouchableOpacity>                        
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: grayBackground }]}
+                            onPress={close}
+                        >
+                            <Text>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
             {/* Difficulty Modal */}
             <Modal
@@ -302,32 +299,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 20,
-    },
     innerContainer: {
         justifyContent: 'center', 
         alignItems: 'center', 
-        padding: 16, 
+        paddingVertical: 16, 
         borderRadius: 8,
-        maxWidth: 400,
-        width: '90%',
         maxHeight: '85%',
+        width: 300,
+        maxWidth: '90%',
     },
     button: {
         padding: 10,
         borderRadius: 6,
         marginVertical: 4,
-        width: 250,
         alignItems: 'center',
+        width: 280,
     },
     gameBox: {
         borderWidth: 2,
         borderRadius: 8,
-        width: 280,
+        width: '100%',
         minHeight: 220,
         alignItems: 'center',
         paddingVertical: 12,
