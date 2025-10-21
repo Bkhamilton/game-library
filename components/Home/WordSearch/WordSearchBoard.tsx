@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { getStrikethroughStyle } from "@/utils/wordSearch";
 import useTheme from "@/hooks/useTheme";
+import AnimatedStrikethrough from "./AnimatedStrikethrough";
 
 interface Cell {
     letter: string;
@@ -45,9 +46,11 @@ const WordSearchBoard: React.FC<WordSearchBoardProps> = ({ grid, handleCellPress
                             {cell.partOfFoundWord && cell.wordDirections && cell.foundColors && (
                                 <>
                                     {cell.wordDirections.map((direction, index) => (
-                                        <View 
-                                            key={index} 
-                                            style={getStrikethroughStyle(direction, cell.foundColors?.[index])} 
+                                        <AnimatedStrikethrough
+                                            key={index}
+                                            direction={direction}
+                                            color={cell.foundColors?.[index] || "#4CAF50"}
+                                            delay={index * 200}
                                         />
                                     ))}
                                 </>
