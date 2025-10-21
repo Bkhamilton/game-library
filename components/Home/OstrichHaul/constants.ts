@@ -16,6 +16,10 @@ export const groundLevel = screenHeight - 450;
 
 // Physics constants
 export const jumpVelocity = -15;
+export const maxJumpVelocity = -18; // Maximum upward velocity when holding
+export const minJumpHeight = 50; // Minimum jump height for a tap
+export const maxJumpHeight = 250; // Maximum jump height when holding
+export const glideGravity = 0.3; // Reduced gravity when gliding down
 
 // Ostrich dimensions
 export const OSTRICH_WIDTH = 100;

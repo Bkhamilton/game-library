@@ -14,6 +14,7 @@ import {
     screenHeight,
     groundLevel,
     jumpVelocity,
+    maxJumpVelocity,
     OSTRICH_HEIGHT,
     OSTRICH_OFFSET,
     SPRITE_ANIMATION_INTERVAL,
@@ -41,6 +42,7 @@ export default function OstrichHaulGame() {
         isJumping: false,
         gravity: 1,
         spriteFrame: 0,
+        isHolding: false,
     });
     const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
     const [clouds, setClouds] = useState<CloudType[]>([]);
@@ -73,7 +75,22 @@ export default function OstrichHaulGame() {
         if (isGameRunning) {
             const gameLoop = setInterval(() => {
                 setGameState((prev) => {
-                    const newVelocity = prev.velocity + prev.gravity;
+                    let newVelocity = prev.velocity + prev.gravity;
+                    
+                    // If holding and jumping, continue applying upward force
+                    if (prev.isHolding && prev.isJumping) {
+                        const currentY = position.y.__getValue();
+                        const groundCollisionPoint = groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET;
+                        const jumpedHeight = groundCollisionPoint - currentY;
+                        
+                        // Apply upward force if we haven't reached max height
+                        // and velocity is still upward (negative)
+                        if (jumpedHeight < 250 && prev.velocity < 0) {
+                            // Continue applying slight upward force while holding
+                            newVelocity = Math.max(newVelocity, maxJumpVelocity);
+                        }
+                    }
+                    
                     const newY = position.y.__getValue() + newVelocity;
                     const groundCollisionPoint = groundLevel - OSTRICH_HEIGHT + OSTRICH_OFFSET;
 
@@ -177,14 +194,14 @@ export default function OstrichHaulGame() {
     }, [isGameRunning]);
 
     useEffect(() => {
-        const newGravity = calculateGravity(gameState.isJumping, gameState.velocity, difficulty as string);
+        const newGravity = calculateGravity(gameState.isJumping, gameState.velocity, difficulty as string, gameState.isHolding);
         if (gameState.gravity !== newGravity) {
             setGameState((prev) => ({
                 ...prev,
                 gravity: newGravity,
             }));
         }
-    }, [gameState.isJumping, gameState.velocity]);
+    }, [gameState.isJumping, gameState.velocity, gameState.isHolding]);
 
     useEffect(() => {
         if (isGameRunning) {
@@ -210,6 +227,7 @@ export default function OstrichHaulGame() {
             isJumping: false,
             gravity: 1,
             spriteFrame: 0,
+            isHolding: false,
         });
         setObstacles([]);
         setClouds([]);
@@ -218,15 +236,23 @@ export default function OstrichHaulGame() {
         setDistance(0);
     };
 
-    const jump = () => {
+    const handlePressIn = () => {
         if (!gameState.isJumping) {
             setJumps((prevJumps) => prevJumps + 1);
             setGameState((prev) => ({
                 ...prev,
                 velocity: jumpVelocity,
                 isJumping: true,
+                isHolding: true,
             }));
         }
+    };
+
+    const handlePressOut = () => {
+        setGameState((prev) => ({
+            ...prev,
+            isHolding: false,
+        }));
     };
 
     return (
@@ -237,7 +263,7 @@ export default function OstrichHaulGame() {
                 <Cloud key={cloud.key} x={cloud.x} y={cloud.y} size={cloud.size} />
             ))}
             <View style={styles.ground} />
-            <TouchableOpacity style={styles.screen} onPress={jump} activeOpacity={1}>
+            <TouchableOpacity style={styles.screen} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={1}>
                 <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
                 {obstacles.map((obstacle) => (
                     <Obstacle key={obstacle.key} x={obstacle.x} />
