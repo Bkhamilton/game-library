@@ -35,8 +35,14 @@ export const checkCollision = (position: Position, obstacle: Obstacle): boolean 
 export const calculateGravity = (
     isJumping: boolean,
     velocity: number,
-    difficulty: string
+    difficulty: string,
+    isHolding: boolean = false
 ): number => {
+    // If holding the button and moving down (velocity > 0), apply glide gravity
+    if (isHolding && velocity > 0) {
+        return 0.3; // Glide gravity - slower fall
+    }
+    
     if (isJumping && velocity > -5 && velocity < 5) {
         if (difficulty === "Hard") {
             return 0.6;

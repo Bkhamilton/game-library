@@ -10,6 +10,7 @@ export interface GameState {
     isJumping: boolean;
     gravity: number;
     spriteFrame: number;
+    isHolding: boolean;
 }
 
 export interface Obstacle {
