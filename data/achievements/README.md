@@ -15,10 +15,11 @@ Each file contains achievements for a specific game or category:
 - **2048.json** - 17 2048 achievements (IDs: 7, 1501-1516)
 - **memory-match.json** - 17 Memory Match achievements (IDs: 8, 1601-1616)
 - **connect-four.json** - 17 Connect Four achievements (IDs: 10, 1701-1716)
+- **simon-says.json** - 18 Simon Says achievements (IDs: 13, 1801-1817)
 - **general.json** - 17 general achievements (IDs: 1301-1413)
   - Includes: Streaks, Collections, and Meta achievements
 
-**Total: 124 achievements**
+**Total: 142 achievements**
 
 ## Achievement Schema
 

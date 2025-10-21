@@ -9,6 +9,7 @@ import gogobirdAchievements from '@/data/achievements/gogobird.json';
 import game2048Achievements from '@/data/achievements/2048.json';
 import memoryMatchAchievements from '@/data/achievements/memory-match.json';
 import connectFourAchievements from '@/data/achievements/connect-four.json';
+import simonSaysAchievements from '@/data/achievements/simon-says.json';
 import generalAchievements from '@/data/achievements/general.json';
 import { insertGame } from '@/db/Games/Games';
 import { insertUser } from '@/db/Users/Users';
@@ -97,6 +98,7 @@ export const syncData = async (db) => {
         ...game2048Achievements,
         ...memoryMatchAchievements,
         ...connectFourAchievements,
+        ...simonSaysAchievements,
         ...generalAchievements
     ];
     for (const achievement of achievementsData) {

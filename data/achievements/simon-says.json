@@ -1,0 +1,260 @@
+[
+  {
+    "id": 13,
+    "title": "First Simon Says Game",
+    "description": "Complete your first game of Simon Says",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "trophy",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 1
+    }
+  },
+  {
+    "id": 1801,
+    "title": "Memory Beginner",
+    "description": "Reach round 5 in Simon Says",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 5
+    }
+  },
+  {
+    "id": 1802,
+    "title": "Memory Apprentice",
+    "description": "Reach round 10 in Simon Says",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 10
+    }
+  },
+  {
+    "id": 1803,
+    "title": "Memory Expert",
+    "description": "Reach round 15 in Simon Says",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 15
+    }
+  },
+  {
+    "id": 1804,
+    "title": "Memory Master",
+    "description": "Reach round 20 in Simon Says",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "star",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 20
+    }
+  },
+  {
+    "id": 1805,
+    "title": "Memory Legend",
+    "description": "Reach round 30 in Simon Says",
+    "tier": "Diamond",
+    "points": 200,
+    "icon": "crown",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 30
+    }
+  },
+  {
+    "id": 1806,
+    "title": "Easy Mode Champion",
+    "description": "Reach round 15 on Easy difficulty",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 15,
+      "difficulty": "Easy"
+    }
+  },
+  {
+    "id": 1807,
+    "title": "Medium Mode Champion",
+    "description": "Reach round 12 on Medium difficulty",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 12,
+      "difficulty": "Medium"
+    }
+  },
+  {
+    "id": 1808,
+    "title": "Hard Mode Champion",
+    "description": "Reach round 10 on Hard difficulty",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "medal",
+    "category": "Score",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "highScore",
+      "threshold": 10,
+      "difficulty": "Hard"
+    }
+  },
+  {
+    "id": 1809,
+    "title": "Easy Perfectionist",
+    "description": "Play 50 games on Easy difficulty",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 50,
+      "difficulty": "Easy"
+    }
+  },
+  {
+    "id": 1810,
+    "title": "Medium Perfectionist",
+    "description": "Play 50 games on Medium difficulty",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 50,
+      "difficulty": "Medium"
+    }
+  },
+  {
+    "id": 1811,
+    "title": "Hard Perfectionist",
+    "description": "Play 50 games on Hard difficulty",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 50,
+      "difficulty": "Hard"
+    }
+  },
+  {
+    "id": 1812,
+    "title": "Pattern Recognition",
+    "description": "Complete 100 total rounds across all games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "brain",
+    "category": "Collection",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "totalRounds",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 1813,
+    "title": "Sequence Master",
+    "description": "Complete 500 total rounds across all games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "brain",
+    "category": "Collection",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "totalRounds",
+      "threshold": 500
+    }
+  },
+  {
+    "id": 1814,
+    "title": "Memory Savant",
+    "description": "Complete 1000 total rounds across all games",
+    "tier": "Platinum",
+    "points": 100,
+    "icon": "brain",
+    "category": "Collection",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "totalRounds",
+      "threshold": 1000
+    }
+  },
+  {
+    "id": 1815,
+    "title": "Simon Says Enthusiast",
+    "description": "Play 25 Simon Says games",
+    "tier": "Bronze",
+    "points": 10,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 25
+    }
+  },
+  {
+    "id": 1816,
+    "title": "Simon Says Devotee",
+    "description": "Play 100 Simon Says games",
+    "tier": "Silver",
+    "points": 25,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 100
+    }
+  },
+  {
+    "id": 1817,
+    "title": "Simon Says Addict",
+    "description": "Play 250 Simon Says games",
+    "tier": "Gold",
+    "points": 50,
+    "icon": "gamepad",
+    "category": "Completion",
+    "criteria": {
+      "game": "Simon Says",
+      "metric": "gamesPlayed",
+      "threshold": 250
+    }
+  }
+]
