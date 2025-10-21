@@ -32,6 +32,14 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
 
     const { primary, text, secondary } = useTheme();
 
+    // Helper function to convert hex color to rgba with opacity
+    const hexToRgba = (hex: string, opacity: number) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    };
+
     // Count occurrences of each number on the board
     const getNumberCounts = () => {
         const counts: { [key: number]: number } = {};
@@ -64,9 +72,16 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
         if (colIndex % 3 === 0) style.push(styles.thickLeftBorder);
         if (rowIndex === 8) style.push(styles.thickBottomBorder);
         if (colIndex === 8) style.push(styles.thickRightBorder);
+        
+        // Highlight the selected cell with full secondary color
         if (selectedTile?.row === rowIndex && selectedTile?.col === colIndex) {
             style.push({ backgroundColor: secondary });
         }
+        // Highlight cells in the same row or column with a dimmer version
+        else if (selectedTile && (selectedTile.row === rowIndex || selectedTile.col === colIndex)) {
+            style.push({ backgroundColor: hexToRgba(secondary, 0.3) });
+        }
+        
         return style;
     };
 
