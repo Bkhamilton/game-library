@@ -11,6 +11,8 @@ interface Cell {
     partOfFoundWord: boolean;
     wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left";
     foundColor?: string;
+    wordDirections?: Array<"horizontal" | "vertical" | "diagonal-right" | "diagonal-left">;
+    foundColors?: string[];
 }
 
 interface WordSearchBoardProps {
@@ -40,8 +42,15 @@ const WordSearchBoard: React.FC<WordSearchBoardProps> = ({ grid, handleCellPress
                             <Text style={[styles.letter, cell.partOfFoundWord && { color: cell.foundColor }, { color: cell.selected ? primary : text }]}>
                                 {cell.letter}
                             </Text>
-                            {cell.partOfFoundWord && (
-                                <View style={getStrikethroughStyle(cell.wordDirection, cell.foundColor)} />
+                            {cell.partOfFoundWord && cell.wordDirections && cell.foundColors && (
+                                <>
+                                    {cell.wordDirections.map((direction, index) => (
+                                        <View 
+                                            key={index} 
+                                            style={getStrikethroughStyle(direction, cell.foundColors?.[index])} 
+                                        />
+                                    ))}
+                                </>
                             )}
                         </TouchableOpacity>
                     ))}

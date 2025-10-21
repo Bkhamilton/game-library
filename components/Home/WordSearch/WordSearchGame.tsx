@@ -23,6 +23,8 @@ interface Cell {
     partOfFoundWord: boolean;
     wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left";
     foundColor?: string;
+    wordDirections?: Array<"horizontal" | "vertical" | "diagonal-right" | "diagonal-left">;
+    foundColors?: string[];
 }
 
 type Difficulty = "Easy" | "Medium" | "Hard";
@@ -92,8 +94,17 @@ export default function WordSearchGame() {
         newGrid[row][col].selected = !newGrid[row][col].selected;
         setGrid(newGrid);
 
-        const selectedCells = grid.flat().filter((cell) => cell.selected);
-        const selectedWord = selectedCells.map((cell) => cell.letter).join("");
+        // Get selected cells with their positions
+        const selectedCellsWithPositions: Array<{ cell: Cell, row: number, col: number }> = [];
+        grid.forEach((gridRow, i) => {
+            gridRow.forEach((cell, j) => {
+                if (cell.selected) {
+                    selectedCellsWithPositions.push({ cell, row: i, col: j });
+                }
+            });
+        });
+        
+        const selectedWord = selectedCellsWithPositions.map(({ cell }) => cell.letter).join("");
 
         const wordFound = wordBank.some((word) => word.toUpperCase() === selectedWord.toUpperCase());
 
@@ -102,14 +113,49 @@ export default function WordSearchGame() {
             setWordColors((prev) => ({ ...prev, [selectedWord]: color }));
             setFoundWords((prev) => [...prev, selectedWord]);
 
+            // Determine the direction of the found word
+            let direction: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left" = "horizontal";
+            
+            if (selectedCellsWithPositions.length > 1) {
+                const first = selectedCellsWithPositions[0];
+                const second = selectedCellsWithPositions[1];
+                const rowDiff = second.row - first.row;
+                const colDiff = second.col - first.col;
+                
+                if (rowDiff === 0) {
+                    direction = "horizontal";
+                } else if (colDiff === 0) {
+                    direction = "vertical";
+                } else if (rowDiff === colDiff) {
+                    direction = "diagonal-right";
+                } else {
+                    direction = "diagonal-left";
+                }
+            }
+
             const updatedGrid = grid.map((row) =>
-                row.map((cell) => ({
-                    ...cell,
-                    isFound: cell.selected ? true : cell.isFound,
-                    partOfFoundWord: cell.selected ? true : cell.partOfFoundWord,
-                    selected: false,
-                    foundColor: cell.selected ? (cell.partOfFoundWord ? "#000000" : color) : cell.foundColor,
-                }))
+                row.map((cell) => {
+                    if (cell.selected) {
+                        // Cell is part of the newly found word
+                        const newWordDirections = [...(cell.wordDirections || []), direction];
+                        const newFoundColors = [...(cell.foundColors || []), color];
+                        
+                        return {
+                            ...cell,
+                            isFound: true,
+                            partOfFoundWord: true,
+                            selected: false,
+                            wordDirection: direction, // Keep for backward compatibility
+                            foundColor: color, // Keep for backward compatibility
+                            wordDirections: newWordDirections,
+                            foundColors: newFoundColors,
+                        };
+                    }
+                    return {
+                        ...cell,
+                        selected: false,
+                    };
+                })
             );
             setGrid(updatedGrid);
 
