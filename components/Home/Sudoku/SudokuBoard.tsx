@@ -32,6 +32,24 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
 
     const { primary, text, secondary } = useTheme();
 
+    // Count occurrences of each number on the board
+    const getNumberCounts = () => {
+        const counts: { [key: number]: number } = {};
+        for (let i = 1; i <= 9; i++) {
+            counts[i] = 0;
+        }
+        board.forEach(row => {
+            row.forEach(cell => {
+                if (cell >= 1 && cell <= 9) {
+                    counts[cell]++;
+                }
+            });
+        });
+        return counts;
+    };
+
+    const numberCounts = getNumberCounts();
+
     useEffect(() => {
         if (selectedTile && selectedNumber !== null) {
             handleInputChange(selectedTile.row, selectedTile.col, selectedNumber.toString());
@@ -72,16 +90,29 @@ export default function SudokuBoard({ board, handleInputChange, selectedNumber, 
                 ))}
             </View>
             <View style={styles.numberContainer}>
-                {[...Array(9)].map((_, index) => (
-                    <TouchableOpacity 
-                        key={index} 
-                        style={[styles.numberButton, { backgroundColor: primary }]}
-                        onPress={() => handlePress(index + 1)}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <Text style={styles.numberButtonText}>{index + 1}</Text>
-                    </TouchableOpacity>
-                ))}
+                {[...Array(9)].map((_, index) => {
+                    const number = index + 1;
+                    const isComplete = numberCounts[number] === 9;
+                    return (
+                        <TouchableOpacity 
+                            key={index} 
+                            style={[
+                                styles.numberButton, 
+                                { backgroundColor: primary },
+                                isComplete && styles.completedButton
+                            ]}
+                            onPress={() => handlePress(number)}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                            <Text style={[
+                                styles.numberButtonText,
+                                isComplete && styles.completedButtonText
+                            ]}>
+                                {number}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
                 <TouchableOpacity 
                     style={[styles.numberButton, { backgroundColor: primary }]}
                     onPress={() => handlePress(-1)}
@@ -157,5 +188,12 @@ const styles = StyleSheet.create({
     numberButtonText: {
         fontSize: 16,
         fontWeight: '800',
+    },
+    completedButton: {
+        opacity: 0.5,
+    },
+    completedButtonText: {
+        textDecorationLine: 'line-through',
+        textDecorationStyle: 'solid',
     },
 });
