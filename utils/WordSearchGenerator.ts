@@ -7,6 +7,8 @@ export type Cell = {
     isFound: boolean,
     partOfFoundWord: boolean,
     wordDirection?: "horizontal" | "vertical" | "diagonal-right" | "diagonal-left",
+    wordDirections?: Array<"horizontal" | "vertical" | "diagonal-right" | "diagonal-left">,
+    foundColors?: string[],
 };
 
 type Direction = {
@@ -30,6 +32,8 @@ export const initializeGrid = (gridSize: number, words: string[]): Cell[][] => {
             partOfWord: false,
             isFound: false,
             partOfFoundWord: false,
+            wordDirections: [],
+            foundColors: [],
         }))
     );
 
@@ -120,6 +124,8 @@ export const initializeGrid = (gridSize: number, words: string[]): Cell[][] => {
                     partOfWord: false,
                     isFound: false,
                     partOfFoundWord: false,
+                    wordDirections: [],
+                    foundColors: [],
                 };
             }
         }
