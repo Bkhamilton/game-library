@@ -38,28 +38,28 @@ const AnimatedStrikethrough: React.FC<AnimatedStrikethroughProps> = ({
 
     const baseStyle = getStrikethroughStyle(direction, color);
     
-    // Determine scale direction based on word direction
-    const getScaleTransform = () => {
+    // Determine scale transform based on word direction
+    const getScaleTransform = (): Animated.AnimatedProps<any>[] => {
         if (direction === "horizontal") {
-            return { scaleX: scaleAnim };
+            return [{ scaleX: scaleAnim }];
         } else if (direction === "vertical") {
-            return { scaleY: scaleAnim };
+            return [{ scaleY: scaleAnim }];
         } else {
             // For diagonal, scale both dimensions
-            return { scaleX: scaleAnim, scaleY: scaleAnim };
+            return [{ scaleX: scaleAnim }, { scaleY: scaleAnim }];
         }
     };
 
-    const animatedStyle: ViewStyle = {
+    const animatedStyle = {
         ...baseStyle,
         opacity: opacityAnim,
         transform: [
             ...(baseStyle.transform || []),
-            getScaleTransform(),
-        ] as any,
+            ...getScaleTransform(),
+        ],
     };
 
-    return <Animated.View style={animatedStyle} />;
+    return <Animated.View style={animatedStyle as any} />;
 };
 
 export default AnimatedStrikethrough;
