@@ -87,33 +87,44 @@ export default function WordSearchGame() {
         const buckets = ['Three', 'Four', 'Five', 'SixPlus'] as const;
         
         // Calculate how many words to pick from each bucket
+        // Use floor for initial allocation to avoid over-allocating
+        const counts: { [key: string]: number } = {};
+        let totalAllocated = 0;
+        
         buckets.forEach(bucket => {
             const bucketRatio = ratio[bucket];
             if (bucketRatio > 0) {
-                const count = Math.round(wordCount * bucketRatio);
+                const count = Math.floor(wordCount * bucketRatio);
+                counts[bucket] = count;
+                totalAllocated += count;
+            }
+        });
+        
+        // Distribute remaining words to buckets with highest fractional parts
+        const remaining = wordCount - totalAllocated;
+        if (remaining > 0) {
+            const fractionalParts = buckets
+                .map(bucket => ({
+                    bucket,
+                    fractional: ratio[bucket] > 0 ? (wordCount * ratio[bucket]) % 1 : 0
+                }))
+                .filter(item => item.fractional > 0)
+                .sort((a, b) => b.fractional - a.fractional);
+            
+            for (let i = 0; i < remaining && i < fractionalParts.length; i++) {
+                counts[fractionalParts[i].bucket] = (counts[fractionalParts[i].bucket] || 0) + 1;
+            }
+        }
+        
+        // Now select words based on calculated counts
+        buckets.forEach(bucket => {
+            const count = counts[bucket] || 0;
+            if (count > 0) {
                 const pool = [...WORD_POOLS[bucket]];
                 const shuffled = pool.sort(() => Math.random() - 0.5);
                 selectedWords.push(...shuffled.slice(0, count));
             }
         });
-        
-        // If we don't have exactly wordCount words due to rounding, adjust
-        while (selectedWords.length < wordCount) {
-            // Pick from the bucket with the highest ratio
-            const mainBucket = buckets.reduce((max, bucket) => 
-                ratio[bucket] > ratio[max] ? bucket : max
-            );
-            const pool = WORD_POOLS[mainBucket];
-            const randomWord = pool[Math.floor(Math.random() * pool.length)];
-            if (!selectedWords.includes(randomWord)) {
-                selectedWords.push(randomWord);
-            }
-        }
-        
-        // If we have too many words due to rounding, remove extras
-        while (selectedWords.length > wordCount) {
-            selectedWords.pop();
-        }
         
         // Shuffle the final selection
         return selectedWords.sort(() => Math.random() - 0.5);
