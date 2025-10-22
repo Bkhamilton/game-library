@@ -73,12 +73,57 @@ export default function WordSearchGame() {
         }, 500);
     };
 
+    const selectWordsFromBuckets = (diff: Difficulty, wordCount: number): string[] => {
+        const selectedWords: string[] = [];
+        
+        // Define ratios for each difficulty
+        const ratios = {
+            Easy: { Three: 0.85, Four: 0.15, Five: 0, SixPlus: 0 },
+            Medium: { Three: 0, Four: 0.15, Five: 0.75, SixPlus: 0.10 },
+            Hard: { Three: 0, Four: 0, Five: 0.10, SixPlus: 0.90 }
+        };
+        
+        const ratio = ratios[diff];
+        const buckets = ['Three', 'Four', 'Five', 'SixPlus'] as const;
+        
+        // Calculate how many words to pick from each bucket
+        buckets.forEach(bucket => {
+            const bucketRatio = ratio[bucket];
+            if (bucketRatio > 0) {
+                const count = Math.round(wordCount * bucketRatio);
+                const pool = [...WORD_POOLS[bucket]];
+                const shuffled = pool.sort(() => Math.random() - 0.5);
+                selectedWords.push(...shuffled.slice(0, count));
+            }
+        });
+        
+        // If we don't have exactly wordCount words due to rounding, adjust
+        while (selectedWords.length < wordCount) {
+            // Pick from the bucket with the highest ratio
+            const mainBucket = buckets.reduce((max, bucket) => 
+                ratio[bucket] > ratio[max] ? bucket : max
+            );
+            const pool = WORD_POOLS[mainBucket];
+            const randomWord = pool[Math.floor(Math.random() * pool.length)];
+            if (!selectedWords.includes(randomWord)) {
+                selectedWords.push(randomWord);
+            }
+        }
+        
+        // If we have too many words due to rounding, remove extras
+        while (selectedWords.length > wordCount) {
+            selectedWords.pop();
+        }
+        
+        // Shuffle the final selection
+        return selectedWords.sort(() => Math.random() - 0.5);
+    };
+
     const initializeGameWithDifficulty = (diff: Difficulty) => {
         setIsLoading(true);
         setTimeout(() => {
             const settings = DIFFICULTY_SETTINGS[diff];
-            const wordPool = WORD_POOLS[diff];
-            const selectedWords = [...wordPool].sort(() => Math.random() - 0.5).slice(0, settings.wordCount);
+            const selectedWords = selectWordsFromBuckets(diff, settings.wordCount);
 
             setFoundWords([]);
             setWordBank(selectedWords);
