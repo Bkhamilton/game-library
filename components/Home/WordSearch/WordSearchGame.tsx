@@ -73,12 +73,68 @@ export default function WordSearchGame() {
         }, 500);
     };
 
+    const selectWordsFromBuckets = (diff: Difficulty, wordCount: number): string[] => {
+        const selectedWords: string[] = [];
+        
+        // Define ratios for each difficulty
+        const ratios = {
+            Easy: { Three: 0.85, Four: 0.15, Five: 0, SixPlus: 0 },
+            Medium: { Three: 0, Four: 0.15, Five: 0.75, SixPlus: 0.10 },
+            Hard: { Three: 0, Four: 0, Five: 0.10, SixPlus: 0.90 }
+        };
+        
+        const ratio = ratios[diff];
+        const buckets = ['Three', 'Four', 'Five', 'SixPlus'] as const;
+        
+        // Calculate how many words to pick from each bucket
+        // Use floor for initial allocation to avoid over-allocating
+        const counts: { [key: string]: number } = {};
+        let totalAllocated = 0;
+        
+        buckets.forEach(bucket => {
+            const bucketRatio = ratio[bucket];
+            if (bucketRatio > 0) {
+                const count = Math.floor(wordCount * bucketRatio);
+                counts[bucket] = count;
+                totalAllocated += count;
+            }
+        });
+        
+        // Distribute remaining words to buckets with highest fractional parts
+        const remaining = wordCount - totalAllocated;
+        if (remaining > 0) {
+            const fractionalParts = buckets
+                .map(bucket => ({
+                    bucket,
+                    fractional: ratio[bucket] > 0 ? (wordCount * ratio[bucket]) % 1 : 0
+                }))
+                .filter(item => item.fractional > 0)
+                .sort((a, b) => b.fractional - a.fractional);
+            
+            for (let i = 0; i < remaining && i < fractionalParts.length; i++) {
+                counts[fractionalParts[i].bucket] = (counts[fractionalParts[i].bucket] || 0) + 1;
+            }
+        }
+        
+        // Now select words based on calculated counts
+        buckets.forEach(bucket => {
+            const count = counts[bucket] || 0;
+            if (count > 0) {
+                const pool = [...WORD_POOLS[bucket]];
+                const shuffled = pool.sort(() => Math.random() - 0.5);
+                selectedWords.push(...shuffled.slice(0, count));
+            }
+        });
+        
+        // Shuffle the final selection
+        return selectedWords.sort(() => Math.random() - 0.5);
+    };
+
     const initializeGameWithDifficulty = (diff: Difficulty) => {
         setIsLoading(true);
         setTimeout(() => {
             const settings = DIFFICULTY_SETTINGS[diff];
-            const wordPool = WORD_POOLS[diff];
-            const selectedWords = [...wordPool].sort(() => Math.random() - 0.5).slice(0, settings.wordCount);
+            const selectedWords = selectWordsFromBuckets(diff, settings.wordCount);
 
             setFoundWords([]);
             setWordBank(selectedWords);
