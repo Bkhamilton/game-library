@@ -3,6 +3,7 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X } from './constants';
+import dolphinSprite from '../../../assets/images/DolphinDive/dolphinSprite.png';
 
 interface DolphinProps {
     y: number;
@@ -11,7 +12,8 @@ interface DolphinProps {
 export const Dolphin: React.FC<DolphinProps> = ({ y }) => {
     return (
         <Image
-            source={require('../../../assets/images/DolphinDive/dolphinSprite.png')}
+            source={dolphinSprite}
+            resizeMode="contain"
             style={[
                 styles.dolphin,
                 {
