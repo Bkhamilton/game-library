@@ -1,8 +1,8 @@
 // Dolphin Component
 
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_COLOR, DOLPHIN_X } from './constants';
+import { Image, StyleSheet } from 'react-native';
+import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X } from './constants';
 
 interface DolphinProps {
     y: number;
@@ -10,7 +10,8 @@ interface DolphinProps {
 
 export const Dolphin: React.FC<DolphinProps> = ({ y }) => {
     return (
-        <View
+        <Image
+            source={require('../../../assets/images/DolphinDive/dolphinSprite.png')}
             style={[
                 styles.dolphin,
                 {
@@ -27,8 +28,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: DOLPHIN_WIDTH,
         height: DOLPHIN_HEIGHT,
-        backgroundColor: DOLPHIN_COLOR,
-        borderRadius: 5,
         zIndex: 5,
     },
 });
