@@ -1,5 +1,9 @@
 // DolphinDive Game Constants
 
+export const DOLPHIN_SPRITE = require("@/assets/images/DolphinDive/dolphinSprite.png");
+export const SEAGULL_SPRITE = require("@/assets/images/DolphinDive/seagullSprite.png");
+export const JELLYFISH_SPRITE = require("@/assets/images/DolphinDive/jellyfishSprite.png");
+
 // Screen dimensions
 export const SCREEN_WIDTH = 375;
 export const SCREEN_HEIGHT = 850;
@@ -25,9 +29,9 @@ export const MAX_JUMP_SPEED = 28;             // px/frame (upward)
 export const EXIT_VELOCITY_INFLUENCE = 0.8;   // Maximum height above water
 
 // Dolphin properties
-export const DOLPHIN_WIDTH = 60;
-export const DOLPHIN_HEIGHT = 40;
-export const DOLPHIN_X = 100;                 // Fixed X position
+export const DOLPHIN_WIDTH = 138;
+export const DOLPHIN_HEIGHT = 60;
+export const DOLPHIN_X = 60;                 // Fixed X position
 
 // Colors
 export const OCEAN_BLUE = '#006994';          // Ocean water color

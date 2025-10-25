@@ -1,8 +1,9 @@
 // Obstacle Component
 
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import { Obstacle as ObstacleType } from './types';
+import { SEAGULL_SPRITE, JELLYFISH_SPRITE } from './constants';
 
 interface ObstacleProps {
     obstacle: ObstacleType;
@@ -27,20 +28,42 @@ export const Obstacle: React.FC<ObstacleProps> = ({ obstacle }) => {
         }
     }
 
+    function SpriteDisplay({ type }: { type: string }) {
+        const commonStyle = {
+            left: obstacle.x,
+            top: obstacle.y,
+            zIndex: getZIndex(type),
+            width: obstacle.width,
+            height: obstacle.height,
+        };
+
+        if (type === 'seagull') {
+            return <Image source={SEAGULL_SPRITE} resizeMethod='scale' style={[styles.obstacle, commonStyle, {backgroundColor: 'transparent'}]} />;
+        }
+
+        if (type === 'jellyfish') {
+            return <Image source={JELLYFISH_SPRITE} resizeMethod='scale' style={[styles.obstacle, commonStyle, {backgroundColor: 'transparent'}]} />;
+        }
+
+        return (
+            <View
+                style={[
+                    styles.obstacle,
+                    {
+                        left: obstacle.x,
+                        top: obstacle.y,
+                        width: obstacle.width,
+                        height: obstacle.height,
+                        backgroundColor: obstacle.color,
+                        zIndex: getZIndex(obstacle.type),
+                    },
+                ]}
+            />
+        );
+    }
+
     return (
-        <View
-            style={[
-                styles.obstacle,
-                {
-                    left: obstacle.x,
-                    top: obstacle.y,
-                    width: obstacle.width,
-                    height: obstacle.height,
-                    backgroundColor: obstacle.color,
-                    zIndex: getZIndex(obstacle.type),
-                },
-            ]}
-        />
+        <SpriteDisplay type={obstacle.type} />
     );
 };
 
@@ -48,4 +71,10 @@ const styles = StyleSheet.create({
     obstacle: {
         position: 'absolute',
     },
+    seagull: {
+        position: 'absolute',
+    },
+    jellyfish: {
+        position: 'absolute',
+    },    
 });

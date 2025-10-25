@@ -104,15 +104,15 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'bigBoat':
             // Large boat obstacle, requires significant vertical movement
             y = WATER_SURFACE_Y - 50;
-            width = 180;
+            width = 230;
             height = 100;
             color = '#C2185B'; // Pink
             break;
         case 'seagull':
             // High in air, requires deep dive to jump over
             y = WATER_SURFACE_Y - 200;
-            width = 50;
-            height = 40;
+            width = 80;
+            height = 50;
             color = '#1976D2'; // Blue
             break;
         case 'buoy':
@@ -132,8 +132,8 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'jellyfish':
             // Deep underwater, forces player to stay shallow
             y = WATER_SURFACE_Y + 150;
-            width = 55;
-            height = 65;
+            width = 60;
+            height = 85;
             color = '#9C27B0'; // Purple
             break;
         default:

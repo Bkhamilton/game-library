@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X } from './constants';
-import dolphinSprite from '../../../assets/images/DolphinDive/dolphinSprite.png';
+import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X, DOLPHIN_SPRITE } from './constants';
 
 interface DolphinProps {
     y: number;
@@ -12,8 +11,8 @@ interface DolphinProps {
 export const Dolphin: React.FC<DolphinProps> = ({ y }) => {
     return (
         <Image
-            source={dolphinSprite}
-            resizeMode="contain"
+            source={DOLPHIN_SPRITE}
+            resizeMethod="scale"
             style={[
                 styles.dolphin,
                 {
