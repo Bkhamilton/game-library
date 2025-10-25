@@ -32,7 +32,6 @@ export const DOLPHIN_X = 100;                 // Fixed X position
 // Colors
 export const OCEAN_BLUE = '#006994';          // Ocean water color
 export const SKY_BLUE = '#87CEEB';            // Sky color
-export const DOLPHIN_COLOR = '#000000';       // Temporary black box for dolphin
 
 // Difficulty settings
 export const DIFFICULTY_SETTINGS = {
