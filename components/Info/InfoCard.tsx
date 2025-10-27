@@ -54,7 +54,7 @@ export default function InfoCard({ game }: InfoCardProps) {
 
     const animatedHeight = height.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, 300],
+        outputRange: [0, 350],
     });
 
     return (
