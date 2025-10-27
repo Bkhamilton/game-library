@@ -45,6 +45,7 @@ export default function OstrichHaulGame() {
         isHolding: false,
     });
     const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
+    const [passedObstacles, setPassedObstacles] = useState<string[]>([]);
     const [clouds, setClouds] = useState<CloudType[]>([]);
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [score, setScore] = useState(0);
@@ -113,19 +114,19 @@ export default function OstrichHaulGame() {
                 // Track distance traveled
                 setDistance((prevDistance) => prevDistance + 1);
 
-                obstacles.forEach((obstacle, index) => {
+                obstacles.forEach((obstacle) => {
                     if (checkCollision(position, obstacle)) {
                         handleLoss();
-                    } else if (position.x.__getValue() > obstacle.x.__getValue() + OBSTACLE_WIDTH) {
+                    } else if (!passedObstacles.includes(obstacle.key) && position.x.__getValue() > obstacle.x.__getValue() + OBSTACLE_WIDTH) {
                         setScore((prevScore) => prevScore + 1);
-                        setObstacles((prevObstacles) => prevObstacles.filter((_, i) => i !== index));
+                        setPassedObstacles((prevPassedObstacles) => [...prevPassedObstacles, obstacle.key]);
                     }
                 });
             }, 1000 / GAME_LOOP_FPS);
 
             return () => clearInterval(gameLoop);
         }
-    }, [isGameRunning, obstacles]);
+    }, [isGameRunning, obstacles, passedObstacles]);
 
     useEffect(() => {
         if (isGameRunning) {
@@ -230,6 +231,7 @@ export default function OstrichHaulGame() {
             isHolding: false,
         });
         setObstacles([]);
+        setPassedObstacles([]);
         setClouds([]);
         setScore(0);
         setJumps(0);
