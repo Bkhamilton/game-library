@@ -14,6 +14,8 @@ interface InfoCardProps {
     };
 }
 
+const EXPANDED_CARD_HEIGHT = 350;
+
 export default function InfoCard({ game }: InfoCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const height = useRef(new Animated.Value(0)).current;
@@ -54,7 +56,7 @@ export default function InfoCard({ game }: InfoCardProps) {
 
     const animatedHeight = height.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, 350],
+        outputRange: [0, EXPANDED_CARD_HEIGHT],
     });
 
     return (
