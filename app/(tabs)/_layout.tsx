@@ -75,7 +75,7 @@ export default function TabLayout() {
                                     />
                                 )}
                             </Pressable>
-                            <Link href="/modal" asChild>
+                            <Link href="/info" asChild>
                                 <Pressable style={{ paddingHorizontal: 8 }}>
                                     {({ pressed }) => (
                                         <FontAwesome 

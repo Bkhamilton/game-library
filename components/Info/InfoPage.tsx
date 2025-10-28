@@ -18,7 +18,6 @@ export default function InfoPage() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Game Library</Text>
                 <Text style={styles.headerSubtitle}>
                     Explore all available games
                 </Text>
@@ -49,7 +48,7 @@ const styles = StyleSheet.create({
       flex: 1,
     },
     header: {
-      paddingTop: 60,
+      paddingTop: 20,
       paddingBottom: 20,
       paddingHorizontal: 20,
       alignItems: "center",
