@@ -4,6 +4,7 @@ import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { GameLogos } from "@/constants/GameLogos";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import GameModes from "@/constants/GameModes";
 
 // Animated button component for modal
 const AnimatedModalButton = ({ onPress, children, style }) => {
@@ -76,7 +77,7 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
     const [selectedMode, setSelectedMode] = useState("Classic");
 
-    const modes = ["Classic", "Frenzy", "Daily Challenge"];
+    const modes = GameModes[game.title] || ["Classic"];
 
     useEffect(() => {
         setSelectedDifficulty(difficulties[0]);
