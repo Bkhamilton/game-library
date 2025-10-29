@@ -43,6 +43,7 @@ const AnimatedModalButton = ({ onPress, children, style }) => {
 
 export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
+    const [showModeModal, setShowModeModal] = useState(false);
 
     const openDifficultyModal = () => {
         setShowDifficultyModal(true);
@@ -57,9 +58,25 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
         setSelectedDifficulty(difficulty);
     };
 
+    const openModeModal = () => {
+        setShowModeModal(true);
+    };
+
+    const closeModeModal = () => {
+        setShowModeModal(false);
+    };
+
+    const selectMode = (mode) => {
+        closeModeModal();
+        setSelectedMode(mode);
+    };
+
     const { primary, grayBackground } = useTheme();
 
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
+    const [selectedMode, setSelectedMode] = useState("Classic");
+
+    const modes = ["Classic", "Frenzy", "Daily Challenge"];
 
     useEffect(() => {
         setSelectedDifficulty(difficulties[0]);
@@ -93,6 +110,11 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                         </Text>
                     </View>
                     <View style={{ paddingTop: 16 }}>
+                        <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openModeModal}>
+                            <Text>
+                                Mode: <Text style={{ fontWeight: "bold" }}>{selectedMode}</Text>
+                            </Text>
+                        </AnimatedModalButton>
                         <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openDifficultyModal}>
                             <Text>
                                 Difficulty: <Text style={{ fontWeight: "bold" }}>{selectedDifficulty}</Text>
@@ -101,7 +123,7 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                         <AnimatedModalButton style={{ backgroundColor: primary, opacity: 0.5 }}>
                             <Text>Continue</Text>
                         </AnimatedModalButton>
-                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() => selectGame(game.title, selectedDifficulty)}>
+                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() => selectGame(game.title, selectedDifficulty, selectedMode)}>
                             <Text>New Game</Text>
                         </AnimatedModalButton>
                         <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={close}>
@@ -121,6 +143,22 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                             </AnimatedModalButton>
                         ))}
                         <AnimatedModalButton style={{ backgroundColor: primary }} onPress={closeDifficultyModal}>
+                            <Text>Close</Text>
+                        </AnimatedModalButton>
+                    </View>
+                </View>
+            </Modal>
+            {/* Mode Modal */}
+            <Modal animationType="slide" transparent={true} visible={showModeModal} onRequestClose={closeModeModal}>
+                <View style={styles.container}>
+                    <View style={styles.innerContainer}>
+                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>Select Mode</Text>
+                        {modes.map((mode, index) => (
+                            <AnimatedModalButton key={index} style={{ backgroundColor: grayBackground }} onPress={() => selectMode(mode)}>
+                                <Text>{mode}</Text>
+                            </AnimatedModalButton>
+                        ))}
+                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={closeModeModal}>
                             <Text>Close</Text>
                         </AnimatedModalButton>
                     </View>
