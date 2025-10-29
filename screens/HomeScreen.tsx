@@ -29,6 +29,8 @@ export default function HomeScreen() {
     const confirmSelectGame = (title: string, difficulty: Difficulty, mode: string) => {
         handleCloseModal();
         handleCurGame(title);
+        // Note: mode parameter is captured but not yet used in routing
+        // Mode implementation will be added in a future update
         switch (title) {
             case "Sudoku":
                 return router.push(`/sudoku?difficulty=${difficulty}`);
