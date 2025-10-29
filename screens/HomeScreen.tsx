@@ -26,7 +26,7 @@ export default function HomeScreen() {
         setShowSelectGame(false);
     };
 
-    const confirmSelectGame = (title: string, difficulty: Difficulty) => {
+    const confirmSelectGame = (title: string, difficulty: Difficulty, mode: string) => {
         handleCloseModal();
         handleCurGame(title);
         switch (title) {
