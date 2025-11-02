@@ -14,6 +14,7 @@ import {
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
+import useTheme from '@/hooks/useTheme';
 
 type ThemeProps = {
   lightColor?: string;
@@ -31,13 +32,17 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const deviceColorScheme = useColorScheme() ?? 'light';
+  const themeColors = useTheme();
+  
+  // Check if props provide an override for the current color scheme
+  const colorFromProps = props[deviceColorScheme];
 
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[theme][colorName];
+    // Use the theme from context (respects custom themes and phone mode)
+    return themeColors[colorName];
   }
 }
 
