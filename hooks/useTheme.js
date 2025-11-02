@@ -23,6 +23,9 @@ export default function useTheme() {
         secondary: colors.secondary,
         tabBarInactiveColor: colors.tabBarInactiveColor,
         tabBar: colors.tabBar,
+        tabIconDefault: colors.tabIconDefault,
+        tabIconSelected: colors.tabIconSelected,
+        activeBackground: colors.activeBackground,
     }
 
     return themeColors;
