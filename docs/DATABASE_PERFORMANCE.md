@@ -57,7 +57,7 @@ const getCachedGameId = async (db, gameTitle) => {
 **Batch Statistics Fetching**
 ```javascript
 const batchGetAchievementStats = async (db, achievements) => {
-    // Get all unique game IDs
+    // Get all unique game IDs from achievements
     const gameIds = new Set();
     for (const achievement of achievements) {
         if (achievement.criteria.game) {
@@ -65,6 +65,12 @@ const batchGetAchievementStats = async (db, achievements) => {
             gameIds.add(gameId);
         }
     }
+    
+    if (gameIds.size === 0) return new Map();
+    
+    // Create placeholders for SQL IN clause
+    const gameIdList = Array.from(gameIds);
+    const placeholders = gameIdList.map(() => '?').join(',');
     
     // Single query to get ALL stats for ALL games
     const statsQuery = `
@@ -82,7 +88,14 @@ const batchGetAchievementStats = async (db, achievements) => {
     `;
     
     const stats = await db.getAllAsync(statsQuery, gameIdList);
-    // Store in Map for O(1) lookup
+    
+    // Organize stats in Map for O(1) lookup
+    const statsByGame = new Map();
+    for (const stat of stats) {
+        const key = `${stat.gameId}-${stat.metric}-${stat.difficulty || 'all'}`;
+        statsByGame.set(key, stat);
+    }
+    
     return statsByGame;
 };
 ```

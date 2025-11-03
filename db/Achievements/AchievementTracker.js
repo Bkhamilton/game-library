@@ -86,6 +86,24 @@ const batchGetAchievementStats = async (db, achievements) => {
     }
 };
 
+// Helper function to count wins (results with score > 0)
+const countWins = async (db, gameId, metric, difficulty, threshold) => {
+    let query;
+    let params;
+    if (difficulty) {
+        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?';
+        params = [gameId, metric, difficulty];
+    } else {
+        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0';
+        params = [gameId, metric];
+    }
+    const result = await db.getAllAsync(query, params);
+    return result[0].count >= threshold;
+};
+
+// Constants for metrics
+const METRIC_HINTS_USED = 'hintsUsed';
+
 // Optimized function to check if criteria is met using cached stats
 const checkCriteriaWithStats = async (db, criteria, statsByGame) => {
     try {
@@ -97,34 +115,7 @@ const checkCriteriaWithStats = async (db, criteria, statsByGame) => {
             
             if (metric === 'result') {
                 // Count wins (score > 0) - need to query separately for this
-                const key = `${gameId}-${metric}-${difficulty || 'all'}`;
-                const stats = statsByGame.get(key);
-                
-                if (!stats) {
-                    // Fallback to direct query if stats not found
-                    let query;
-                    if (difficulty) {
-                        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?';
-                        const result = await db.getAllAsync(query, [gameId, metric, difficulty]);
-                        return result[0].count >= threshold;
-                    } else {
-                        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0';
-                        const result = await db.getAllAsync(query, [gameId, metric]);
-                        return result[0].count >= threshold;
-                    }
-                }
-                
-                // Since we need to count where score > 0, we still need a specific query
-                let query;
-                if (difficulty) {
-                    query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?';
-                    const result = await db.getAllAsync(query, [gameId, metric, difficulty]);
-                    return result[0].count >= threshold;
-                } else {
-                    query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0';
-                    const result = await db.getAllAsync(query, [gameId, metric]);
-                    return result[0].count >= threshold;
-                }
+                return await countWins(db, gameId, metric, difficulty, threshold);
             } else if (metric === 'highScore') {
                 const key = `${gameId}-${metric}-all`;
                 const stats = statsByGame.get(key);
@@ -150,7 +141,7 @@ const checkCriteriaWithStats = async (db, criteria, statsByGame) => {
             } else if (metric === 'noHints') {
                 // Need specific query for count where score = 0
                 const query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score = 0';
-                const result = await db.getAllAsync(query, [gameId, 'hintsUsed']);
+                const result = await db.getAllAsync(query, [gameId, METRIC_HINTS_USED]);
                 return result[0].count >= threshold;
             } else if (metric === 'moves') {
                 if (operator === 'less_than') {
@@ -180,6 +171,21 @@ const checkCriteriaWithStats = async (db, criteria, statsByGame) => {
     }
 };
 
+// Helper function to get win count progress
+const getWinCountProgress = async (db, gameId, metric, difficulty, threshold) => {
+    let query;
+    let params;
+    if (difficulty) {
+        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?';
+        params = [gameId, metric, difficulty];
+    } else {
+        query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0';
+        params = [gameId, metric];
+    }
+    const result = await db.getAllAsync(query, params);
+    return Math.min(result[0].count, threshold);
+};
+
 // Optimized function to get current progress using cached stats
 const getProgressForAchievementWithStats = async (db, criteria, statsByGame) => {
     try {
@@ -189,16 +195,7 @@ const getProgressForAchievementWithStats = async (db, criteria, statsByGame) => 
             const gameId = await getCachedGameId(db, game);
             
             if (metric === 'result') {
-                let query;
-                if (difficulty) {
-                    query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 AND difficulty = ?';
-                    const result = await db.getAllAsync(query, [gameId, metric, difficulty]);
-                    return Math.min(result[0].count, threshold);
-                } else {
-                    query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score > 0';
-                    const result = await db.getAllAsync(query, [gameId, metric]);
-                    return Math.min(result[0].count, threshold);
-                }
+                return await getWinCountProgress(db, gameId, metric, difficulty, threshold);
             } else if (metric === 'highScore') {
                 const key = `${gameId}-${metric}-all`;
                 const stats = statsByGame.get(key);
@@ -224,7 +221,7 @@ const getProgressForAchievementWithStats = async (db, criteria, statsByGame) => 
                 return Math.min(stats?.total || 0, threshold);
             } else if (metric === 'noHints') {
                 const query = 'SELECT COUNT(*) as count FROM Scores WHERE gameId = ? AND metric = ? AND score = 0';
-                const result = await db.getAllAsync(query, [gameId, 'hintsUsed']);
+                const result = await db.getAllAsync(query, [gameId, METRIC_HINTS_USED]);
                 return Math.min(result[0].count, threshold);
             } else if (metric === 'moves') {
                 if (operator === 'less_than') {
