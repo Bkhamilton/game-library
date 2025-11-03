@@ -33,25 +33,25 @@ export default function HomeScreen() {
             case "Sudoku":
                 return router.push(`/sudoku?difficulty=${difficulty}&mode=${mode}`);
             case "Ostrich Haul":
-                return router.push(`/ostrichhaul?difficulty=${difficulty}`);
+                return router.push(`/ostrichhaul?difficulty=${difficulty}&mode=${mode}`);
             case "Word Search":
-                return router.push(`/wordSearch?difficulty=${difficulty}`);
+                return router.push(`/wordSearch?difficulty=${difficulty}&mode=${mode}`);
             case "Crossword":
-                return router.push(`/crossword?difficulty=${difficulty}`);
+                return router.push(`/crossword?difficulty=${difficulty}&mode=${mode}`);
             case "Minesweeper":
-                return router.push(`/minesweeper?difficulty=${difficulty}`);
+                return router.push(`/minesweeper?difficulty=${difficulty}&mode=${mode}`);
             case "GoGoBird":
-                return router.push(`/gogobird?difficulty=${difficulty}`);
+                return router.push(`/gogobird?difficulty=${difficulty}&mode=${mode}`);
             case "2048":
-                return router.push(`/2048?difficulty=${difficulty}`);
+                return router.push(`/2048?difficulty=${difficulty}&mode=${mode}`);
             case "Memory Match":
-                return router.push(`/memorymatch?difficulty=${difficulty}`);
+                return router.push(`/memorymatch?difficulty=${difficulty}&mode=${mode}`);
             case "Simon Says":
-                return router.push(`/simonsays?difficulty=${difficulty}`);
+                return router.push(`/simonsays?difficulty=${difficulty}&mode=${mode}`);
             case "Connect Four":
-                return router.push(`/connectfour?difficulty=${difficulty}`);
+                return router.push(`/connectfour?difficulty=${difficulty}&mode=${mode}`);
             case "DolphinDive":
-                return router.push(`/dolphindive?difficulty=${difficulty}`);
+                return router.push(`/dolphindive?difficulty=${difficulty}&mode=${mode}`);
             default:
                 return "";
         }

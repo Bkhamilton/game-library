@@ -36,7 +36,7 @@ const DIFFICULTY_SETTINGS = {
 };
 
 export default function WordSearchGame() {
-    const { difficulty } = useLocalSearchParams();
+    const { difficulty, mode } = useLocalSearchParams();
     const [grid, setGrid] = useState<Cell[][]>([]);
     const [foundWords, setFoundWords] = useState<string[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
@@ -46,6 +46,9 @@ export default function WordSearchGame() {
     const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
     const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentLevel, setCurrentLevel] = useState(1); // Track current level for Endless mode
+    const [totalScore, setTotalScore] = useState(0); // Track total score for Endless mode
+    const [isEndlessMode, setIsEndlessMode] = useState(false); // Track if in Endless mode
 
     const { db, curGame } = useContext(DBContext);
     const router = useRouter();
@@ -61,16 +64,42 @@ export default function WordSearchGame() {
         setFoundWords([]);
     };
 
-    const handleWin = () => {
+    const handleStopEndless = () => {
+        // Record the level reached and show end game modal
         insertWin(db, curGame?.id, difficulty);
         insertTimeScore(db, curGame?.id, gameTime, difficulty);
-        insertWordsFound(db, curGame?.id, foundWords.length, difficulty);
+        // In endless mode, record the level as the score
+        insertWordsFound(db, curGame?.id, currentLevel - 1, difficulty);
         insertHintsUsed(db, curGame?.id, hintsUsed, difficulty);
-        setShowVictoryConfetti(true);
-        // Delay showing the modal slightly to let confetti play
-        setTimeout(() => {
-            setEndGameModalVisible(true);
-        }, 500);
+        setEndGameModalVisible(true);
+    };
+
+    const handleWin = () => {
+        if (isEndlessMode) {
+            // In Endless mode, award points and continue to next level
+            const levelScore = 100 * currentLevel; // Points increase with level
+            setTotalScore(prev => prev + levelScore);
+            setCurrentLevel(prev => prev + 1);
+            setShowVictoryConfetti(true);
+            
+            // Reset game after a brief delay
+            setTimeout(() => {
+                setShowVictoryConfetti(false);
+                initializeGameWithDifficulty(difficulty as Difficulty);
+                setFoundWords([]);
+            }, 1500);
+        } else {
+            // Classic mode - end the game
+            insertWin(db, curGame?.id, difficulty);
+            insertTimeScore(db, curGame?.id, gameTime, difficulty);
+            insertWordsFound(db, curGame?.id, foundWords.length, difficulty);
+            insertHintsUsed(db, curGame?.id, hintsUsed, difficulty);
+            setShowVictoryConfetti(true);
+            // Delay showing the modal slightly to let confetti play
+            setTimeout(() => {
+                setEndGameModalVisible(true);
+            }, 500);
+        }
     };
 
     const selectWordsFromBuckets = (diff: Difficulty, wordCount: number): string[] => {
@@ -222,8 +251,9 @@ export default function WordSearchGame() {
     };
 
     useEffect(() => {
+        setIsEndlessMode(mode === 'Endless');
         initializeGameWithDifficulty(difficulty as Difficulty);
-    }, [difficulty]);
+    }, [difficulty, mode]);
 
     return (
         <View style={styles.container}>
@@ -231,6 +261,10 @@ export default function WordSearchGame() {
                 wordCount={wordBank.length}
                 foundWords={foundWords.length}
                 onTimeUpdate={handleTimeUpdate}
+                isEndlessMode={isEndlessMode}
+                currentLevel={currentLevel}
+                totalScore={totalScore}
+                onStopEndless={handleStopEndless}
             />
             {isLoading ? (
                 <LoadingSpinner size="large" />
