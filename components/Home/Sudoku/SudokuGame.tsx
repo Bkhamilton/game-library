@@ -11,7 +11,8 @@ import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Sco
 import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
 
 export default function SudokuGame() {
-    const { difficulty } = useLocalSearchParams();
+    const { difficulty, mode } = useLocalSearchParams();
+    const gameMode = typeof mode === 'string' ? mode : 'Classic'; // Default to Classic if not specified
     const [board, setBoard] = useState<number[][]>([]);
     const [solvedBoard, setSolvedBoard] = useState<number[][]>([]);
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
@@ -29,12 +30,19 @@ export default function SudokuGame() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [gameTime, setGameTime] = useState(0); // Track game time
+    const [timerReset, setTimerReset] = useState(false); // For resetting timer on correct moves in Frenzy mode
 
     const { db, curGame } = useContext(DBContext);
 
     const handleTimeUpdate = useCallback((seconds: number) => {
         setGameTime(seconds);
     }, []);
+
+    const handleTimeExpired = useCallback(() => {
+        if (gameMode === 'Frenzy' && !lossModalShown) {
+            handleLoss();
+        }
+    }, [gameMode, lossModalShown]);
 
     const handleWin = () => {
         insertWin(db, curGame!.id, difficulty);
@@ -69,6 +77,10 @@ export default function SudokuGame() {
         if (checkMove(solvedBoard, row, col, intValue)) {
             newBoard[row][col] = intValue;
             setBoard(newBoard);
+            // In Frenzy mode, reset the timer on correct move
+            if (gameMode === 'Frenzy') {
+                setTimerReset(prev => !prev); // Toggle to trigger reset
+            }
         } else {
             setWrongCount(prevCount => prevCount + 1);
             setErrorShakeTrigger(prev => prev + 1); // Trigger shake animation
@@ -77,8 +89,8 @@ export default function SudokuGame() {
         if (JSON.stringify(newBoard) === JSON.stringify(solvedBoard)) {
             handleWin();
         }
-        // Check if the board is lost
-        if (wrongCount >= 3 && !lossModalShown) {
+        // Check if the board is lost (only for Classic mode - 4 mistakes rule)
+        if (gameMode === 'Classic' && wrongCount >= 3 && !lossModalShown) {
             handleLoss();
         }
     };
@@ -112,7 +124,7 @@ export default function SudokuGame() {
     const restartGame = (difficulty: string) => {
         setWrongCount(0);
         setLossModalShown(false);
-        router.replace(`/sudoku?difficulty=${difficulty}`);
+        router.replace(`/sudoku?difficulty=${difficulty}&mode=${gameMode}`);
     }
 
     return (
@@ -120,6 +132,10 @@ export default function SudokuGame() {
             <SudokuHeader 
                 wrongCount={wrongCount}
                 onTimeUpdate={handleTimeUpdate}
+                mode={gameMode}
+                difficulty={difficulty as string}
+                timerReset={timerReset}
+                onTimeExpired={handleTimeExpired}
             />
             {isLoading ? (
                 <LoadingSpinner size="large" />
