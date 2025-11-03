@@ -23,7 +23,7 @@ type PlacedWord = {
 }
 
 export default function CrosswordGame() {
-    const { difficulty } = useLocalSearchParams();
+    const { difficulty, mode } = useLocalSearchParams();
     const [grid, setGrid] = useState<string[][]>([]);
     const [placedWords, setPlacedWords] = useState<PlacedWord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +38,10 @@ export default function CrosswordGame() {
 
     const [wrongCount, setWrongCount] = useState(0);
     const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
+    
+    const [currentLevel, setCurrentLevel] = useState(1); // Track current level for Endless mode
+    const [totalScore, setTotalScore] = useState(0); // Track total score for Endless mode
+    const [isEndlessMode, setIsEndlessMode] = useState(false); // Track if in Endless mode
 
     const { db, curGame } = useContext(DBContext);
 
@@ -46,23 +50,49 @@ export default function CrosswordGame() {
     }, []);
 
     const handleWin = () => {
-        insertWin(db, curGame && curGame.id, difficulty);
-        insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
-        insertCorrectWords(db, curGame && curGame.id, guessedWords.length, difficulty);
-        insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
-        setEndGameResult(true);
-        setEndGameModalVisible(true);
+        if (isEndlessMode) {
+            // In Endless mode, award points and continue to next level
+            const levelScore = 100 * currentLevel; // Points increase with level
+            setTotalScore(prev => prev + levelScore);
+            setCurrentLevel(prev => prev + 1);
+            
+            // Reset game after a brief delay
+            setTimeout(() => {
+                setWrongCount(0);
+                setGuessedWords([]);
+                setActiveCell(null);
+                generateCrossword();
+            }, 1500);
+        } else {
+            // Classic mode - end the game
+            insertWin(db, curGame && curGame.id, difficulty);
+            insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
+            insertCorrectWords(db, curGame && curGame.id, guessedWords.length, difficulty);
+            insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
+            setEndGameResult(true);
+            setEndGameModalVisible(true);
+        }
     }
 
     const handleLoss = () => {
-        insertLoss(db, curGame && curGame.id, difficulty);
-        setEndGameResult(false);
-        setEndGameModalVisible(true);
+        if (isEndlessMode) {
+            // In Endless mode, losing ends the game and records the level
+            insertLoss(db, curGame && curGame.id, difficulty);
+            insertCorrectWords(db, curGame && curGame.id, currentLevel - 1, difficulty);
+            setEndGameResult(false);
+            setEndGameModalVisible(true);
+        } else {
+            // Classic mode
+            insertLoss(db, curGame && curGame.id, difficulty);
+            setEndGameResult(false);
+            setEndGameModalVisible(true);
+        }
     }
 
     useEffect(() => {
+        setIsEndlessMode(mode === 'Endless');
         generateCrossword();
-    }, []);
+    }, [mode]);
 
     const getWordCount = (difficulty: string) => {
         switch (difficulty) {
@@ -153,6 +183,17 @@ export default function CrosswordGame() {
         generateCrossword();
     };
 
+    const handleStopEndless = () => {
+        // Record the level reached and show end game modal
+        insertWin(db, curGame && curGame.id, difficulty);
+        insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
+        // In endless mode, record the level as the score
+        insertCorrectWords(db, curGame && curGame.id, currentLevel - 1, difficulty);
+        insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
+        setEndGameResult(true);
+        setEndGameModalVisible(true);
+    };
+
     return (
         <View style={styles.container}>
             <EndGameMessage 
@@ -172,6 +213,10 @@ export default function CrosswordGame() {
                         wordsFound={guessedWords.length}
                         totalWords={wordsToFind.length}
                         onTimeUpdate={handleTimeUpdate}
+                        isEndlessMode={isEndlessMode}
+                        currentLevel={currentLevel}
+                        totalScore={totalScore}
+                        onStopEndless={handleStopEndless}
                     />
                     <CrosswordGrid 
                         grid={grid}

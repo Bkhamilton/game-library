@@ -1,7 +1,7 @@
 export default {
     'Sudoku': ['Classic', 'Frenzy', 'Daily Challenge'],
-    'Crossword': ['Classic', 'Frenzy', 'Daily Challenge'],
-    'Word Search': ['Classic', 'Frenzy', 'Daily Challenge'],
+    'Crossword': ['Classic', 'Frenzy', 'Daily Challenge', 'Endless'],
+    'Word Search': ['Classic', 'Frenzy', 'Daily Challenge', 'Endless'],
     'Minesweeper': ['Classic', 'Frenzy', 'Daily Challenge'],
     'Ostrich Haul': ['Classic'],
     'GoGoBird': ['Classic'],

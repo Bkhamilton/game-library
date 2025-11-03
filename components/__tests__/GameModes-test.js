@@ -26,7 +26,7 @@ describe('GameModes', () => {
   });
 
   it('should contain only valid mode types', () => {
-    const validModes = ['Classic', 'Frenzy', 'Daily Challenge'];
+    const validModes = ['Classic', 'Frenzy', 'Daily Challenge', 'Endless'];
     
     Object.values(GameModes).forEach(modes => {
       modes.forEach(mode => {
