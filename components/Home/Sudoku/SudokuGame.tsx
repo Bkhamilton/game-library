@@ -115,7 +115,7 @@ export default function SudokuGame() {
         // Simulate loading time to show spinner
         setTimeout(() => {
             // Use seeded generation for Daily Challenge mode
-            const seed = gameMode === 'Daily Challenge' ? getTodaysSeed() : null;
+            const seed = gameMode === 'Daily Challenge' ? getTodaysSeed() : undefined;
             const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, seed);
             setBoard(puzzleBoard);
             setSolvedBoard(completeBoard);

@@ -127,8 +127,8 @@ const isSolvable = (board) => {
 };
 
 // Generate a Sudoku puzzle with the given difficulty
-export const generateSudokuPuzzle = (difficulty, seed = null) => {
-    const rng = seed !== null ? new SeededRandom(seed) : null;
+export const generateSudokuPuzzle = (difficulty, seed) => {
+    const rng = seed !== null && seed !== undefined ? new SeededRandom(seed) : null;
     let completeBoard;
     let puzzleBoard;
     do {
