@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { StyleSheet, Modal, TouchableOpacity, Image } from "react-native";
 import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
@@ -91,20 +91,20 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
     }, [difficulties]);
 
     // Check if daily challenge has been completed
+    const checkDailyChallenge = useCallback(async () => {
+        if (selectedMode === 'Daily Challenge') {
+            const completed = await isDailyChallengeCompleted(game.title, selectedDifficulty);
+            setIsDailyChallengeDisabled(completed);
+        } else {
+            setIsDailyChallengeDisabled(false);
+        }
+    }, [selectedMode, selectedDifficulty, game.title]);
+    
     useEffect(() => {
-        const checkDailyChallenge = async () => {
-            if (selectedMode === 'Daily Challenge') {
-                const completed = await isDailyChallengeCompleted(game.title, selectedDifficulty);
-                setIsDailyChallengeDisabled(completed);
-            } else {
-                setIsDailyChallengeDisabled(false);
-            }
-        };
-        
         if (visible) {
             checkDailyChallenge();
         }
-    }, [selectedMode, selectedDifficulty, game.title, visible]);
+    }, [visible, checkDailyChallenge]);
 
     return (
         <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={close}>

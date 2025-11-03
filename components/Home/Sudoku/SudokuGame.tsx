@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
@@ -14,6 +14,11 @@ import { getTodaysSeed, markDailyChallengeCompleted } from '@/utils/DailyChallen
 export default function SudokuGame() {
     const { difficulty, mode } = useLocalSearchParams();
     const gameMode = typeof mode === 'string' ? mode : 'Classic'; // Default to Classic if not specified
+    
+    // Memoize today's seed since it only changes once per day
+    const todaysSeed = useMemo(() => {
+        return gameMode === 'Daily Challenge' ? getTodaysSeed() : undefined;
+    }, [gameMode]);
     const [board, setBoard] = useState<number[][]>([]);
     const [solvedBoard, setSolvedBoard] = useState<number[][]>([]);
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
@@ -115,8 +120,7 @@ export default function SudokuGame() {
         // Simulate loading time to show spinner
         setTimeout(() => {
             // Use seeded generation for Daily Challenge mode
-            const seed = gameMode === 'Daily Challenge' ? getTodaysSeed() : undefined;
-            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, seed);
+            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, todaysSeed);
             setBoard(puzzleBoard);
             setSolvedBoard(completeBoard);
             const initialNums: { [key: string]: boolean } = {};
@@ -130,7 +134,7 @@ export default function SudokuGame() {
             setInitialNumbers(initialNums);
             setIsLoading(false);
         }, 300);
-    }, [difficulty, gameMode]);
+    }, [difficulty, todaysSeed]);
 
     const router = useRouter();
 

@@ -21,7 +21,7 @@ export const generateSeedFromDate = (dateKey) => {
     for (let i = 0; i < dateKey.length; i++) {
         const char = dateKey.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32-bit integer
+        hash = hash | 0; // Convert to 32-bit integer
     }
     return Math.abs(hash);
 };
