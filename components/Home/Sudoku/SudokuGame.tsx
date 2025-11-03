@@ -40,9 +40,13 @@ export default function SudokuGame() {
 
     const handleTimeExpired = useCallback(() => {
         if (gameMode === 'Frenzy' && !lossModalShown) {
-            handleLoss();
+            insertLoss(db, curGame!.id, difficulty);
+            insertMistakes(db, curGame!.id, wrongCount, difficulty);
+            setEndGameResult(false);
+            setEndGameModalVisible(true);
+            setLossModalShown(true);
         }
-    }, [gameMode, lossModalShown]);
+    }, [gameMode, lossModalShown, db, curGame, difficulty, wrongCount]);
 
     const handleWin = () => {
         insertWin(db, curGame!.id, difficulty);

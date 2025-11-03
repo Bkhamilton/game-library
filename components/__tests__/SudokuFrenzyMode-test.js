@@ -8,61 +8,58 @@
  * 4. Different header display for Frenzy vs Classic mode
  */
 
+// Helper function to get initial timer seconds based on difficulty
+// This mirrors the logic in SudokuHeader.tsx
+const getInitialSeconds = (difficulty) => {
+    switch (difficulty) {
+        case 'Easy':
+            return 15;
+        case 'Medium':
+            return 20;
+        case 'Hard':
+            return 25;
+        case 'Expert':
+            return 30;
+        default:
+            return 15;
+    }
+};
+
 describe('Sudoku Frenzy Mode', () => {
     describe('Timer initialization', () => {
         it('should initialize with 15 seconds for Easy difficulty', () => {
             const difficulty = 'Easy';
             const expectedSeconds = 15;
             
-            const initialSeconds = difficulty === 'Easy' ? 15 : 
-                                   difficulty === 'Medium' ? 20 : 
-                                   difficulty === 'Hard' ? 25 : 30;
-            
-            expect(initialSeconds).toBe(expectedSeconds);
+            expect(getInitialSeconds(difficulty)).toBe(expectedSeconds);
         });
 
         it('should initialize with 20 seconds for Medium difficulty', () => {
             const difficulty = 'Medium';
             const expectedSeconds = 20;
             
-            const initialSeconds = difficulty === 'Easy' ? 15 : 
-                                   difficulty === 'Medium' ? 20 : 
-                                   difficulty === 'Hard' ? 25 : 30;
-            
-            expect(initialSeconds).toBe(expectedSeconds);
+            expect(getInitialSeconds(difficulty)).toBe(expectedSeconds);
         });
 
         it('should initialize with 25 seconds for Hard difficulty', () => {
             const difficulty = 'Hard';
             const expectedSeconds = 25;
             
-            const initialSeconds = difficulty === 'Easy' ? 15 : 
-                                   difficulty === 'Medium' ? 20 : 
-                                   difficulty === 'Hard' ? 25 : 30;
-            
-            expect(initialSeconds).toBe(expectedSeconds);
+            expect(getInitialSeconds(difficulty)).toBe(expectedSeconds);
         });
 
         it('should initialize with 30 seconds for Expert difficulty', () => {
             const difficulty = 'Expert';
             const expectedSeconds = 30;
             
-            const initialSeconds = difficulty === 'Easy' ? 15 : 
-                                   difficulty === 'Medium' ? 20 : 
-                                   difficulty === 'Hard' ? 25 : 30;
-            
-            expect(initialSeconds).toBe(expectedSeconds);
+            expect(getInitialSeconds(difficulty)).toBe(expectedSeconds);
         });
 
         it('should default to 15 seconds for unknown difficulty', () => {
             const difficulty = 'Unknown';
             const expectedSeconds = 15;
             
-            const initialSeconds = difficulty === 'Easy' ? 15 : 
-                                   difficulty === 'Medium' ? 20 : 
-                                   difficulty === 'Hard' ? 25 : 15;
-            
-            expect(initialSeconds).toBe(expectedSeconds);
+            expect(getInitialSeconds(difficulty)).toBe(expectedSeconds);
         });
     });
 

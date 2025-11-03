@@ -29,7 +29,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     }, [resetTrigger, initialSeconds]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout | number | null = null;
+        let interval: ReturnType<typeof setInterval> | null = null;
         if (isActive && seconds > 0) {
             interval = setInterval(() => {
                 setSeconds(prevSeconds => {
