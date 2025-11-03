@@ -111,11 +111,13 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                         </Text>
                     </View>
                     <View style={{ paddingTop: 16 }}>
-                        <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openModeModal}>
-                            <Text>
-                                Mode: <Text style={{ fontWeight: "bold" }}>{selectedMode}</Text>
-                            </Text>
-                        </AnimatedModalButton>
+                        {modes.length > 1 && (
+                            <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openModeModal}>
+                                <Text>
+                                    Mode: <Text style={{ fontWeight: "bold" }}>{selectedMode}</Text>
+                                </Text>
+                            </AnimatedModalButton>
+                        )}
                         <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={openDifficultyModal}>
                             <Text>
                                 Difficulty: <Text style={{ fontWeight: "bold" }}>{selectedDifficulty}</Text>
