@@ -37,10 +37,15 @@ export default function SudokuHeader({
     onTimeExpired
 }: SudokuHeaderProps) {
     const isFrenzyMode = mode === 'Frenzy';
+    const isDailyChallenge = mode === 'Daily Challenge';
     
     return (
         <GameHeader
-            leftContent={isFrenzyMode ? <Text style={{ fontSize: 16 }}>Frenzy</Text> : undefined}
+            leftContent={
+                isFrenzyMode ? <Text style={{ fontSize: 16 }}>Frenzy</Text> : 
+                isDailyChallenge ? <Text style={{ fontSize: 16 }}>Daily Challenge</Text> :
+                undefined
+            }
             rightContent={!isFrenzyMode ? <Text style={{ fontSize: 16 }}>{wrongCount}/4</Text> : undefined}
             centerContent={isFrenzyMode ? (
                 <CountdownTimer

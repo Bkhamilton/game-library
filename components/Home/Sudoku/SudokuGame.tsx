@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
@@ -9,10 +9,16 @@ import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
 import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
 import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
+import { getTodaysSeed, markDailyChallengeCompleted } from '@/utils/DailyChallenge';
 
 export default function SudokuGame() {
     const { difficulty, mode } = useLocalSearchParams();
     const gameMode = typeof mode === 'string' ? mode : 'Classic'; // Default to Classic if not specified
+    
+    // Memoize today's seed since it only changes once per day
+    const todaysSeed = useMemo(() => {
+        return gameMode === 'Daily Challenge' ? getTodaysSeed() : undefined;
+    }, [gameMode]);
     const [board, setBoard] = useState<number[][]>([]);
     const [solvedBoard, setSolvedBoard] = useState<number[][]>([]);
     const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
@@ -48,10 +54,16 @@ export default function SudokuGame() {
         }
     }, [gameMode, lossModalShown, db, curGame, difficulty, wrongCount]);
 
-    const handleWin = () => {
+    const handleWin = async () => {
         insertWin(db, curGame!.id, difficulty);
         insertTimeScore(db, curGame!.id, gameTime, difficulty);
         insertMistakes(db, curGame!.id, wrongCount, difficulty);
+        
+        // Mark daily challenge as completed if in Daily Challenge mode
+        if (gameMode === 'Daily Challenge') {
+            await markDailyChallengeCompleted('Sudoku', difficulty as string);
+        }
+        
         setShowVictoryConfetti(true);
         // Delay showing the modal slightly to let confetti play
         setTimeout(() => {
@@ -107,7 +119,8 @@ export default function SudokuGame() {
         setIsLoading(true);
         // Simulate loading time to show spinner
         setTimeout(() => {
-            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
+            // Use seeded generation for Daily Challenge mode
+            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, todaysSeed);
             setBoard(puzzleBoard);
             setSolvedBoard(completeBoard);
             const initialNums: { [key: string]: boolean } = {};
@@ -121,7 +134,7 @@ export default function SudokuGame() {
             setInitialNumbers(initialNums);
             setIsLoading(false);
         }, 300);
-    }, [difficulty]);
+    }, [difficulty, todaysSeed]);
 
     const router = useRouter();
 
