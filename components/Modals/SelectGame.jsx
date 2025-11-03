@@ -5,9 +5,10 @@ import useTheme from "@/hooks/useTheme";
 import { GameLogos } from "@/constants/GameLogos";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import GameModes from "@/constants/GameModes";
+import { isDailyChallengeCompleted } from "@/utils/DailyChallenge";
 
 // Animated button component for modal
-const AnimatedModalButton = ({ onPress, children, style }) => {
+const AnimatedModalButton = ({ onPress, children, style, disabled }) => {
     const scale = useSharedValue(1);
     
     const animatedStyle = useAnimatedStyle(() => ({
@@ -15,17 +16,21 @@ const AnimatedModalButton = ({ onPress, children, style }) => {
     }));
     
     const handlePressIn = () => {
-        scale.value = withSpring(0.95, {
-            damping: 15,
-            stiffness: 150,
-        });
+        if (!disabled) {
+            scale.value = withSpring(0.95, {
+                damping: 15,
+                stiffness: 150,
+            });
+        }
     };
     
     const handlePressOut = () => {
-        scale.value = withSpring(1, {
-            damping: 15,
-            stiffness: 150,
-        });
+        if (!disabled) {
+            scale.value = withSpring(1, {
+                damping: 15,
+                stiffness: 150,
+            });
+        }
     };
     
     return (
@@ -33,7 +38,8 @@ const AnimatedModalButton = ({ onPress, children, style }) => {
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             onPress={onPress}
-            activeOpacity={0.8}
+            activeOpacity={disabled ? 1 : 0.8}
+            disabled={disabled}
         >
             <Animated.View style={[styles.button, style, animatedStyle]}>
                 {children}
@@ -45,6 +51,7 @@ const AnimatedModalButton = ({ onPress, children, style }) => {
 export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
     const [showModeModal, setShowModeModal] = useState(false);
+    const [isDailyChallengeDisabled, setIsDailyChallengeDisabled] = useState(false);
 
     const openDifficultyModal = () => {
         setShowDifficultyModal(true);
@@ -82,6 +89,22 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
     useEffect(() => {
         setSelectedDifficulty(difficulties[0]);
     }, [difficulties]);
+
+    // Check if daily challenge has been completed
+    useEffect(() => {
+        const checkDailyChallenge = async () => {
+            if (selectedMode === 'Daily Challenge') {
+                const completed = await isDailyChallengeCompleted(game.title, selectedDifficulty);
+                setIsDailyChallengeDisabled(completed);
+            } else {
+                setIsDailyChallengeDisabled(false);
+            }
+        };
+        
+        if (visible) {
+            checkDailyChallenge();
+        }
+    }, [selectedMode, selectedDifficulty, game.title, visible]);
 
     return (
         <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={close}>
@@ -126,8 +149,17 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                         <AnimatedModalButton style={{ backgroundColor: primary, opacity: 0.5 }}>
                             <Text>Continue</Text>
                         </AnimatedModalButton>
-                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() => selectGame(game.title, selectedDifficulty, selectedMode)}>
-                            <Text>New Game</Text>
+                        <AnimatedModalButton 
+                            style={{ 
+                                backgroundColor: primary, 
+                                opacity: isDailyChallengeDisabled ? 0.3 : 1 
+                            }} 
+                            onPress={() => selectGame(game.title, selectedDifficulty, selectedMode)}
+                            disabled={isDailyChallengeDisabled}
+                        >
+                            <Text>
+                                {isDailyChallengeDisabled ? 'Completed Today' : 'New Game'}
+                            </Text>
                         </AnimatedModalButton>
                         <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={close}>
                             <Text>Close</Text>

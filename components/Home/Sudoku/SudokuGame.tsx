@@ -9,6 +9,7 @@ import EndGameMessage from '@/components/Modals/EndGameMessage';
 import { DBContext } from '@/contexts/DBContext';
 import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
 import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
+import { getTodaysSeed, markDailyChallengeCompleted } from '@/utils/DailyChallenge';
 
 export default function SudokuGame() {
     const { difficulty, mode } = useLocalSearchParams();
@@ -48,10 +49,16 @@ export default function SudokuGame() {
         }
     }, [gameMode, lossModalShown, db, curGame, difficulty, wrongCount]);
 
-    const handleWin = () => {
+    const handleWin = async () => {
         insertWin(db, curGame!.id, difficulty);
         insertTimeScore(db, curGame!.id, gameTime, difficulty);
         insertMistakes(db, curGame!.id, wrongCount, difficulty);
+        
+        // Mark daily challenge as completed if in Daily Challenge mode
+        if (gameMode === 'Daily Challenge') {
+            await markDailyChallengeCompleted('Sudoku', difficulty as string);
+        }
+        
         setShowVictoryConfetti(true);
         // Delay showing the modal slightly to let confetti play
         setTimeout(() => {
@@ -107,7 +114,9 @@ export default function SudokuGame() {
         setIsLoading(true);
         // Simulate loading time to show spinner
         setTimeout(() => {
-            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty);
+            // Use seeded generation for Daily Challenge mode
+            const seed = gameMode === 'Daily Challenge' ? getTodaysSeed() : null;
+            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, seed);
             setBoard(puzzleBoard);
             setSolvedBoard(completeBoard);
             const initialNums: { [key: string]: boolean } = {};
@@ -121,7 +130,7 @@ export default function SudokuGame() {
             setInitialNumbers(initialNums);
             setIsLoading(false);
         }, 300);
-    }, [difficulty]);
+    }, [difficulty, gameMode]);
 
     const router = useRouter();
 

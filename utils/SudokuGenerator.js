@@ -1,14 +1,28 @@
 // Description: This file contains the functions to generate a complete Sudoku board and create a Sudoku puzzle with the given difficulty.
 
+// Seeded random number generator (Mulberry32)
+class SeededRandom {
+    constructor(seed) {
+        this.seed = seed;
+    }
+    
+    next() {
+        let t = this.seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
 // Generate a complete Sudoku board
-const generateCompleteBoard = () => {
+const generateCompleteBoard = (rng = null) => {
     const board = Array.from({ length: 9 }, () => Array(9).fill(0));
-    fillBoard(board);
+    fillBoard(board, rng);
     return board;
 };
 
 // Fill the board with a valid Sudoku solution
-const fillBoard = (board) => {
+const fillBoard = (board, rng = null) => {
     const findEmpty = () => {
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
@@ -38,14 +52,14 @@ const fillBoard = (board) => {
     // Shuffle numbers 1-9 to avoid predictable patterns
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     for (let i = numbers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor((rng ? rng.next() : Math.random()) * (i + 1));
         [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
     }
     
     for (let num of numbers) {
         if (isValid(num, [row, col])) {
             board[row][col] = num;
-            if (fillBoard(board)) return true;
+            if (fillBoard(board, rng)) return true;
             board[row][col] = 0;
         }
     }
@@ -53,14 +67,14 @@ const fillBoard = (board) => {
 };
 
 // Create a Sudoku puzzle by removing numbers from the complete board
-const createPuzzle = (board, difficulty) => {
+const createPuzzle = (board, difficulty, rng = null) => {
     const emptySpaces = difficulty === 'Easy' ? 30 : difficulty === 'Medium' ? 40 : difficulty === 'Hard' ? 60 : 65;
     const puzzle = board.map(row => row.slice());
 
     let count = 0;
     while (count < emptySpaces) {
-        const row = Math.floor(Math.random() * 9);
-        const col = Math.floor(Math.random() * 9);
+        const row = Math.floor((rng ? rng.next() : Math.random()) * 9);
+        const col = Math.floor((rng ? rng.next() : Math.random()) * 9);
         if (puzzle[row][col] !== 0) {
             puzzle[row][col] = 0;
             count++;
@@ -113,12 +127,13 @@ const isSolvable = (board) => {
 };
 
 // Generate a Sudoku puzzle with the given difficulty
-export const generateSudokuPuzzle = (difficulty) => {
+export const generateSudokuPuzzle = (difficulty, seed = null) => {
+    const rng = seed !== null ? new SeededRandom(seed) : null;
     let completeBoard;
     let puzzleBoard;
     do {
-        completeBoard = generateCompleteBoard();
-        puzzleBoard = createPuzzle(completeBoard, difficulty);
+        completeBoard = generateCompleteBoard(rng);
+        puzzleBoard = createPuzzle(completeBoard, difficulty, rng);
     } while (!isSolvable(puzzleBoard));
     return { completeBoard, puzzleBoard };
 };
