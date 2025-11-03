@@ -34,4 +34,14 @@ describe('GameModes', () => {
       });
     });
   });
+
+  it('should restrict Ostrich Haul, GoGoBird, and DolphinDive to Classic mode only', () => {
+    const classicOnlyGames = ['Ostrich Haul', 'GoGoBird', 'DolphinDive'];
+    
+    classicOnlyGames.forEach(game => {
+      expect(GameModes[game]).toBeDefined();
+      expect(GameModes[game]).toEqual(['Classic']);
+      expect(GameModes[game].length).toBe(1);
+    });
+  });
 });
