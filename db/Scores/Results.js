@@ -37,7 +37,7 @@ export const getTotalLosses = async (db) => {
 // Function to get scores by game
 export const getGameScores = async (db, gameId) => {
     try {
-        const allRows = await db.getAllAsync(`SELECT * FROM Scores WHERE gameId = "${gameId}"`);
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE gameId = ?', [gameId]);
         return allRows;
     } catch (error) {
         console.error('Error getting scores:', error);
@@ -59,7 +59,7 @@ export const getHighScores = async (db) => {
 // Function to get high scores by game
 export const getHighScoreByGame = async (db, gameId) => {
     try {
-        const allRows = await db.getAllAsync(`SELECT * FROM Scores WHERE metric = "highScore" AND gameId = "${gameId}" ORDER BY SCORE DESC LIMIT 5`);
+        const allRows = await db.getAllAsync('SELECT * FROM Scores WHERE metric = ? AND gameId = ? ORDER BY score DESC LIMIT 5', ['highScore', gameId]);
         return allRows;
     } catch (error) {
         console.error('Error getting high scores:', error);
@@ -125,7 +125,7 @@ export const getWinLossCount = async (db) => {
 // Function to get win loss count by game
 export const getWinLossCountByGame = async (db, gameId) => {
     try {
-        const allRows = await db.getAllAsync(`SELECT score, COUNT(*) as count FROM Scores WHERE metric = "result" AND gameId = "${gameId}" GROUP BY score`);
+        const allRows = await db.getAllAsync('SELECT score, COUNT(*) as count FROM Scores WHERE metric = ? AND gameId = ? GROUP BY score', ['result', gameId]);
         return allRows;
     } catch (error) {
         console.error('Error getting win loss count:', error);
@@ -137,14 +137,17 @@ export const getWinLossCountByGame = async (db, gameId) => {
 export const checkCriteria = async (db, gameId, metric, threshold) => {
     try {
         let query;
+        let params;
         if (metric === 'result') {
-            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > 0 LIMIT 1`;
+            query = 'SELECT * FROM Scores WHERE gameId = ? AND metric = ? AND score > 0 LIMIT 1';
+            params = [gameId, metric];
         } else if (metric === 'highScore') {
-            query = `SELECT * FROM Scores WHERE gameId = "${gameId}" AND metric = "${metric}" AND score > ${threshold} ORDER BY score DESC LIMIT 1`;
+            query = 'SELECT * FROM Scores WHERE gameId = ? AND metric = ? AND score > ? ORDER BY score DESC LIMIT 1';
+            params = [gameId, metric, threshold];
         } else {
             throw new Error('Invalid metric');
         }
-        const allRows = await db.getAllAsync(query);
+        const allRows = await db.getAllAsync(query, params);
         return allRows.length > 0;
     } catch (error) {
         console.error('Error checking criteria:', error);

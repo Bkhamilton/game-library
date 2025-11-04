@@ -59,6 +59,16 @@ export const createTables = async (db) => {
             FOREIGN KEY (achievementId) REFERENCES Achievements(id),
             UNIQUE(userId, achievementId)
         );
+
+        -- Performance indexes for frequently queried columns
+        CREATE INDEX IF NOT EXISTS idx_scores_gameid ON Scores(gameId);
+        CREATE INDEX IF NOT EXISTS idx_scores_metric ON Scores(metric);
+        CREATE INDEX IF NOT EXISTS idx_scores_gameid_metric ON Scores(gameId, metric);
+        CREATE INDEX IF NOT EXISTS idx_scores_gameid_metric_difficulty ON Scores(gameId, metric, difficulty);
+        CREATE INDEX IF NOT EXISTS idx_scores_createdat ON Scores(createdAt);
+        CREATE INDEX IF NOT EXISTS idx_userachievements_userid ON UserAchievements(userId);
+        CREATE INDEX IF NOT EXISTS idx_userachievements_unlocked ON UserAchievements(userId, unlocked);
+        CREATE INDEX IF NOT EXISTS idx_games_title ON Games(title);
     `);
 };
 
