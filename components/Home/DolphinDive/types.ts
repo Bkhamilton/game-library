@@ -20,6 +20,7 @@ export interface Obstacle {
     width: number;
     height: number;
     color: string;
+    scale?: number;
 }
 
 export interface Collectible {
