@@ -17,8 +17,8 @@ export const ROCK_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/rock
 export const SPRITE_CONFIGS = {
     dolphin: { frameCount: 6, frameWidth: 256, frameHeight: 100, fps: 8 },
     seagull: { frameCount: 9, frameWidth: 256, frameHeight: 256, fps: 12 },
-    jellyfish: { frameCount: 4, frameWidth: 256, frameHeight: 256, fps: 8 },
-    boat: { frameCount: 5, frameWidth: 256, frameHeight: 256, fps: 10 },
+    jellyfish: { frameCount: 4, frameWidth: 256, frameHeight: 185, fps: 8 },
+    boat: { frameCount: 5, frameWidth: 256, frameHeight: 131, fps: 10 },
     buoy: { frameCount: 4, frameWidth: 128, frameHeight: 128, fps: 8 },
     rock: { frameCount: 4, frameWidth: 128, frameHeight: 128, fps: 8 },
 };

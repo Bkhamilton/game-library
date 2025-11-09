@@ -99,7 +99,7 @@ export const generateObstacle = (screenWidth: number): any => {
             // Sits on water surface, dolphin must go completely under
             y = WATER_SURFACE_Y - 40;  // Partially in water
             width = 256;
-            height = 256;
+            height = 131;
             color = '#D32F2F'; // Red
             scale = 0.8; // Scale down to 80% of original size
             break;
@@ -122,16 +122,16 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'buoy':
             // At surface level, can go under or shallow jump over
             y = WATER_SURFACE_Y - 30;
-            width = 256;
-            height = 256;
+            width = 128;
+            height = 128;
             color = '#FBC02D'; // Yellow
             scale = 0.5; // Scale down to 50% of original size
             break;
         case 'rock':
             // Underwater obstacle, must avoid while diving
             y = WATER_SURFACE_Y + 50;
-            width = 256;
-            height = 256;
+            width = 128;
+            height = 128;
             color = '#757575'; // Gray
             scale = 0.5; // Scale down to 50% of original size
             break;
@@ -139,7 +139,7 @@ export const generateObstacle = (screenWidth: number): any => {
             // Deep underwater, forces player to stay shallow
             y = WATER_SURFACE_Y + 150;
             width = 256;
-            height = 256;
+            height = 185;
             color = '#9C27B0'; // Purple
             scale = 0.6; // Scale down to 60% of original size
             break;
