@@ -6,12 +6,12 @@ export const SEAGULL_SPRITE = require("@/assets/images/DolphinDive/seagullSprite
 export const JELLYFISH_SPRITE = require("@/assets/images/DolphinDive/jellyfishSprite.png");
 
 // Sprite sheets
-export const DOLPHIN_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/dolphinSheet.PNG");
-export const SEAGULL_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/seagullSheet.PNG");
-export const JELLYFISH_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/jellyfishSheet.PNG");
-export const BOAT_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/boatSheet.PNG");
-export const BUOY_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/buoySheet.PNG");
-export const ROCK_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/rockSheet.PNG");
+export const DOLPHIN_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/dolphinSheet.png");
+export const SEAGULL_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/seagullSheet.png");
+export const JELLYFISH_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/jellyfishSheet.png");
+export const BOAT_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/boatSheet.png");
+export const BUOY_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/buoySheet.png");
+export const ROCK_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/rockSheet.png");
 
 // Sprite sheet configurations
 export const SPRITE_CONFIGS = {
