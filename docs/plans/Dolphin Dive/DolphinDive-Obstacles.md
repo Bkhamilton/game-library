@@ -165,6 +165,7 @@ The obstacle generation has been tested to ensure:
 - Sprite sheets are now implemented for most obstacle types (boat, seagull, buoy, rock, jellyfish)
 - The scale property allows flexible sizing - sprites can be created at high resolution and scaled down for display
 - All sprite sheets are created at 256×256 base size and scaled to 128×128 for most obstacles
+- The SpriteSheet component automatically calculates the correct scale factor to match sprite frame dimensions to container dimensions, ensuring proper display and animation
 - The boat obstacle fulfills the requirement for "an obstacle that sits in the water in such a way that the dolphin has to go under it the entire way"
 - All obstacles are designed for an endless runner style game with vertical movement
 - BigBoat still uses colored rectangles as a placeholder until sprite sheets are created
