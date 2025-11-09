@@ -9,7 +9,6 @@ export interface GameState {
     velocity: number;
     isJumping: boolean;
     gravity: number;
-    spriteFrame: number;
     isHolding: boolean;
 }
 

@@ -1,5 +1,13 @@
 import { Dimensions } from "react-native";
 
+// Sprite sheets
+export const OSTRICH_SHEET = require("@/assets/images/ostrichHaul/ostrichSheet.png");
+
+// Sprite sheet configurations
+export const SPRITE_CONFIGS = {
+    ostrich: { frameCount: 3, frameWidth: 256, frameHeight: 192, fps: 10 },
+};
+
 // Difficulty settings
 export const DIFFICULTY_SETTINGS = {
     Easy: { obstacleSpeed: 2000, minSpawnRate: 1500, maxSpawnRate: 2500, cloudSpeed: 4000 },
@@ -37,9 +45,6 @@ export const OBSTACLE_HEIGHT = 100;
 // Obstacle spawn probabilities
 export const SPIKE1_SPAWN_RATE = 0.65; // 65% chance
 export const SPIKE2_SPAWN_RATE = 0.35; // 35% chance
-
-// Sprite animation
-export const SPRITE_ANIMATION_INTERVAL = 70; // ms
 
 // Game loop
 export const GAME_LOOP_FPS = 60;

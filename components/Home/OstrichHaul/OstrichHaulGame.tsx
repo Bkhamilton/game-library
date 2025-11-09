@@ -17,7 +17,6 @@ import {
     maxJumpVelocity,
     OSTRICH_HEIGHT,
     OSTRICH_OFFSET,
-    SPRITE_ANIMATION_INTERVAL,
     GAME_LOOP_FPS,
     OBSTACLE_WIDTH,
     CLOUD_MIN_SPAWN_RATE,
@@ -41,7 +40,6 @@ export default function OstrichHaulGame() {
         velocity: 0,
         isJumping: false,
         gravity: 1,
-        spriteFrame: 0,
         isHolding: false,
     });
     const [obstacles, setObstacles] = useState<ObstacleType[]>([]);
@@ -207,19 +205,6 @@ export default function OstrichHaulGame() {
         }
     }, [gameState.isJumping, gameState.velocity, gameState.isHolding]);
 
-    useEffect(() => {
-        if (isGameRunning) {
-            const spriteInterval = setInterval(() => {
-                setGameState((prev) => ({
-                    ...prev,
-                    spriteFrame: (prev.spriteFrame + 1) % OSTRICH_SPRITE_COUNT,
-                }));
-            }, SPRITE_ANIMATION_INTERVAL);
-
-            return () => clearInterval(spriteInterval);
-        }
-    }, [isGameRunning]);
-
     const startGame = () => {
         setIsGameRunning(true);
         setPosition({
@@ -230,7 +215,6 @@ export default function OstrichHaulGame() {
             velocity: 0,
             isJumping: false,
             gravity: 1,
-            spriteFrame: 0,
             isHolding: false,
         });
         setObstacles([]);
@@ -269,7 +253,7 @@ export default function OstrichHaulGame() {
             ))}
             <View style={styles.ground} />
             <TouchableOpacity style={styles.screen} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={1}>
-                <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
+                <Ostrich y={position.y} x={position.x} />
                 {obstacles.map((obstacle) => (
                     <Obstacle key={obstacle.key} x={obstacle.x} variant={obstacle.variant} width={obstacle.width} />
                 ))}
