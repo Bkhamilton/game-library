@@ -16,6 +16,8 @@ export interface GameState {
 export interface Obstacle {
     key: string;
     x: Animated.Value;
+    variant: 1 | 2;
+    width: number;
 }
 
 export interface Cloud {
