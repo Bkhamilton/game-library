@@ -50,7 +50,7 @@ describe('OstrichHaul Utils', () => {
       const result = selectSpikeVariant();
       expect([1, 2]).toContain(result.variant);
       if (result.variant === 1) {
-        expect(result.width).toBe(50);
+        expect(result.width).toBe(64);
       } else {
         expect(result.width).toBe(80);
       }
