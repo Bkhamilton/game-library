@@ -30,11 +30,18 @@ export const SpriteSheet: React.FC<SpriteSheetProps> = ({
     useEffect(() => {
         const interval = setInterval(() => {
             frameIndex.current = (frameIndex.current + 1) % frameCount;
-            translateX.setValue(-frameIndex.current * frameWidth);
+            const newTranslateX = -frameIndex.current * frameWidth;
+            
+            // Use timing for smooth transition or setValue for instant
+            Animated.timing(translateX, {
+                toValue: newTranslateX,
+                duration: 0, // Instant frame change
+                useNativeDriver: true,
+            }).start();
         }, 1000 / fps);
 
         return () => clearInterval(interval);
-    }, [frameCount, frameWidth, fps]);
+    }, [frameCount, frameWidth, fps, translateX]);
 
     return (
         <Animated.View
