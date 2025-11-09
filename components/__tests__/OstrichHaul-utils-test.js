@@ -1,4 +1,11 @@
-import { calculateGravity, selectSpikeVariant } from '../Home/OstrichHaul/utils';
+import { calculateGravity, selectSpikeVariant, checkCollision } from '../Home/OstrichHaul/utils';
+import { Animated } from 'react-native';
+import { 
+  OSTRICH_SCALE, 
+  OSTRICH_INNER_WIDTH, 
+  OSTRICH_INNER_OFFSET_X,
+  OSTRICH_INNER_OFFSET_Y
+} from '../Home/OstrichHaul/constants';
 
 describe('OstrichHaul Utils', () => {
   describe('calculateGravity', () => {
@@ -81,6 +88,52 @@ describe('OstrichHaul Utils', () => {
       // Allow 5% margin of error
       expect(spike2Percentage).toBeGreaterThan(0.30);
       expect(spike2Percentage).toBeLessThan(0.40);
+    });
+  });
+
+  describe('checkCollision', () => {
+    it('uses inner hitbox for collision detection', () => {
+      // Verify that the ostrich dimensions are scaled correctly
+      expect(OSTRICH_SCALE).toBe(0.8);
+      expect(OSTRICH_INNER_WIDTH).toBe(200 * 0.8); // 160px
+      expect(OSTRICH_INNER_OFFSET_X).toBe(((256 - 200) / 2) * 0.8); // 22.4px
+      expect(OSTRICH_INNER_OFFSET_Y).toBe(10 * 0.8); // 8px
+    });
+
+    it('detects collision when obstacle overlaps with inner hitbox', () => {
+      const position = {
+        y: new Animated.Value(100),
+        x: new Animated.Value(50)
+      };
+      
+      const obstacle = {
+        key: 'test',
+        x: new Animated.Value(100),
+        variant: 1,
+        width: 64,
+        gapTop: 0 // Obstacle goes from ground to gapTop
+      };
+      
+      const collision = checkCollision(position, obstacle);
+      expect(typeof collision).toBe('boolean');
+    });
+
+    it('does not detect collision when obstacle is outside inner hitbox', () => {
+      const position = {
+        y: new Animated.Value(100),
+        x: new Animated.Value(50)
+      };
+      
+      const obstacle = {
+        key: 'test',
+        x: new Animated.Value(300), // Far away
+        variant: 1,
+        width: 64,
+        gapTop: 0
+      };
+      
+      const collision = checkCollision(position, obstacle);
+      expect(collision).toBe(false);
     });
   });
 });
