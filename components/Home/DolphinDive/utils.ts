@@ -92,6 +92,7 @@ export const generateObstacle = (screenWidth: number): any => {
     let width: number;
     let height: number;
     let color: string;
+    let scale: number;
     
     switch(type) {
         case 'boat':
@@ -100,6 +101,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 256;
             height = 256;
             color = '#D32F2F'; // Red
+            scale = 0.5; // Scale down to 50% of original size
             break;
         case 'bigBoat':
             // Large boat obstacle, requires significant vertical movement
@@ -107,6 +109,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 230;
             height = 100;
             color = '#C2185B'; // Pink
+            scale = 1.0; // Keep at original size (no sprite sheet for bigBoat)
             break;
         case 'seagull':
             // High in air, requires deep dive to jump over
@@ -114,6 +117,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 256;
             height = 256;
             color = '#1976D2'; // Blue
+            scale = 0.5; // Scale down to 50% of original size
             break;
         case 'buoy':
             // At surface level, can go under or shallow jump over
@@ -121,6 +125,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 256;
             height = 256;
             color = '#FBC02D'; // Yellow
+            scale = 0.5; // Scale down to 50% of original size
             break;
         case 'rock':
             // Underwater obstacle, must avoid while diving
@@ -128,6 +133,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 256;
             height = 256;
             color = '#757575'; // Gray
+            scale = 0.5; // Scale down to 50% of original size
             break;
         case 'jellyfish':
             // Deep underwater, forces player to stay shallow
@@ -135,12 +141,14 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 60;
             height = 85;
             color = '#9C27B0'; // Purple
+            scale = 1.0; // Keep at original size (already small)
             break;
         default:
             y = WATER_SURFACE_Y;
             width = 50;
             height = 50;
             color = '#000000';
+            scale = 1.0;
     }
     
     return {
@@ -148,8 +156,9 @@ export const generateObstacle = (screenWidth: number): any => {
         x: screenWidth,
         y,
         type,
-        width,
-        height,
+        width: width * scale,
+        height: height * scale,
         color,
+        scale,
     };
 };
