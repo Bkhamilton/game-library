@@ -97,8 +97,8 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'boat':
             // Sits on water surface, dolphin must go completely under
             y = WATER_SURFACE_Y - 40;  // Partially in water
-            width = 120;
-            height = 80;
+            width = 256;
+            height = 256;
             color = '#D32F2F'; // Red
             break;
         case 'bigBoat':
@@ -111,22 +111,22 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'seagull':
             // High in air, requires deep dive to jump over
             y = WATER_SURFACE_Y - 200;
-            width = 80;
-            height = 50;
+            width = 256;
+            height = 256;
             color = '#1976D2'; // Blue
             break;
         case 'buoy':
             // At surface level, can go under or shallow jump over
             y = WATER_SURFACE_Y - 30;
-            width = 40;
-            height = 60;
+            width = 256;
+            height = 256;
             color = '#FBC02D'; // Yellow
             break;
         case 'rock':
             // Underwater obstacle, must avoid while diving
             y = WATER_SURFACE_Y + 50;
-            width = 60;
-            height = 50;
+            width = 256;
+            height = 256;
             color = '#757575'; // Gray
             break;
         case 'jellyfish':

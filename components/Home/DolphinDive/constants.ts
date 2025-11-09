@@ -15,7 +15,7 @@ export const ROCK_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/rock
 
 // Sprite sheet configurations
 export const SPRITE_CONFIGS = {
-    dolphin: { frameCount: 6, frameWidth: 256, frameHeight: 256, fps: 12 },
+    dolphin: { frameCount: 6, frameWidth: 256, frameHeight: 100, fps: 8 },
     seagull: { frameCount: 9, frameWidth: 256, frameHeight: 256, fps: 12 },
     jellyfish: { frameCount: 4, frameWidth: 256, frameHeight: 256, fps: 8 },
     boat: { frameCount: 5, frameWidth: 256, frameHeight: 256, fps: 10 },
@@ -48,9 +48,9 @@ export const MAX_JUMP_SPEED = 28;             // px/frame (upward)
 export const EXIT_VELOCITY_INFLUENCE = 0.8;   // Maximum height above water
 
 // Dolphin properties
-export const DOLPHIN_WIDTH = 138;
-export const DOLPHIN_HEIGHT = 60;
-export const DOLPHIN_X = 60;                 // Fixed X position
+export const DOLPHIN_WIDTH = 256;
+export const DOLPHIN_HEIGHT = 100;
+export const DOLPHIN_X = 20;                 // Fixed X position
 
 // Colors
 export const OCEAN_BLUE = '#006994';          // Ocean water color
