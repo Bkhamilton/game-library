@@ -5,7 +5,7 @@ export const OSTRICH_SHEET = require("@/assets/images/ostrichHaul/ostrichSheet.p
 
 // Sprite sheet configurations
 export const SPRITE_CONFIGS = {
-    ostrich: { frameCount: 3, frameWidth: 256, frameHeight: 192, fps: 10 },
+    ostrich: { frameCount: 10, frameWidth: 256, frameHeight: 192, fps: 10 },
 };
 
 // Difficulty settings
@@ -30,8 +30,8 @@ export const maxJumpHeight = 250; // Maximum jump height when holding
 export const glideGravity = 0.3; // Reduced gravity when gliding down
 
 // Ostrich dimensions
-export const OSTRICH_WIDTH = 100;
-export const OSTRICH_HEIGHT = 121;
+export const OSTRICH_WIDTH = 256;
+export const OSTRICH_HEIGHT = 192;
 export const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the ground
 
 // Collision constants
