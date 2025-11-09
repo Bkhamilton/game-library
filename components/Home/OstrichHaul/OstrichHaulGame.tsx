@@ -28,7 +28,7 @@ import {
     CLOUD_MAX_Y
 } from "./constants";
 import { Position, GameState, Obstacle as ObstacleType, Cloud as CloudType } from "./types";
-import { checkCollision, calculateGravity, getRandomSpawnRate } from "./utils";
+import { checkCollision, calculateGravity, getRandomSpawnRate, selectSpikeVariant } from "./utils";
 
 export default function OstrichHaulGame() {
     const router = useRouter();
@@ -117,7 +117,7 @@ export default function OstrichHaulGame() {
                 obstacles.forEach((obstacle) => {
                     if (checkCollision(position, obstacle)) {
                         handleLoss();
-                    } else if (!passedObstacles.includes(obstacle.key) && position.x.__getValue() > obstacle.x.__getValue() + OBSTACLE_WIDTH) {
+                    } else if (!passedObstacles.includes(obstacle.key) && position.x.__getValue() > obstacle.x.__getValue() + obstacle.width) {
                         setScore((prevScore) => prevScore + 1);
                         setPassedObstacles((prevPassedObstacles) => [...prevPassedObstacles, obstacle.key]);
                     }
@@ -133,14 +133,17 @@ export default function OstrichHaulGame() {
             let spawnTimeout: NodeJS.Timeout;
 
             const spawnObstacle = () => {
+                const { variant, width } = selectSpikeVariant();
                 const newObstacle = {
                     key: Math.random().toString(),
                     x: new Animated.Value(screenWidth),
+                    variant,
+                    width,
                 };
                 setObstacles((prevObstacles) => [...prevObstacles, newObstacle]);
 
                 Animated.timing(newObstacle.x, {
-                    toValue: -50,
+                    toValue: -100,
                     duration: settings.obstacleSpeed,
                     easing: Easing.linear,
                     useNativeDriver: false,
@@ -268,7 +271,7 @@ export default function OstrichHaulGame() {
             <TouchableOpacity style={styles.screen} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={1}>
                 <Ostrich y={position.y} x={position.x} spriteFrame={gameState.spriteFrame} />
                 {obstacles.map((obstacle) => (
-                    <Obstacle key={obstacle.key} x={obstacle.x} />
+                    <Obstacle key={obstacle.key} x={obstacle.x} variant={obstacle.variant} width={obstacle.width} />
                 ))}
             </TouchableOpacity>
             {!isGameRunning && (

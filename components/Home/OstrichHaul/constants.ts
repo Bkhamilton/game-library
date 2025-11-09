@@ -31,7 +31,12 @@ export const COLLISION_ADJUST = 20; // Amount to reduce collision box size
 
 // Obstacle dimensions
 export const OBSTACLE_WIDTH = 50;
+export const OBSTACLE_WIDTH_SPIKE2 = 80;
 export const OBSTACLE_HEIGHT = 100;
+
+// Obstacle spawn probabilities
+export const SPIKE1_SPAWN_RATE = 0.65; // 65% chance
+export const SPIKE2_SPAWN_RATE = 0.35; // 35% chance
 
 // Sprite animation
 export const SPRITE_ANIMATION_INTERVAL = 70; // ms
