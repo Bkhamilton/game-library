@@ -30,9 +30,16 @@ export const maxJumpHeight = 250; // Maximum jump height when holding
 export const glideGravity = 0.3; // Reduced gravity when gliding down
 
 // Ostrich dimensions
-export const OSTRICH_WIDTH = 256;
-export const OSTRICH_HEIGHT = 192;
+export const OSTRICH_SCALE = 0.8; // Scale down the ostrich to 80%
+export const OSTRICH_WIDTH = 256 * OSTRICH_SCALE; // Scaled sprite width
+export const OSTRICH_HEIGHT = 192 * OSTRICH_SCALE; // Scaled sprite height
 export const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the ground
+
+// Inner hitbox dimensions (actual ostrich within the sprite)
+// The actual ostrich is ~200px wide, centered in the 256px sprite
+export const OSTRICH_INNER_WIDTH = 200 * OSTRICH_SCALE; // Actual ostrich width
+export const OSTRICH_INNER_OFFSET_X = ((256 - 200) / 2) * OSTRICH_SCALE; // Horizontal offset to center the hitbox
+export const OSTRICH_INNER_OFFSET_Y = 10 * OSTRICH_SCALE; // Vertical offset for better hitbox alignment
 
 // Collision constants
 export const COLLISION_ADJUST = 20; // Amount to reduce collision box size

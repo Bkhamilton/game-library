@@ -1,7 +1,10 @@
 import { Animated } from "react-native";
 import { 
     OSTRICH_WIDTH, 
-    OSTRICH_HEIGHT, 
+    OSTRICH_HEIGHT,
+    OSTRICH_INNER_WIDTH,
+    OSTRICH_INNER_OFFSET_X,
+    OSTRICH_INNER_OFFSET_Y,
     COLLISION_ADJUST, 
     groundLevel,
     OBSTACLE_WIDTH,
@@ -24,12 +27,14 @@ export const selectSpikeVariant = (): { variant: 1 | 2; width: number } => {
 
 /**
  * Check if the ostrich collides with an obstacle
+ * Uses the inner hitbox that represents the actual ostrich, not the full sprite
  */
 export const checkCollision = (position: Position, obstacle: Obstacle): boolean => {
-    const ostrichTop = position.y.__getValue() + COLLISION_ADJUST;
-    const ostrichBottom = ostrichTop + OSTRICH_HEIGHT - COLLISION_ADJUST * 2;
-    const ostrichLeft = position.x.__getValue() + COLLISION_ADJUST;
-    const ostrichRight = ostrichLeft + OSTRICH_WIDTH - COLLISION_ADJUST * 2;
+    // Calculate the inner hitbox position (actual ostrich within the sprite)
+    const ostrichTop = position.y.__getValue() + OSTRICH_INNER_OFFSET_Y + COLLISION_ADJUST;
+    const ostrichBottom = ostrichTop + OSTRICH_HEIGHT - OSTRICH_INNER_OFFSET_Y - COLLISION_ADJUST * 2;
+    const ostrichLeft = position.x.__getValue() + OSTRICH_INNER_OFFSET_X + COLLISION_ADJUST;
+    const ostrichRight = ostrichLeft + OSTRICH_INNER_WIDTH - COLLISION_ADJUST * 2;
 
     const obstacleLeft = obstacle.x.__getValue();
     const obstacleRight = obstacleLeft + obstacle.width;
