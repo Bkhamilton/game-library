@@ -101,7 +101,7 @@ export const generateObstacle = (screenWidth: number): any => {
             width = 256;
             height = 256;
             color = '#D32F2F'; // Red
-            scale = 0.5; // Scale down to 50% of original size
+            scale = 0.8; // Scale down to 80% of original size
             break;
         case 'bigBoat':
             // Large boat obstacle, requires significant vertical movement
@@ -138,10 +138,10 @@ export const generateObstacle = (screenWidth: number): any => {
         case 'jellyfish':
             // Deep underwater, forces player to stay shallow
             y = WATER_SURFACE_Y + 150;
-            width = 60;
-            height = 85;
+            width = 256;
+            height = 256;
             color = '#9C27B0'; // Purple
-            scale = 1.0; // Keep at original size (already small)
+            scale = 0.6; // Scale down to 60% of original size
             break;
         default:
             y = WATER_SURFACE_Y;
