@@ -38,7 +38,7 @@ export const OSTRICH_OFFSET = 60; // Amount to lift the ostrich up from the grou
 export const COLLISION_ADJUST = 20; // Amount to reduce collision box size
 
 // Obstacle dimensions
-export const OBSTACLE_WIDTH = 50;
+export const OBSTACLE_WIDTH = 64;
 export const OBSTACLE_WIDTH_SPIKE2 = 80;
 export const OBSTACLE_HEIGHT = 100;
 
