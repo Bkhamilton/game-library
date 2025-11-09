@@ -166,7 +166,7 @@ export default function DolphinDiveGame() {
     useEffect(() => {
         if (!isGameRunning) return;
 
-        let spawnTimeout: number;
+        let spawnTimeout: ReturnType<typeof setTimeout>;
 
         const spawnObstacle = () => {
             const newObstacle = generateObstacle(SCREEN_WIDTH);
