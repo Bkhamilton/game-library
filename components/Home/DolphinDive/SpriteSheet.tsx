@@ -26,11 +26,14 @@ export const SpriteSheet: React.FC<SpriteSheetProps> = ({
 }) => {
     const frameIndex = useRef(0);
     const translateX = useRef(new Animated.Value(0)).current;
+    // Calculate scale factor for proper frame positioning
+    const scale = width / frameWidth;
 
     useEffect(() => {
         const interval = setInterval(() => {
             frameIndex.current = (frameIndex.current + 1) % frameCount;
-            const newTranslateX = -frameIndex.current * frameWidth;
+            // Use scaled frame width for translateX calculation
+            const newTranslateX = -frameIndex.current * frameWidth * scale;
             
             // Use timing for smooth transition or setValue for instant
             Animated.timing(translateX, {
@@ -41,7 +44,7 @@ export const SpriteSheet: React.FC<SpriteSheetProps> = ({
         }, 1000 / fps);
 
         return () => clearInterval(interval);
-    }, [frameCount, frameWidth, fps, translateX]);
+    }, [frameCount, frameWidth, fps, translateX, width, scale]);
 
     return (
         <Animated.View
@@ -58,8 +61,8 @@ export const SpriteSheet: React.FC<SpriteSheetProps> = ({
             <Animated.Image
                 source={source}
                 style={{
-                    width: frameWidth * frameCount,
-                    height: frameHeight,
+                    width: frameWidth * frameCount * scale,
+                    height: frameHeight * scale,
                     transform: [{ translateX }],
                 }}
                 resizeMode="stretch"
