@@ -8,49 +8,63 @@ This document describes the obstacle system implemented for the DolphinDive endl
 
 ### 1. Boat 🚤 (Red)
 - **Color:** Red (#D32F2F)
-- **Size:** 120px wide × 80px tall
+- **Sprite Sheet:** 256px × 256px (5 frames)
+- **Display Size:** 128px × 128px (scale: 0.5)
 - **Position:** 40px above water surface (Y = 360)
 - **Challenge:** Sits in the water - dolphin must dive completely under it
 - **Strategy:** Forces the player to go underwater, making it impossible to jump over
-- **Visual:** Large red rectangular box
+- **Visual:** Animated sprite sheet scaled to 50% of original size
 
 ### 2. Seagull 🐦 (Blue)
 - **Color:** Blue (#1976D2)
-- **Size:** 50px wide × 40px tall
+- **Sprite Sheet:** 256px × 256px (9 frames)
+- **Display Size:** 128px × 128px (scale: 0.5)
 - **Position:** 200px above water surface (Y = 200)
 - **Challenge:** High in the air - requires maximum jump height
 - **Strategy:** Player must perform a deep dive first to build enough momentum for a high jump
-- **Visual:** Small blue rectangular box
+- **Visual:** Animated sprite sheet scaled to 50% of original size
 
 ### 3. Buoy ⚓ (Yellow)
 - **Color:** Yellow (#FBC02D)
-- **Size:** 40px wide × 60px tall
+- **Sprite Sheet:** 256px × 256px (4 frames)
+- **Display Size:** 128px × 128px (scale: 0.5)
 - **Position:** 30px above water surface (Y = 370)
 - **Challenge:** Near surface level - can be avoided by going under or with a shallow jump
 - **Strategy:** Offers flexibility - players can choose to dive slightly or jump slightly
-- **Visual:** Tall yellow rectangular box
+- **Visual:** Animated sprite sheet scaled to 50% of original size
 
 ### 4. Rock 🪨 (Gray)
 - **Color:** Gray (#757575)
-- **Size:** 60px wide × 50px tall
-- **Position:** 75px below water surface (Y = 475)
+- **Sprite Sheet:** 256px × 256px (4 frames)
+- **Display Size:** 128px × 128px (scale: 0.5)
+- **Position:** 50px below water surface (Y = 450)
 - **Challenge:** Underwater obstacle that blocks diving paths
 - **Strategy:** Player must stay shallow or time their dive to avoid it
-- **Visual:** Wide gray rectangular box
+- **Visual:** Animated sprite sheet scaled to 50% of original size
 
 ### 5. Jellyfish 🪼 (Purple)
 - **Color:** Purple (#9C27B0)
-- **Size:** 55px wide × 65px tall
+- **Sprite Sheet:** 256px × 256px (4 frames)
+- **Display Size:** 60px × 85px (scale: 1.0, custom size)
 - **Position:** 150px below water surface (Y = 550)
 - **Challenge:** Deep underwater - punishes overly aggressive diving
 - **Strategy:** Forces players to moderate dive depth and not go too deep
-- **Visual:** Purple rectangular box
+- **Visual:** Animated sprite sheet at custom size
+
+### 6. Big Boat 🚢 (Pink)
+- **Color:** Pink (#C2185B)
+- **Size:** 230px × 100px (no sprite sheet)
+- **Display Size:** 230px × 100px (scale: 1.0)
+- **Position:** 50px above water surface (Y = 350)
+- **Challenge:** Large boat obstacle, requires significant vertical movement
+- **Strategy:** Requires deeper dive or higher jump to avoid
+- **Visual:** Colored rectangle (sprite sheet to be added)
 
 ## Technical Implementation
 
 ### Type System
 ```typescript
-export type ObstacleType = 'boat' | 'seagull' | 'buoy' | 'rock' | 'jellyfish';
+export type ObstacleType = 'boat' | 'seagull' | 'buoy' | 'rock' | 'jellyfish' | 'bigBoat';
 
 export interface Obstacle {
     key: string;
@@ -60,8 +74,17 @@ export interface Obstacle {
     width: number;
     height: number;
     color: string;
+    scale?: number;  // Optional scale factor for sprite sheets
 }
 ```
+
+### Scaling System
+Obstacles now support sprite sheet scaling to allow fine-tuning of displayed sizes:
+- **Sprite sheets** are created at a base size (typically 256×256)
+- **Scale property** determines the displayed size (e.g., 0.5 = 50% of original)
+- **Width and height** are calculated as: `originalSize * scale`
+- Most obstacles use a 0.5 scale to reduce the 256×256 sprite sheets to 128×128
+- Jellyfish and bigBoat keep their original sizes (scale: 1.0)
 
 ### Obstacle Generation
 Obstacles are randomly generated using the `generateObstacle()` function in `utils.ts`:
@@ -117,13 +140,15 @@ The boat obstacle is particularly interesting because:
 ## Future Enhancements
 
 Potential improvements for the obstacle system:
-1. Replace colored boxes with actual sprite graphics
-2. Add animation to obstacles (bobbing boats, flying seagulls)
-3. Implement obstacle combinations/patterns
-4. Add visual warnings before obstacles spawn
-5. Create special/rare obstacle types
-6. Add particle effects for obstacle interactions
-7. Implement difficulty scaling (more obstacles over time)
+1. ✅ Replace colored boxes with actual sprite graphics (COMPLETED - sprite sheets implemented)
+2. ✅ Add animation to obstacles (COMPLETED - using animated sprite sheets)
+3. Add sprite sheet for bigBoat obstacle type
+4. Implement obstacle combinations/patterns
+5. Add visual warnings before obstacles spawn
+6. Create special/rare obstacle types
+7. Add particle effects for obstacle interactions
+8. Implement difficulty scaling (more obstacles over time)
+9. Fine-tune scale values for better gameplay balance
 
 ## Testing
 
@@ -137,7 +162,9 @@ The obstacle generation has been tested to ensure:
 
 ## Notes
 
-- Using colored boxes instead of sprites was an intentional design choice for rapid prototyping
+- Sprite sheets are now implemented for most obstacle types (boat, seagull, buoy, rock, jellyfish)
+- The scale property allows flexible sizing - sprites can be created at high resolution and scaled down for display
+- All sprite sheets are created at 256×256 base size and scaled to 128×128 for most obstacles
 - The boat obstacle fulfills the requirement for "an obstacle that sits in the water in such a way that the dolphin has to go under it the entire way"
 - All obstacles are designed for an endless runner style game with vertical movement
-- No sprite assets are required - the colored boxes provide clear visual distinction
+- BigBoat still uses colored rectangles as a placeholder until sprite sheets are created
