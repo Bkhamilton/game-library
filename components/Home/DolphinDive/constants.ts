@@ -1,8 +1,27 @@
 // DolphinDive Game Constants
 
+// Static sprites (kept for backwards compatibility)
 export const DOLPHIN_SPRITE = require("@/assets/images/DolphinDive/dolphinSprite.png");
 export const SEAGULL_SPRITE = require("@/assets/images/DolphinDive/seagullSprite.png");
 export const JELLYFISH_SPRITE = require("@/assets/images/DolphinDive/jellyfishSprite.png");
+
+// Sprite sheets
+export const DOLPHIN_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/dolphinSheet.PNG");
+export const SEAGULL_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/seagullSheet.PNG");
+export const JELLYFISH_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/jellyfishSheet.PNG");
+export const BOAT_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/boatSheet.PNG");
+export const BUOY_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/buoySheet.PNG");
+export const ROCK_SHEET = require("@/assets/images/DolphinDive/SpriteSheets/rockSheet.PNG");
+
+// Sprite sheet configurations
+export const SPRITE_CONFIGS = {
+    dolphin: { frameCount: 6, frameWidth: 256, frameHeight: 256, fps: 12 },
+    seagull: { frameCount: 9, frameWidth: 256, frameHeight: 256, fps: 12 },
+    jellyfish: { frameCount: 4, frameWidth: 256, frameHeight: 256, fps: 8 },
+    boat: { frameCount: 5, frameWidth: 256, frameHeight: 256, fps: 10 },
+    buoy: { frameCount: 4, frameWidth: 128, frameHeight: 128, fps: 8 },
+    rock: { frameCount: 4, frameWidth: 128, frameHeight: 128, fps: 8 },
+};
 
 // Screen dimensions
 export const SCREEN_WIDTH = 375;

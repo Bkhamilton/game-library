@@ -1,25 +1,31 @@
 // Dolphin Component
 
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
-import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X, DOLPHIN_SPRITE } from './constants';
+import { StyleSheet } from 'react-native';
+import { DOLPHIN_WIDTH, DOLPHIN_HEIGHT, DOLPHIN_X, DOLPHIN_SHEET, SPRITE_CONFIGS } from './constants';
+import { SpriteSheet } from './SpriteSheet';
 
 interface DolphinProps {
     y: number;
 }
 
 export const Dolphin: React.FC<DolphinProps> = ({ y }) => {
+    const config = SPRITE_CONFIGS.dolphin;
+    
     return (
-        <Image
-            source={DOLPHIN_SPRITE}
-            resizeMethod="scale"
-            style={[
-                styles.dolphin,
-                {
-                    left: DOLPHIN_X,
-                    top: y,
-                },
-            ]}
+        <SpriteSheet
+            source={DOLPHIN_SHEET}
+            frameCount={config.frameCount}
+            frameWidth={config.frameWidth}
+            frameHeight={config.frameHeight}
+            fps={config.fps}
+            width={DOLPHIN_WIDTH}
+            height={DOLPHIN_HEIGHT}
+            style={{
+                left: DOLPHIN_X,
+                top: y,
+                zIndex: 5,
+            }}
         />
     );
 };

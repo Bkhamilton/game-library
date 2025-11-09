@@ -1,9 +1,17 @@
 // Obstacle Component
 
 import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Obstacle as ObstacleType } from './types';
-import { SEAGULL_SPRITE, JELLYFISH_SPRITE } from './constants';
+import { 
+    SEAGULL_SHEET, 
+    JELLYFISH_SHEET, 
+    BOAT_SHEET, 
+    BUOY_SHEET, 
+    ROCK_SHEET,
+    SPRITE_CONFIGS 
+} from './constants';
+import { SpriteSheet } from './SpriteSheet';
 
 interface ObstacleProps {
     obstacle: ObstacleType;
@@ -33,31 +41,78 @@ export const Obstacle: React.FC<ObstacleProps> = ({ obstacle }) => {
             left: obstacle.x,
             top: obstacle.y,
             zIndex: getZIndex(type),
-            width: obstacle.width,
-            height: obstacle.height,
         };
 
-        if (type === 'seagull') {
-            return <Image source={SEAGULL_SPRITE} resizeMethod='scale' style={[styles.obstacle, commonStyle, {backgroundColor: 'transparent'}]} />;
-        }
+        // Get sprite sheet configuration based on obstacle type
+        let spriteSource;
+        let config;
 
-        if (type === 'jellyfish') {
-            return <Image source={JELLYFISH_SPRITE} resizeMethod='scale' style={[styles.obstacle, commonStyle, {backgroundColor: 'transparent'}]} />;
+        switch (type) {
+            case 'seagull':
+                spriteSource = SEAGULL_SHEET;
+                config = SPRITE_CONFIGS.seagull;
+                break;
+            case 'jellyfish':
+                spriteSource = JELLYFISH_SHEET;
+                config = SPRITE_CONFIGS.jellyfish;
+                break;
+            case 'boat':
+                spriteSource = BOAT_SHEET;
+                config = SPRITE_CONFIGS.boat;
+                break;
+            case 'buoy':
+                spriteSource = BUOY_SHEET;
+                config = SPRITE_CONFIGS.buoy;
+                break;
+            case 'rock':
+                spriteSource = ROCK_SHEET;
+                config = SPRITE_CONFIGS.rock;
+                break;
+            case 'bigBoat':
+                // BigBoat doesn't have a sprite sheet yet, use colored rectangle
+                return (
+                    <View
+                        style={[
+                            styles.obstacle,
+                            {
+                                left: obstacle.x,
+                                top: obstacle.y,
+                                width: obstacle.width,
+                                height: obstacle.height,
+                                backgroundColor: obstacle.color,
+                                zIndex: getZIndex(obstacle.type),
+                            },
+                        ]}
+                    />
+                );
+            default:
+                return (
+                    <View
+                        style={[
+                            styles.obstacle,
+                            {
+                                left: obstacle.x,
+                                top: obstacle.y,
+                                width: obstacle.width,
+                                height: obstacle.height,
+                                backgroundColor: obstacle.color,
+                                zIndex: getZIndex(obstacle.type),
+                            },
+                        ]}
+                    />
+                );
         }
 
         return (
-            <View
-                style={[
-                    styles.obstacle,
-                    {
-                        left: obstacle.x,
-                        top: obstacle.y,
-                        width: obstacle.width,
-                        height: obstacle.height,
-                        backgroundColor: obstacle.color,
-                        zIndex: getZIndex(obstacle.type),
-                    },
-                ]}
+            <SpriteSheet
+                source={spriteSource}
+                frameCount={config.frameCount}
+                frameWidth={config.frameWidth}
+                frameHeight={config.frameHeight}
+                fps={config.fps}
+                width={obstacle.width}
+                height={obstacle.height}
+                style={commonStyle}
             />
         );
     }
