@@ -1,45 +1,39 @@
 import React from "react";
-import { View, Image, StyleSheet, Animated } from "react-native";
+import { Animated } from "react-native";
+import { OSTRICH_SHEET, SPRITE_CONFIGS, OSTRICH_WIDTH, OSTRICH_HEIGHT } from "./constants";
+import { SpriteSheet } from "./SpriteSheet";
 
-const OSTRICH_SPRITES = [
-    require("@/assets/images/ostrichHaul/ostrichSprite1.png"),
-    require("@/assets/images/ostrichHaul/ostrichSprite2.png"),
-    require("@/assets/images/ostrichHaul/ostrichSprite3.png"),
-];
-
-export const OSTRICH_SPRITE_COUNT = OSTRICH_SPRITES.length;
+// Export for backwards compatibility
+export const OSTRICH_SPRITE_COUNT = SPRITE_CONFIGS.ostrich.frameCount;
 
 interface OstrichProps {
     y: Animated.Value;
     x: Animated.Value;
-    spriteFrame: number;
 }
 
-export const Ostrich = ({ y, x, spriteFrame }: OstrichProps) => {
+export const Ostrich = ({ y, x }: OstrichProps) => {
+    const config = SPRITE_CONFIGS.ostrich;
+    
     return (
         <Animated.View
-            style={[
-                styles.ostrichContainer,
-                {
-                    transform: [{ translateY: y }, { translateX: x }],
-                },
-            ]}
+            style={{
+                position: "absolute",
+                transform: [{ translateY: y }, { translateX: x }],
+            }}
         >
-            <Image source={OSTRICH_SPRITES[spriteFrame]} style={styles.ostrichImage} />
+            <SpriteSheet
+                source={OSTRICH_SHEET}
+                frameCount={config.frameCount}
+                frameWidth={config.frameWidth}
+                frameHeight={config.frameHeight}
+                fps={config.fps}
+                width={OSTRICH_WIDTH}
+                height={OSTRICH_HEIGHT}
+                style={{
+                    left: 0,
+                    top: 0,
+                }}
+            />
         </Animated.View>
     );
 };
-
-const styles = StyleSheet.create({
-    ostrichContainer: {
-        width: 100,
-        height: 121,
-        position: "absolute",
-        left: 15,
-    },
-    ostrichImage: {
-        width: "100%",
-        height: "100%",
-        resizeMode: "contain",
-    },
-});
