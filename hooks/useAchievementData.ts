@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { DBContext } from '@/contexts/DBContext';
 import { getUserAchievementsWithGames, getUserTotalPoints } from '@/db/Achievements/Achievements';
 import { getGames } from '@/db/Games/Games';
+import { isAchievementVisible, isGameVisible } from '@/utils/gameVisibility';
 
 /**
  * Custom hook to manage achievement data loading and state
@@ -17,13 +18,13 @@ export const useAchievementData = () => {
         if (db) {
             try {
                 const userAchievements = await getUserAchievementsWithGames(db, 1);
-                setAchievements(userAchievements);
+                setAchievements(userAchievements.filter(isAchievementVisible));
                 
                 const points = await getUserTotalPoints(db, 1);
                 setTotalPoints(points);
 
                 const gamesList = await getGames(db);
-                setGames(gamesList);
+                setGames(gamesList.filter((game: { title: string }) => isGameVisible(game.title)));
             } catch (error) {
                 console.error('Error loading achievements:', error);
             }

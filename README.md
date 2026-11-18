@@ -1,14 +1,21 @@
 # 🎮 Game Library
 
-A comprehensive mobile game collection built with React Native and Expo, featuring classic puzzle games, action games, and a robust achievement system.
+A mobile puzzle and strategy collection built with React Native and Expo.
 
 ## 📱 About
 
-Game Library is a mobile application that brings together a diverse collection of classic and modern games in one place. Each game offers multiple difficulty levels and contributes to an extensive achievement system, providing hours of engaging gameplay and progression tracking.
+Game Library is being refined into a cohesive, ad-free puzzle collection, with Sudoku as the quality reference for its theme, feedback, and animations.
+
+See the [current-app backlog](docs/BACKLOG.md) for prioritized correctness, session,
+accessibility, achievement, and release work. New games and SDK modernization are
+outside that backlog's scope.
 
 ## 🎯 Current Games
 
-### Fully Functional Games
+### Current Puzzle and Strategy Games
+
+The eight games below remain in the catalog. Known defects and validation gaps
+are tracked in the [backlog](docs/BACKLOG.md).
 
 #### 1. **Sudoku** 🔢
 A logic-based number placement puzzle where you fill a 9×9 grid with numbers 1-9.
@@ -34,49 +41,37 @@ Classic word puzzle with intersecting words based on clues.
 - **Game Type**: Word Puzzle
 - **Achievements**: 12+ including First Win, perfect games, mastery tiers
 
-#### 5. **Ostrich Haul** 🦅
-An action game where you control an ostrich jumping over obstacles.
-- **Difficulty Levels**: Easy, Hard
-- **Game Type**: Action/Arcade
-- **Achievements**: 10+ including high score milestones, win streaks
-
-#### 6. **GoGoBird** 🐦
-Navigate a bird through obstacles in this fast-paced action game.
-- **Difficulty Levels**: Easy, Hard
-- **Game Type**: Action/Arcade
-- **Achievements**: 10+ including high score milestones, skill challenges
-
-#### 7. **2048** 🎲
+#### 5. **2048** 🎲
 A sliding tile puzzle where you combine numbered tiles to reach 2048.
 - **Difficulty Levels**: Easy, Medium, Hard
 - **Game Type**: Puzzle
 - **Achievements**: 12+ including First Win, tile milestones, score achievements
 
-#### 8. **Memory Match** 🃏
+#### 6. **Memory Match** 🃏
 A card-flipping game where you match pairs of identical cards.
 - **Difficulty Levels**: Easy, Medium, Hard
 - **Game Type**: Memory Puzzle
 - **Achievements**: 12+ including First Win, perfect matches, speed completions
 
-#### 9. **Connect Four** 🔴🟡
+#### 7. **Connect Four** 🔴🟡
 Strategic two-player game where you drop colored discs to get four in a row.
 - **Difficulty Levels**: Easy, Medium, Hard (AI Opponent)
 - **Game Type**: Strategy/Board Game
 - **Achievements**: In development (gameplay fully functional)
 
-#### 10. **Simon Says** 🎨
+#### 8. **Simon Says** 🎨
 Memory game where you repeat increasingly longer sequences of colored tiles.
 - **Difficulty Levels**: Easy, Medium, Hard
 - **Game Type**: Memory/Pattern Recognition
 - **Achievements**: Partially implemented (gameplay fully functional)
 
-### Games in Development
+### Preserved Arcade Code (Not Displayed)
 
-#### 11. **Dolphin Dive** 🐬
-An endless runner where a dolphin dives underwater to build momentum for jumps.
-- **Planned Difficulty Levels**: Easy, Hard
-- **Game Type**: Action/Endless Runner
-- **Status**: Early development - basic physics implemented, sprites and gameplay in progress
+GoGoBird, Ostrich Haul, and Dolphin Dive are hidden from the home catalog,
+achievement filters, and arcade-specific achievement previews. Their source,
+routes, assets, saved records, and earned points are retained. Direct routes are
+not disabled. Arcade completion and new game additions are not part of the
+current release backlog.
 
 ## 🚀 Planned Features
 
@@ -224,6 +219,39 @@ The app tracks comprehensive statistics for each game:
 - **Responsive Design**: Optimized for various screen sizes
 - **Dark/Light Mode**: Automatic UI style based on system preferences
 - **Offline Play**: All games work without internet connection
+
+## Read-only audit agents
+
+Two repository-local Copilot custom agents support product planning:
+
+- [UI & Experience Auditor](.github/agents/ui-experience-auditor.agent.md):
+  visual identity, usability, accessibility, and consistency across games.
+- [Product & Content Auditor](.github/agents/product-content-auditor.agent.md):
+  distinctive player value, content depth, progression, and a focused release
+  strategy rather than extra complexity.
+
+Open this repository in VS Code with Copilot and select either reviewer from the
+agent picker in a new chat. If missing, check **Chat: Open Customizations > Agents**
+and confirm that the profile is discovered without errors.
+
+Example requests:
+
+- UI reviewer: "Audit the app's visual identity and user experience. Use the
+  attached screenshots alongside the code, distinguish polish from
+  differentiation, and recommend the highest-impact changes."
+- Product reviewer: "Audit the implemented games and progression against the
+  existing plans. Recommend a coherent differentiation direction and a focused
+  first release. Here is the App Review rejection text: ..."
+
+Supply screenshots or supported recordings of key flows, or captures from an
+already-running preview, for visual review. Without them, visual conclusions are
+provisional and source-based. The reviewers cannot launch or operate the app.
+Both allow only reading, searching, and public web research, not editing,
+terminal execution, or delegation. Check the host's effective tool permissions
+before use; enforcement varies across Copilot hosts.
+
+Reports stay in chat. SDK modernization is excluded, and no recommendation
+guarantees App Store approval. Run the actual audits separately after setup.
 
 ## 📄 License
 

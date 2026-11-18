@@ -5,6 +5,7 @@ import useTheme from "@/hooks/useTheme";
 import { DBContext } from "@/contexts/DBContext";
 import { Games } from "@/constants/Types";
 import { GameLogos } from "@/constants/GameLogos";
+import { isGameVisible } from "@/utils/gameVisibility";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 interface GameSelectorProps {
@@ -103,7 +104,7 @@ const GameSelector: React.FC<GameSelectorProps> = ({ handleSelectGame }) => {
 
     return (
         <View style={styles.gameContainer}>
-            {games.map((game, index) => (
+            {games.filter(game => isGameVisible(game.title)).map((game, index) => (
                 <AnimatedGameTile
                     key={index}
                     game={game}

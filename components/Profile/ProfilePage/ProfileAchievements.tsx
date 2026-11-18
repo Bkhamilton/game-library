@@ -7,6 +7,8 @@ import ProgressBar from '@/components/Helpers/ProgressBar';
 import { getUserAchievements, getUserTotalPoints } from '@/db/Achievements/Achievements';
 import { useRouter } from 'expo-router';
 import useTheme from '@/hooks/useTheme';
+import { isAchievementVisible } from '@/utils/gameVisibility';
+import type { Achievement } from '@/utils/achievementFilters';
 
 interface AchievementBoxProps {
     icon: React.ReactNode;
@@ -34,11 +36,12 @@ export default function ProfileAchievements({ onLoadAchievements }: ProfileAchie
     const loadAchievements = async () => {
         if (db) {
             try {
-                const userAchievements = await getUserAchievements(db, 1); // userId = 1
+                const userAchievements: Achievement[] = await getUserAchievements(db, 1); // userId = 1
                 
                 // Show all unlocked achievements plus a few locked ones (max 6 total)
-                const unlocked = userAchievements.filter(a => a.unlocked);
-                const locked = userAchievements.filter(a => !a.unlocked).slice(0, Math.max(0, 6 - unlocked.length));
+                const visibleAchievements = userAchievements.filter(isAchievementVisible);
+                const unlocked = visibleAchievements.filter(a => a.unlocked);
+                const locked = visibleAchievements.filter(a => !a.unlocked).slice(0, Math.max(0, 6 - unlocked.length));
                 const displayAchievements = [...unlocked, ...locked];
                 
                 setAchievements(displayAchievements);
