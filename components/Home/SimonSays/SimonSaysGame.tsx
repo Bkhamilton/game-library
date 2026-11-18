@@ -35,7 +35,7 @@ export default function SimonSaysGame() {
     const { primary } = useTheme();
     const settings = getDifficultySettings(difficulty as string);
     const tileColors = getTileColors(difficulty as string);
-    const playbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const playbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         // Clean up timeouts on unmount

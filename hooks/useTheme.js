@@ -9,7 +9,7 @@ export default function useTheme() {
     // If user has disabled default phone mode, use the custom theme
     // Otherwise, use the device's color scheme
     const colors = useDefaultPhoneMode 
-        ? Colors[deviceColorScheme] 
+        ? Colors[deviceColorScheme ?? 'light']
         : currentTheme.colors;
 
     const themeColors = {

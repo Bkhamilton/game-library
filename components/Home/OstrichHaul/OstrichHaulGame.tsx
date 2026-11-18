@@ -128,7 +128,7 @@ export default function OstrichHaulGame() {
 
     useEffect(() => {
         if (isGameRunning) {
-            let spawnTimeout: NodeJS.Timeout;
+            let spawnTimeout: ReturnType<typeof setTimeout>;
 
             const spawnObstacle = () => {
                 const { variant, width } = selectSpikeVariant();
@@ -163,7 +163,7 @@ export default function OstrichHaulGame() {
 
     useEffect(() => {
         if (isGameRunning) {
-            let spawnTimeout: NodeJS.Timeout;
+            let spawnTimeout: ReturnType<typeof setTimeout>;
 
             const spawnCloud = () => {
                 const newCloud = {

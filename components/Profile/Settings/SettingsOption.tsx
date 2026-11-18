@@ -10,7 +10,7 @@ interface SettingsOptionsProps {
 }
 
 interface SettingsOptionProps {
-    icon: string;
+    icon: React.ComponentProps<typeof Ionicons>["name"];
     title: string;
     pressIcon: string;
     onSelect: () => void;
@@ -31,7 +31,7 @@ export default function SettingsOptions({ onSelect } : SettingsOptionsProps) {
                     <Text style={styles.optionText}>{title}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                    style={{ addingHorizontal: 6, paddingVertical: 6 }}
+                    style={{ paddingHorizontal: 6, paddingVertical: 6 }}
                     onPress={onSelect}    
                 >
                     <FontAwesome5 name={pressIcon} size={24} color={text} />
@@ -40,7 +40,7 @@ export default function SettingsOptions({ onSelect } : SettingsOptionsProps) {
         );
     }
 
-    const accountData = [
+    const accountData: Omit<SettingsOptionProps, 'onSelect'>[] = [
         { icon: 'trash', title: 'Clear User Data', pressIcon: 'chevron-right' },
         { icon: 'help-circle', title: 'Help', pressIcon: 'chevron-right' },
         { icon: 'information-circle', title: 'About', pressIcon: 'chevron-right' },

@@ -150,8 +150,6 @@ Game Library features a comprehensive achievement system with **124 total achiev
 - **Database**: SQLite (expo-sqlite)
 - **State Management**: React Context API
 - **Navigation**: Expo Router
-- **Game Engine**: react-native-game-engine
-- **Physics**: matter-js (for action games)
 - **Storage**: AsyncStorage
 - **Animations**: 
   - react-native-reanimated (60fps native animations)
@@ -174,9 +172,8 @@ See [Animation Documentation](docs/ANIMATION_LIBRARIES.md) for details.
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn
-- Expo CLI
+- Node.js 24.3 or later in the 24.x series and npm
+- Expo Go with SDK 58 support for testing on a phone
 
 ### Setup
 
@@ -188,7 +185,7 @@ cd game-library
 
 2. Install dependencies:
 ```bash
-npm install
+npm ci
 ```
 
 3. Start the development server:

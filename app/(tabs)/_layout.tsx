@@ -8,7 +8,7 @@ import useTheme from "@/hooks/useTheme";
 import ThemeSelector from "@/components/Modals/ThemeSelector";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>["name"]; color: string }) {
+function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>["name"]; color: React.ComponentProps<typeof FontAwesome>["color"] }) {
     return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
@@ -56,7 +56,7 @@ export default function TabLayout() {
                 name="index"
                 options={{
                     title: "Home",
-                    tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
+                    tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={typeof color === "string" ? color : tint} />,
                     headerRight: () => (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Pressable 
@@ -92,7 +92,7 @@ export default function TabLayout() {
                 name="profile"
                 options={{
                     title: "Profile",
-                    tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+                    tabBarIcon: ({ color }) => <TabBarIcon name="user" color={typeof color === "string" ? color : tint} />,
                     headerShown: false,
                 }}
             />

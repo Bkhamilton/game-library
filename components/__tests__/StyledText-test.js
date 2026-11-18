@@ -1,10 +1,10 @@
 import * as React from 'react';
-import renderer from 'react-test-renderer';
-
+import { render } from '@testing-library/react-native';
 import { MonoText } from '../StyledText';
 
-it(`renders correctly`, () => {
-  const tree = renderer.create(<MonoText>Snapshot test!</MonoText>).toJSON();
+jest.mock('@/hooks/useTheme', () => () => ({ text: '#000000' }));
 
-  expect(tree).toMatchSnapshot();
+it('renders its children in SpaceMono', async () => {
+  const screen = await render(<MonoText>Snapshot test!</MonoText>);
+  expect(screen.getByText('Snapshot test!')).toHaveStyle({ fontFamily: 'SpaceMono' });
 });

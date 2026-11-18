@@ -21,12 +21,12 @@ type ThemeProps = {
   darkColor?: string;
 };
 
-export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
-export type TouchableOpacityProps = ThemeProps & DefaultTouchableOpacity['props'];
-export type ScrollViewProps = ThemeProps & DefaultScrollView['props'];
-export type TextInputProps = ThemeProps & DefaultTextInput['props'];
-export type PressableProps = ThemeProps & DefaultPressable['props'];
+export type TextProps = ThemeProps & React.ComponentProps<typeof DefaultText>;
+export type ViewProps = ThemeProps & React.ComponentProps<typeof DefaultView>;
+export type TouchableOpacityProps = ThemeProps & React.ComponentProps<typeof DefaultTouchableOpacity>;
+export type ScrollViewProps = ThemeProps & React.ComponentProps<typeof DefaultScrollView>;
+export type TextInputProps = ThemeProps & React.ComponentProps<typeof DefaultTextInput>;
+export type PressableProps = ThemeProps & React.ComponentProps<typeof DefaultPressable>;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -90,5 +90,8 @@ export function Pressable(props: PressableProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-  return <DefaultPressable style={[{ backgroundColor }, style]} {...otherProps} />;
+  return <DefaultPressable style={state => [
+    { backgroundColor },
+    typeof style === 'function' ? style(state) : style,
+  ]} {...otherProps} />;
 }

@@ -1,9 +1,7 @@
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { 
-  AnimationTestScreen, 
-  LottieTestScreen, 
-  ConfettiTestScreen 
-} from '@/components/animations';
+import { PulseView } from '@/components/animations/ReanimatedExamples';
+import { LottieTestScreen } from '@/components/animations/LottieExamples';
+import { ConfettiTestScreen } from '@/components/animations/ConfettiExamples';
 
 /**
  * Animation Test Page
@@ -26,7 +24,7 @@ export default function AnimationTestPage() {
       </View>
       
       <View style={styles.section}>
-        <AnimationTestScreen />
+        <PulseView><Text>Reanimated pulse</Text></PulseView>
       </View>
       
       <View style={styles.separator} />
