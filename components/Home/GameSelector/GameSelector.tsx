@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
         resizeMode: "cover",
     },
     gradientOverlay: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         opacity: 0.65,
     },
     gameInfo: {

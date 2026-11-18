@@ -18,7 +18,7 @@ const Timer: React.FC<TimerProps> = ({ isActive, reset, onTimeUpdate }) => {
     }, [reset]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout | number | null = null;
+        let interval: ReturnType<typeof setInterval> | null = null;
         if (isActive) {
             interval = setInterval(() => {
                 setSeconds(prevSeconds => prevSeconds + 1);
