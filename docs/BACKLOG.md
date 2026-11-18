@@ -370,9 +370,13 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SUD-01 - Guarantee valid, uniquely solvable Sudoku puzzles
 
-**P0 | Confirmed source gap**
+**P0 | Confirmed source gap | Status: Implemented; device confirmation tracked by QA-02**
 
-- **Evidence:** The generator checks solvability, not unique solvability.
+- **Original gap:** The generator checked solvability, not unique solvability.
+- **Resolution:** Only remove clues when an exhaustive check proves the
+  remaining puzzle has one solution. Generation and individual searches
+  are bounded. The blank targets are 30/40/50/55; Daily puzzles still
+  reproduce for the same seed on the new generator.
 - **Acceptance:** Every released generated board satisfies Sudoku rules and has
   exactly one solution. Generation terminates with explicit failure handling.
   Regression tests cover classic and seeded generation at every difficulty.
@@ -407,10 +411,13 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### MINE-01 - Use one authoritative mine count
 
-**P0 | Confirmed source defect**
+**P0 | Confirmed source defect | Status: Implemented; device confirmation tracked by QA-02**
 
-- **Evidence:** Display helpers use 10/40/70/100; board generation uses
-  10/35/60/90.
+- **Original defect:** Display helpers used 10/40/70/100 while board
+  generation used 10/35/60/90.
+- **Resolution:** One settings table keeps the existing 10/35/60/90 mine
+  totals. The display subtracts actual flags, and a win still requires
+  revealing every non-mine cell, regardless of flags.
 - **Acceptance:** Generator, displayed count, flag counter, and victory
   conditions use the same settings for each difficulty. Add tests inspecting
   generated mine totals and the corresponding displayed/remaining count.

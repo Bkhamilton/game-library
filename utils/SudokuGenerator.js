@@ -17,12 +17,13 @@ class SeededRandom {
 // Generate a complete Sudoku board
 const generateCompleteBoard = (rng = null) => {
     const board = Array.from({ length: 9 }, () => Array(9).fill(0));
-    fillBoard(board, rng);
-    return board;
+    return fillBoard(board, rng, { nodesLeft: MAX_SEARCH_NODES }) ? board : null;
 };
 
 // Fill the board with a valid Sudoku solution
-const fillBoard = (board, rng = null) => {
+const fillBoard = (board, rng, budget) => {
+    if (budget.nodesLeft === 0) return false;
+    budget.nodesLeft--;
     const findEmpty = () => {
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
@@ -59,83 +60,125 @@ const fillBoard = (board, rng = null) => {
     for (let num of numbers) {
         if (isValid(num, [row, col])) {
             board[row][col] = num;
-            if (fillBoard(board, rng)) return true;
+            if (fillBoard(board, rng, budget)) return true;
             board[row][col] = 0;
+            if (budget.nodesLeft === 0) return false;
         }
     }
     return false;
 };
 
-// Create a Sudoku puzzle by removing numbers from the complete board
-const createPuzzle = (board, difficulty, rng = null) => {
-    const emptySpaces = difficulty === 'Easy' ? 30 : difficulty === 'Medium' ? 40 : difficulty === 'Hard' ? 60 : 65;
-    const puzzle = board.map(row => row.slice());
+const EMPTY_CELLS = { Easy: 30, Medium: 40, Hard: 50, Extreme: 55 };
+const MAX_GENERATION_ATTEMPTS = 12;
+const MAX_SEARCH_NODES = 10_000;
+const ALL_DIGITS = 0b111111111;
+const boxIndex = (row, col) => 3 * Math.floor(row / 3) + Math.floor(col / 3);
 
-    let count = 0;
-    while (count < emptySpaces) {
-        const row = Math.floor((rng ? rng.next() : Math.random()) * 9);
-        const col = Math.floor((rng ? rng.next() : Math.random()) * 9);
-        if (puzzle[row][col] !== 0) {
-            puzzle[row][col] = 0;
-            count++;
+const hasUniqueSolution = (puzzle) => {
+    const rows = new Uint16Array(9);
+    const cols = new Uint16Array(9);
+    const boxes = new Uint16Array(9);
+    const empty = [];
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const box = boxIndex(row, col);
+            const digit = puzzle[row][col];
+            if (digit === 0) {
+                empty.push({ row, col, box });
+            } else {
+                const bit = 1 << (digit - 1);
+                rows[row] |= bit;
+                cols[col] |= bit;
+                boxes[box] |= bit;
+            }
         }
     }
-    return puzzle;
-};
 
-// Check if the Sudoku board is solvable
-const isSolvable = (board) => {
-    const solve = (board) => {
-        const findEmpty = () => {
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    if (board[row][col] === 0) return [row, col];
-                }
-            }
-            return null;
-        };
+    let solutions = 0;
+    let nodesLeft = MAX_SEARCH_NODES;
+    const search = (depth) => {
+        if (solutions === 2 || nodesLeft === 0) return;
+        nodesLeft--;
+        if (depth === empty.length) {
+            solutions++;
+            return;
+        }
 
-        const isValid = (num, pos) => {
-            const [row, col] = pos;
-
-            for (let i = 0; i < 9; i++) {
-                if (board[row][i] === num && col !== i) return false;
-                if (board[i][col] === num && row !== i) return false;
-                const boxRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
-                const boxCol = 3 * Math.floor(col / 3) + i % 3;
-                if (board[boxRow][boxCol] === num && (boxRow !== row || boxCol !== col)) return false;
-            }
-            return true;
-        };
-
-        const emptyPos = findEmpty();
-        if (!emptyPos) return true;
-
-        const [row, col] = emptyPos;
-        for (let num = 1; num <= 9; num++) {
-            if (isValid(num, [row, col])) {
-                board[row][col] = num;
-                if (solve(board)) return true;
-                board[row][col] = 0;
+        // Branch on the empty cell with the fewest legal digits.
+        let bestIndex = depth;
+        let bestMask = 0;
+        let bestCount = 10;
+        for (let i = depth; i < empty.length; i++) {
+            const { row, col, box } = empty[i];
+            const mask = ALL_DIGITS & ~(rows[row] | cols[col] | boxes[box]);
+            if (mask === 0) return;
+            let count = 0;
+            for (let bits = mask; bits; bits &= bits - 1) count++;
+            if (count < bestCount) {
+                bestIndex = i;
+                bestMask = mask;
+                bestCount = count;
+                if (count === 1) break;
             }
         }
-        return false;
-    };
 
-    const boardCopy = board.map(row => row.slice());
-    return solve(boardCopy);
+        [empty[depth], empty[bestIndex]] = [empty[bestIndex], empty[depth]];
+        const { row, col, box } = empty[depth];
+        for (let mask = bestMask; mask && solutions < 2 && nodesLeft > 0; mask &= mask - 1) {
+            const bit = mask & -mask;
+            rows[row] |= bit;
+            cols[col] |= bit;
+            boxes[box] |= bit;
+            search(depth + 1);
+            rows[row] ^= bit;
+            cols[col] ^= bit;
+            boxes[box] ^= bit;
+        }
+        [empty[depth], empty[bestIndex]] = [empty[bestIndex], empty[depth]];
+    };
+    search(0);
+
+    // A search that ran out of budget has not proved uniqueness.
+    return solutions === 1 && nodesLeft > 0;
 };
 
-// Generate a Sudoku puzzle with the given difficulty
+const createPuzzle = (board, emptyTarget, rng) => {
+    const puzzle = board.map(row => row.slice());
+    const positions = Array.from({ length: 81 }, (_, index) => index);
+    for (let i = positions.length - 1; i > 0; i--) {
+        const j = Math.floor((rng ? rng.next() : Math.random()) * (i + 1));
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+    }
+
+    let removed = 0;
+    for (const index of positions) {
+        const row = Math.floor(index / 9);
+        const col = index % 9;
+        puzzle[row][col] = 0;
+        if (!hasUniqueSolution(puzzle)) {
+            puzzle[row][col] = board[row][col];
+        } else if (++removed === emptyTarget) {
+            return puzzle;
+        }
+    }
+    return null;
+};
+
+/**
+ * @param {string} difficulty
+ * @param {number | null} [seed]
+ */
 export const generateSudokuPuzzle = (difficulty, seed = undefined) => {
     const rng = seed !== null && seed !== undefined ? new SeededRandom(seed) : null;
-    let completeBoard;
-    let puzzleBoard;
-    do {
-        completeBoard = generateCompleteBoard(rng);
-        puzzleBoard = createPuzzle(completeBoard, difficulty, rng);
-    } while (!isSolvable(puzzleBoard));
-    return { completeBoard, puzzleBoard };
+    if (!Object.hasOwn(EMPTY_CELLS, difficulty)) return null;
+    const emptyTarget = EMPTY_CELLS[difficulty];
+    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
+        const completeBoard = generateCompleteBoard(rng);
+        if (!completeBoard) continue;
+        const puzzleBoard = createPuzzle(completeBoard, emptyTarget, rng);
+        if (puzzleBoard) return { completeBoard, puzzleBoard };
+    }
+    return null;
 };
 
 // Check if the move is valid

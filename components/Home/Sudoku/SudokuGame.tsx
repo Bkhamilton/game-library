@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { View } from '@/components/Themed';
+import { Button, StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
 import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import SudokuBoard from './SudokuBoard';
@@ -12,7 +12,7 @@ import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/ani
 import { getTodaysSeed, markDailyChallengeCompleted } from '@/utils/DailyChallenge';
 
 export default function SudokuGame() {
-    const { difficulty, mode } = useLocalSearchParams();
+    const { difficulty = 'Easy', mode } = useLocalSearchParams<{ difficulty?: string; mode?: string }>();
     const gameMode = typeof mode === 'string' ? mode : 'Classic'; // Default to Classic if not specified
     
     // Memoize today's seed since it only changes once per day
@@ -34,6 +34,8 @@ export default function SudokuGame() {
     const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
     
     const [isLoading, setIsLoading] = useState(true);
+    const [generationFailed, setGenerationFailed] = useState(false);
+    const [generationAttempt, setGenerationAttempt] = useState(0);
 
     const [gameTime, setGameTime] = useState(0); // Track game time
     const [timerReset, setTimerReset] = useState(false); // For resetting timer on correct moves in Frenzy mode
@@ -117,10 +119,17 @@ export default function SudokuGame() {
 
     useEffect(() => {
         setIsLoading(true);
+        setGenerationFailed(false);
         // Simulate loading time to show spinner
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             // Use seeded generation for Daily Challenge mode
-            const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, todaysSeed);
+            const puzzle = generateSudokuPuzzle(difficulty, todaysSeed);
+            if (!puzzle) {
+                setGenerationFailed(true);
+                setIsLoading(false);
+                return;
+            }
+            const { completeBoard, puzzleBoard } = puzzle;
             setBoard(puzzleBoard);
             setSolvedBoard(completeBoard);
             const initialNums: { [key: string]: boolean } = {};
@@ -134,7 +143,8 @@ export default function SudokuGame() {
             setInitialNumbers(initialNums);
             setIsLoading(false);
         }, 300);
-    }, [difficulty, todaysSeed]);
+        return () => clearTimeout(timeout);
+    }, [difficulty, todaysSeed, generationAttempt]);
 
     const router = useRouter();
 
@@ -144,13 +154,24 @@ export default function SudokuGame() {
         router.replace(`/sudoku?difficulty=${difficulty}&mode=${gameMode}`);
     }
 
+    if (generationFailed) {
+        return (
+            <View style={styles.container}>
+                <Text accessibilityRole="alert">Could not generate a Sudoku puzzle.</Text>
+                {todaysSeed === undefined && (
+                    <Button title="Try again" onPress={() => setGenerationAttempt(attempt => attempt + 1)} />
+                )}
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <SudokuHeader 
                 wrongCount={wrongCount}
                 onTimeUpdate={handleTimeUpdate}
                 mode={gameMode}
-                difficulty={difficulty as string}
+                difficulty={difficulty}
                 timerReset={timerReset}
                 onTimeExpired={handleTimeExpired}
             />

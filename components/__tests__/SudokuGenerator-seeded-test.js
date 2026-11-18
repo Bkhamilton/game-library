@@ -2,10 +2,10 @@ import { generateSudokuPuzzle } from '../../utils/SudokuGenerator';
 
 describe('SudokuGenerator with Seed', () => {
     describe('deterministic generation', () => {
-        it('generates the same board with the same seed', () => {
+        it.each(['Easy', 'Medium', 'Hard', 'Extreme'])('reproduces the same %s board with the same seed', (difficulty) => {
             const seed = 12345;
-            const { completeBoard: board1, puzzleBoard: puzzle1 } = generateSudokuPuzzle('Easy', seed);
-            const { completeBoard: board2, puzzleBoard: puzzle2 } = generateSudokuPuzzle('Easy', seed);
+            const { completeBoard: board1, puzzleBoard: puzzle1 } = generateSudokuPuzzle(difficulty, seed);
+            const { completeBoard: board2, puzzleBoard: puzzle2 } = generateSudokuPuzzle(difficulty, seed);
             
             expect(JSON.stringify(board1)).toBe(JSON.stringify(board2));
             expect(JSON.stringify(puzzle1)).toBe(JSON.stringify(puzzle2));

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "@/components/Themed";
-import { initializeBoard, revealAdjacentCells, getMineCount, checkWin, setSize, createBoard, initializeBoardWithFirstClick } from "@/utils/MineSweeperGenerator";
+import { revealAdjacentCells, getRemainingMineCount, checkWin, setSize, createBoard, initializeBoardWithFirstClick } from "@/utils/MineSweeperGenerator";
 import { useLocalSearchParams } from "expo-router";
 import { DBContext } from "@/contexts/DBContext";
 import Cell from "./Cell";
@@ -34,10 +34,9 @@ export interface Board {
 }
 
 export default function MineSweeperGame() {
-    const { difficulty } = useLocalSearchParams();
+    const { difficulty = "Easy" } = useLocalSearchParams<{ difficulty?: string }>();
     const [board, setBoard] = useState<CellProps[][]>([]);
     const [gameState, setGameState] = useState<string>("active");
-    const [minesCount, setMinesCount] = useState(10);
 
     const [firstMoveMade, setFirstMoveMade] = useState(false);
 
@@ -71,10 +70,8 @@ export default function MineSweeperGame() {
         setTimeout(() => {
             const emptyBoard = createBoard(difficulty);
             setFirstMoveMade(false);
-            const minesCount = getMineCount(difficulty);
             setGameState("active");
             setBoard(emptyBoard);
-            setMinesCount(minesCount);
             setMinesFlagged(0);
             setIncorrectFlags(0);
             setIsLoading(false);
@@ -122,7 +119,6 @@ export default function MineSweeperGame() {
             if (!cell.isRevealed) {
                 const wasAlreadyFlagged = cell.isFlagged;
                 cell.isFlagged = !cell.isFlagged;
-                setMinesCount((prevCount) => (cell.isFlagged ? prevCount - 1 : prevCount + 1));
                 
                 // Track correct and incorrect flags
                 if (cell.isFlagged) {
@@ -188,7 +184,7 @@ export default function MineSweeperGame() {
     return (
         <View style={styles.container}>
             <MineSweeperHeader 
-                minesCount={minesCount} 
+                minesCount={getRemainingMineCount(difficulty, board)}
                 gameState={gameState} 
                 trigger={trigger}
                 onTimeUpdate={handleTimeUpdate}

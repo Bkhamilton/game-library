@@ -19,6 +19,54 @@ const generateTestSolvedBoard = () => {
     return Array.from({ length: 9 }, (_, row) => 
         Array.from({ length: 9 }, (_, col) => ((row * 3 + Math.floor(row / 3) + col) % 9) + 1)
     );
+
+    it('returns a failure instead of an ambiguous puzzle when retries cannot reach the target', () => {
+        const random = jest.spyOn(Math, 'random').mockReturnValue(0);
+        try {
+            expect(generateSudokuPuzzle('Extreme')).toBeNull();
+        } finally {
+            random.mockRestore();
+        }
+    });
+};
+
+const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const coordinates = Array.from({ length: 81 }, (_, index) => ({
+    row: Math.floor(index / 9),
+    col: index % 9,
+}));
+const peers = coordinates.map(({ row, col }, index) => coordinates.flatMap((other, peer) =>
+    peer !== index && (
+        row === other.row || col === other.col ||
+        (Math.floor(row / 3) === Math.floor(other.row / 3) &&
+         Math.floor(col / 3) === Math.floor(other.col / 3))
+    ) ? [peer] : []
+));
+
+// Verify independently using the shown digits, not the generator's internal solver.
+const countSolutions = (cells) => {
+    let bestIndex = -1;
+    let bestDigits = null;
+    for (let index = 0; index < cells.length; index++) {
+        if (cells[index] !== 0) continue;
+        const used = new Set(peers[index].map(peer => cells[peer]));
+        const options = digits.filter(digit => !used.has(digit));
+        if (options.length === 0) return 0;
+        if (!bestDigits || options.length < bestDigits.length) {
+            bestIndex = index;
+            bestDigits = options;
+            if (options.length === 1) break;
+        }
+    }
+    if (bestIndex === -1) return 1;
+    let count = 0;
+    for (const digit of bestDigits) {
+        cells[bestIndex] = digit;
+        count += countSolutions(cells);
+        if (count >= 2) break;
+    }
+    cells[bestIndex] = 0;
+    return count;
 };
 
 describe('SudokuGenerator', () => {
@@ -49,7 +97,7 @@ describe('SudokuGenerator', () => {
 
         it('generates a puzzle board with correct number of empty cells for Hard', () => {
             const { puzzleBoard } = generateSudokuPuzzle('Hard');
-            expect(countEmptyCells(puzzleBoard)).toBe(60);
+            expect(countEmptyCells(puzzleBoard)).toBe(50);
         });
 
         it('validates rows contain all numbers 1-9', () => {
@@ -131,13 +179,29 @@ describe('SudokuGenerator', () => {
             expect(sequentialCount).toBeLessThanOrEqual(1);
         });
 
-        it('puzzle board is solvable', () => {
-            // The isSolvable check is already done in generateSudokuPuzzle
-            // This test just confirms it doesn't throw or hang
-            const result = generateSudokuPuzzle('Medium');
-            expect(result.completeBoard).toBeDefined();
-            expect(result.puzzleBoard).toBeDefined();
-        });
+        it.each([
+            ['Easy', 30],
+            ['Medium', 40],
+            ['Hard', 50],
+            ['Extreme', 55],
+        ])('generates valid and uniquely solvable %s puzzles in both random and seeded mode',
+            (difficulty, emptyTarget) => {
+                for (let sample = 0; sample < 100; sample++) {
+                    for (const seed of [undefined, sample]) {
+                        const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, seed);
+                        const solution = completeBoard.flat();
+                        const puzzle = puzzleBoard.flat();
+                        expect(puzzle.length).toBe(81);
+                        expect(countEmptyCells(puzzleBoard)).toBe(emptyTarget);
+                        expect(solution.every((digit, index) =>
+                            digits.includes(digit) && peers[index].every(peer => solution[peer] !== digit)
+                        )).toBe(true);
+                        expect(puzzle.every((digit, index) => digit === 0 || digit === solution[index])).toBe(true);
+                        expect(countSolutions(puzzle)).toBe(1);
+                    }
+                }
+            }
+        );
     });
 
     describe('checkMove', () => {
