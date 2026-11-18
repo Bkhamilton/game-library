@@ -20,6 +20,11 @@ are tracked in the [backlog](docs/BACKLOG.md).
 #### 1. **Sudoku** 🔢
 A logic-based number placement puzzle where you fill a 9×9 grid with numbers 1-9.
 - **Difficulty Levels**: Easy, Medium, Hard, Extreme
+- **Sudoku difficulty**: Rated by required solving techniques, not blank count.
+  Easy uses naked singles; Medium adds hidden singles; Hard requires locked
+  candidates or pairs; Extreme requires triples or X-Wing. Every supplied
+  puzzle has one solution and can be finished without guessing. See
+  [difficulty grading and puzzle provenance](docs/SUDOKU_DIFFICULTY.md).
 - **Game Type**: Logic Puzzle
 - **Achievements**: 12+ including First Win, win streaks, difficulty mastery
 

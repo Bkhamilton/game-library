@@ -2,6 +2,9 @@ import {
     generateSudokuPuzzle,
     checkMove,
 } from '../../utils/SudokuGenerator';
+import { gradeSudokuPuzzle } from '../../utils/SudokuLogic';
+import * as sudokuLogic from '../../utils/SudokuLogic';
+import puzzles from '../../data/sudoku-puzzles.json';
 
 // Helper function to count empty cells in a board
 const countEmptyCells = (board) => {
@@ -19,15 +22,6 @@ const generateTestSolvedBoard = () => {
     return Array.from({ length: 9 }, (_, row) => 
         Array.from({ length: 9 }, (_, col) => ((row * 3 + Math.floor(row / 3) + col) % 9) + 1)
     );
-
-    it('returns a failure instead of an ambiguous puzzle when retries cannot reach the target', () => {
-        const random = jest.spyOn(Math, 'random').mockReturnValue(0);
-        try {
-            expect(generateSudokuPuzzle('Extreme')).toBeNull();
-        } finally {
-            random.mockRestore();
-        }
-    });
 };
 
 const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -83,21 +77,6 @@ describe('SudokuGenerator', () => {
                     expect(completeBoard[row][col]).toBeLessThanOrEqual(9);
                 }
             }
-        });
-
-        it('generates a puzzle board with correct number of empty cells for Easy', () => {
-            const { puzzleBoard } = generateSudokuPuzzle('Easy');
-            expect(countEmptyCells(puzzleBoard)).toBe(30);
-        });
-
-        it('generates a puzzle board with correct number of empty cells for Medium', () => {
-            const { puzzleBoard } = generateSudokuPuzzle('Medium');
-            expect(countEmptyCells(puzzleBoard)).toBe(40);
-        });
-
-        it('generates a puzzle board with correct number of empty cells for Hard', () => {
-            const { puzzleBoard } = generateSudokuPuzzle('Hard');
-            expect(countEmptyCells(puzzleBoard)).toBe(50);
         });
 
         it('validates rows contain all numbers 1-9', () => {
@@ -179,29 +158,76 @@ describe('SudokuGenerator', () => {
             expect(sequentialCount).toBeLessThanOrEqual(1);
         });
 
-        it.each([
-            ['Easy', 30],
-            ['Medium', 40],
-            ['Hard', 50],
-            ['Extreme', 55],
-        ])('generates valid and uniquely solvable %s puzzles in both random and seeded mode',
-            (difficulty, emptyTarget) => {
+        it.each(['Easy', 'Medium', 'Hard', 'Extreme'])(
+            'generates valid, unique, exactly rated %s puzzles in random and seeded mode',
+            difficulty => {
+                const levels = ['Easy', 'Medium', 'Hard', 'Extreme'];
+                const easier = levels[levels.indexOf(difficulty) - 1];
                 for (let sample = 0; sample < 100; sample++) {
                     for (const seed of [undefined, sample]) {
                         const { completeBoard, puzzleBoard } = generateSudokuPuzzle(difficulty, seed);
                         const solution = completeBoard.flat();
                         const puzzle = puzzleBoard.flat();
                         expect(puzzle.length).toBe(81);
-                        expect(countEmptyCells(puzzleBoard)).toBe(emptyTarget);
+                        expect(countEmptyCells(puzzleBoard)).toBeGreaterThan(0);
                         expect(solution.every((digit, index) =>
                             digits.includes(digit) && peers[index].every(peer => solution[peer] !== digit)
                         )).toBe(true);
                         expect(puzzle.every((digit, index) => digit === 0 || digit === solution[index])).toBe(true);
                         expect(countSolutions(puzzle)).toBe(1);
+                        const grade = gradeSudokuPuzzle(puzzleBoard);
+                        expect(grade.status).toBe('solved');
+                        expect(grade.difficulty).toBe(difficulty);
+                        expect(grade.board).toEqual(completeBoard);
+                        expect(grade.steps.every(step =>
+                            step.placements.every(({ cell, value }) => solution[cell] === value) &&
+                            step.eliminations.every(({ cell, values }) => !values.includes(solution[cell]))
+                        )).toBe(true);
+                        if (easier) expect(gradeSudokuPuzzle(puzzleBoard, easier).status).toBe('stalled');
                     }
                 }
             }
         );
+
+        it.each(['Easy', 'Medium', 'Hard', 'Extreme'])('validates every original in the %s collection', difficulty => {
+            for (const encoded of puzzles[difficulty]) {
+                expect(encoded).toMatch(/^[0-9]{81}$/);
+                const puzzle = Array.from({ length: 9 }, (_, row) =>
+                    [...encoded.slice(row * 9, row * 9 + 9)].map(Number)
+                );
+                expect(countSolutions(puzzle.flat())).toBe(1);
+                const grade = gradeSudokuPuzzle(puzzle);
+                expect(grade.status).toBe('solved');
+                expect(grade.difficulty).toBe(difficulty);
+            }
+        });
+
+        it('keeps constant random input bounded without changing the requested difficulty', () => {
+            const random = jest.spyOn(Math, 'random').mockReturnValue(0);
+            try {
+                const { puzzleBoard } = generateSudokuPuzzle('Extreme');
+                expect(gradeSudokuPuzzle(puzzleBoard).difficulty).toBe('Extreme');
+            } finally {
+                random.mockRestore();
+            }
+        });
+
+        it('reports an invalid difficulty instead of substituting an easier puzzle', () => {
+            expect(() => generateSudokuPuzzle('Unknown')).toThrow('Unknown Sudoku difficulty');
+        });
+
+        it('returns an explicit failure if no candidate can be verified at the requested level', () => {
+            const grader = jest.spyOn(sudokuLogic, 'gradeSudokuPuzzle').mockReturnValue({
+                status: 'stalled',
+                difficulty: null,
+            });
+            try {
+                expect(generateSudokuPuzzle('Extreme', 123)).toBeNull();
+                expect(grader.mock.calls.length).toBeLessThan(20);
+            } finally {
+                grader.mockRestore();
+            }
+        });
     });
 
     describe('checkMove', () => {

@@ -1,4 +1,5 @@
 import { generateSudokuPuzzle } from '../../utils/SudokuGenerator';
+import { gradeSudokuPuzzle } from '../../utils/SudokuLogic';
 
 describe('SudokuGenerator with Seed', () => {
     describe('deterministic generation', () => {
@@ -68,7 +69,8 @@ describe('SudokuGenerator with Seed', () => {
                 }
             }
             
-            expect(emptyCount).toBe(30);
+            expect(emptyCount).toBeGreaterThan(0);
+            expect(gradeSudokuPuzzle(easy).difficulty).toBe('Easy');
         });
     });
 });

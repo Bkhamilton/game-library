@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, Modal, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Modal, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
 import { GameLogos } from "@/constants/GameLogos";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import GameModes from "@/constants/GameModes";
 import { isDailyChallengeCompleted } from "@/utils/DailyChallenge";
+import { SudokuDifficultyDescriptions } from "@/constants/Difficulties";
 
 // Animated button component for modal
 const AnimatedModalButton = ({ onPress, children, style, disabled }) => {
@@ -170,16 +171,28 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
             {/* Difficulty Modal */}
             <Modal animationType="slide" transparent={true} visible={showDifficultyModal} onRequestClose={closeDifficultyModal}>
                 <View style={styles.container}>
-                    <View style={styles.innerContainer}>
-                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>Select Difficulty</Text>
-                        {difficulties.map((difficulty, index) => (
-                            <AnimatedModalButton key={index} style={{ backgroundColor: grayBackground }} onPress={() => selectDifficulty(difficulty)}>
-                                <Text>{difficulty}</Text>
+                    <View style={[styles.innerContainer, { maxHeight: '90%' }]}>
+                        <ScrollView>
+                            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Select Difficulty</Text>
+                            {game.title === 'Sudoku' && (
+                                <Text style={{ width: 200, paddingVertical: 8 }}>
+                                    Rated by solving techniques, not blank count. No guessing required.
+                                </Text>
+                            )}
+                            {difficulties.map((difficulty, index) => (
+                                <AnimatedModalButton key={index} style={{ backgroundColor: grayBackground }} onPress={() => selectDifficulty(difficulty)}>
+                                    <Text>{difficulty}</Text>
+                                    {game.title === 'Sudoku' && (
+                                        <Text style={{ fontSize: 12, marginTop: 4 }}>
+                                            {SudokuDifficultyDescriptions[difficulty]}
+                                        </Text>
+                                    )}
+                                </AnimatedModalButton>
+                            ))}
+                            <AnimatedModalButton style={{ backgroundColor: primary }} onPress={closeDifficultyModal}>
+                                <Text>Close</Text>
                             </AnimatedModalButton>
-                        ))}
-                        <AnimatedModalButton style={{ backgroundColor: primary }} onPress={closeDifficultyModal}>
-                            <Text>Close</Text>
-                        </AnimatedModalButton>
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>

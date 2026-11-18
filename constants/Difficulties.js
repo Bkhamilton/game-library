@@ -1,3 +1,10 @@
+export const SudokuDifficultyDescriptions = {
+    Easy: 'Naked singles: find the only possible number in a cell.',
+    Medium: 'Adds hidden singles: find the only position for a number in a row, column, or box.',
+    Hard: 'Requires locked candidates or naked/hidden pairs.',
+    Extreme: 'Requires naked/hidden triples or X-Wing.',
+};
+
 export default {
     'Sudoku': ['Easy', 'Medium', 'Hard', 'Extreme'],
     'Crossword': ['Easy', 'Medium', 'Hard'],

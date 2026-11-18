@@ -375,8 +375,9 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 - **Original gap:** The generator checked solvability, not unique solvability.
 - **Resolution:** Only remove clues when an exhaustive check proves the
   remaining puzzle has one solution. Generation and individual searches
-  are bounded. The blank targets are 30/40/50/55; Daily puzzles still
-  reproduce for the same seed on the new generator.
+  are bounded. SUD-02 subsequently replaced blank targets with a logically
+  rated puzzle supply; Daily puzzles reproduce for the same seed on that
+  generator.
 - **Acceptance:** Every released generated board satisfies Sudoku rules and has
   exactly one solution. Generation terminates with explicit failure handling.
   Regression tests cover classic and seeded generation at every difficulty.
@@ -387,14 +388,23 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SUD-02 - Calibrate and explain Sudoku difficulty
 
-**P1 | Product improvement based on confirmed source limitation**
+**P1 | Product improvement based on confirmed source limitation | Status: Implemented; human calibration and device confirmation remain**
 
-- **Evidence:** Difficulty primarily changes the number of removed cells.
+- **Original limitation:** Difficulty primarily changed the number of removed
+  cells.
+- **Resolution:** Deterministic logical grading gates each supplied puzzle:
+  naked singles (Easy), hidden singles (Medium), locked candidates/pairs
+  (Hard), and triples/X-Wing (Extreme). Higher bands must defeat the easier
+  solver. No guessing or unsupported puzzles are labeled Extreme.
+  An original rated collection and verified transformations avoid unbounded
+  on-device searching for rare harder puzzles.
 - **Acceptance:** Define what each difficulty promises using solving techniques
   and/or an evaluated puzzle corpus, not blank count alone. Verify progression
   with human playtesting and document any remaining limits. Preserve legitimate
   harder puzzles rather than merely adding more empty cells.
-- **Reference:** [Sudoku generation](../utils/SudokuGenerator.js).
+- **References:** [Sudoku generation](../utils/SudokuGenerator.js),
+  [logical grader](../utils/SudokuLogic.js),
+  [difficulty contract and provenance](SUDOKU_DIFFICULTY.md).
 - **Dependencies:** SUD-01.
 
 ### SUD-03 - Protect Sudoku's polished play and mode behavior
