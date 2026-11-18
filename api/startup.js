@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import games from '@/data/games.json';
 import sudokuAchievements from '@/data/achievements/sudoku.json';
 import minesweeperAchievements from '@/data/achievements/minesweeper.json';
@@ -11,12 +10,10 @@ import memoryMatchAchievements from '@/data/achievements/memory-match.json';
 import connectFourAchievements from '@/data/achievements/connect-four.json';
 import simonSaysAchievements from '@/data/achievements/simon-says.json';
 import generalAchievements from '@/data/achievements/general.json';
-import { insertGame } from '@/db/Games/Games';
-import { insertUser } from '@/db/Users/Users';
-import { insertAchievement } from '@/db/Achievements/Achievements';
 
-export const createTables = async (db) => {
-    // Your table creation logic here
+const DATABASE_VERSION = 1;
+
+const createTables = async (db) => {
     await db.execAsync(`
         CREATE TABLE IF NOT EXISTS Users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,32 +69,40 @@ export const createTables = async (db) => {
     `);
 };
 
-export const dropTables = async (db) => {
-    // Your table deletion logic here
-    await db.execAsync(`
-        DROP TABLE IF EXISTS Users;
-        DROP TABLE IF EXISTS Games;
-        DROP TABLE IF EXISTS Scores;
-        DROP TABLE IF EXISTS Achievements;
-        DROP TABLE IF EXISTS UserAchievements;
-    `);
+const checkTableColumns = async (db) => {
+    const requiredColumns = {
+        Users: ['id', 'username', 'name', 'totalPoints', 'createdAt'],
+        Games: ['id', 'title', 'description'],
+        Scores: ['id', 'gameId', 'score', 'metric', 'difficulty', 'createdAt'],
+        Achievements: ['id', 'title', 'description', 'tier', 'points', 'icon', 'category', 'criteria'],
+        UserAchievements: ['userId', 'achievementId', 'progress', 'unlocked', 'unlockedAt'],
+    };
+
+    for (const [table, required] of Object.entries(requiredColumns)) {
+        const columns = await db.getAllAsync(`PRAGMA table_info(${table})`);
+        const names = new Set(columns.map(({ name }) => name.toLowerCase()));
+        const missing = required.filter(name => !names.has(name.toLowerCase()));
+        if (missing.length > 0) {
+            throw new Error(`Incompatible database: ${table} is missing ${missing.join(', ')}.`);
+        }
+    }
 };
 
-export const syncData = async (db) => {
-    // Add Users and Games data to the database
-    const user = {
-        username: 'john_doe',
-        name: 'John Doe'
-    };
-    await insertUser(db, user);
+const seedDatabase = async (db) => {
+    await db.runAsync(
+        `INSERT INTO Users (username, name)
+         SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM Users)`,
+        ['john_doe', 'John Doe']
+    );
 
-    const gamesData = games;
-    for (const game of gamesData) {
-        await insertGame(db, game);
+    for (const game of games) {
+        await db.runAsync(
+            `INSERT INTO Games (id, title, description) VALUES (?, ?, ?)
+             ON CONFLICT(id) DO NOTHING`,
+            [game.id, game.title, game.description]
+        );
     }
 
-    // Add achievements data to the database
-    // Combine all achievement files into one array
     const achievementsData = [
         ...sudokuAchievements,
         ...minesweeperAchievements,
@@ -112,28 +117,30 @@ export const syncData = async (db) => {
         ...generalAchievements
     ];
     for (const achievement of achievementsData) {
-        await insertAchievement(db, achievement);
+        const { id, title, description, tier, points, icon, category, criteria } = achievement;
+        await db.runAsync(
+            `INSERT INTO Achievements (id, title, description, tier, points, icon, category, criteria)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO NOTHING`,
+            [id, title, description, tier, points, icon, category, JSON.stringify(criteria)]
+        );
     }
-}
-    
-
-export const setupDatabase = async (db) => {
-    // Your database setup logic here
-    await dropTables(db);
-    await createTables(db);
-    await syncData(db);
 };
 
 export const initializeDatabase = async (db) => {
-    try {
-        const isFirstLaunch = await AsyncStorage.getItem('isFirstLaunch');
-        if (isFirstLaunch === null) {
-            // First time launch
-            await setupDatabase(db);
-            await AsyncStorage.setItem('isFirstLaunch', 'false');
+    // SQLiteProvider waits for onInit before mounting database consumers.
+    await db.withTransactionAsync(async () => {
+        const { user_version: version } = await db.getFirstAsync('PRAGMA user_version');
+        if (version === DATABASE_VERSION) {
+            return;
         }
-        // Open a connection to the SQLite database.
-    } catch (error) {
-        console.error("Error initializing database:", error);
-    }
+        if (version !== 0) {
+            throw new Error(`Unsupported database version ${version}; expected ${DATABASE_VERSION}.`);
+        }
+
+        await createTables(db);
+        await checkTableColumns(db);
+        await seedDatabase(db);
+        await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+    });
 };

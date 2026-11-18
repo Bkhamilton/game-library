@@ -5,7 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { SQLiteProvider } from 'expo-sqlite';
 import "react-native-reanimated";
-import { initializeDatabase } from '@/api/startup'; 
+import { initializeDatabase } from '@/api/startup';
 import { DBContextProvider } from "@/contexts/DBContext";
 import { UserContextProvider } from "@/contexts/UserContext";
 import { ThemeProvider as CustomThemeProvider } from "@/contexts/ThemeContext";
@@ -46,7 +46,7 @@ export default function RootLayout() {
     }
 
     return (
-        <SQLiteProvider databaseName="gamelibrary.db" onInit={initializeDatabase} useSuspense>
+        <SQLiteProvider databaseName="gamelibrary.db" onInit={initializeDatabase}>
             <DBContextProvider>
                 <UserContextProvider>
                     <CustomThemeProvider>

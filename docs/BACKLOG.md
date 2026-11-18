@@ -95,21 +95,23 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ## 2. Database safety and explicit failures
 
-### DATA-01 - Replace first-launch-controlled destructive setup with safe upgrades
+### DATA-01 - Bootstrap the SQLite database without destructive setup
 
-**P0 | Confirmed source risk**
+**P0 | Confirmed source risk | Status: Implemented; device confirmation tracked by QA-02**
 
-- **Evidence:** Database initialization consults an AsyncStorage first-launch
-  flag; setup drops tables before recreating them. Missing storage state can
-  therefore trigger destructive setup even if a database already exists.
-  There is no versioned upgrade path in this initialization flow.
-- **Acceptance:** Separate creation, schema migration, and seed synchronization.
-  Missing AsyncStorage flags must not erase existing SQLite data. Existing
-  scores, users, and unlocks survive upgrades; updates to catalog/achievement
-  definitions reach existing installs without duplicate rows. Use transactions
-  where required and test interrupted/retried upgrades. Keep stable game IDs.
-- **Reference:** [Database startup](../api/startup.js).
-- **Dependencies:** None. Coordinate schema changes with the modernization agent.
+- **Original risk:** A missing AsyncStorage first-launch flag could drop and
+  recreate tables in an existing SQLite file.
+- **First-release behavior:** On version 0, create the schema and add missing
+  default records in one transaction. Record completion in SQLite's
+  `user_version`. Reuse compatible development data and stable IDs; never
+  reset the database from startup. If setup fails, roll back and surface the
+  error before opening the app.
+- **Scope:** This establishes schema version 1. Future schema or seed
+  changes should use an explicit upgrade; legacy migrations and ongoing
+  seed synchronization are not part of this first-release setup.
+- **References:** [Database startup](../api/startup.js),
+  [SQLite regression tests](../api/__tests__/StartupDatabase-test.js).
+- **Dependencies:** None.
 
 ### DATA-02 - Surface loading, saving, and initialization failures
 
