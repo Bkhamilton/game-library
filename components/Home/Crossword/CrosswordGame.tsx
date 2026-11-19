@@ -1,246 +1,140 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { StyleSheet, ActivityIndicator } from 'react-native';
-import { View } from '@/components/Themed';
-import wordsList from '@/data/wordsList.json';
-import crosswordData from '@/data/crosswordData.json';
-import CrosswordGrid from '@/components/Home/Crossword/CrosswordGrid';
-import { buildCrossword } from '@/utils/CrosswordGenerator';
-import { useLocalSearchParams } from "expo-router";
-import CrosswordHeader from './CrosswordHeader';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Button, StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
+import GameHeader from '../GameHeader/GameHeader';
+import CrosswordGrid from './CrosswordGrid';
 import CrosswordWords from './CrosswordWords';
-import EndGameMessage from '@/components/Modals/EndGameMessage';
-import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss, insertTimeScore, insertCorrectWords, insertHintsUsed } from '@/db/Scores/Scores';
+import { applyCrosswordGuess, createCrosswordSnapshot, isCrosswordSnapshot, nextCrosswordLevel,
+    type CrosswordSnapshot, type PlacedWord } from './CrosswordSession';
 
-type PlacedWord = {
-    word: string;
-    startPosition: {
-        row: number;
-        col: number;
-        direction: 'horizontal' | 'vertical';
-    }
-    clue: string;
-}
+const instructions = 'Select a clue or a cell, then enter the answer. Four incorrect guesses end the run. ' +
+    'Complete levels for points in Endless, or stop to record your progress. Pause or leave to save.';
 
 export default function CrosswordGame() {
-    const { difficulty, mode } = useLocalSearchParams();
-    const [grid, setGrid] = useState<string[][]>([]);
-    const [placedWords, setPlacedWords] = useState<PlacedWord[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [wordsToFind, setWordsToFind] = useState<PlacedWord[]>([]); 
-    const [guessedWords, setGuessedWords] = useState<PlacedWord[]>([]);
-    const [activeCell, setActiveCell] = useState<{row: number, col: number} | null>(null);
+    return <StoredGameSession title="Crossword" version={1}
+        create={identity => createCrosswordSnapshot(identity.difficulty)}
+        validate={isCrosswordSnapshot} instructions={instructions}>
+        {props => <CrosswordRun {...props} />}
+    </StoredGameSession>;
+}
 
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [endGameResult, setEndGameResult] = useState<boolean>(false);
-
-    const [gameTime, setGameTime] = useState(0); // Track game time
-
-    const [wrongCount, setWrongCount] = useState(0);
-    const [hintsUsed, setHintsUsed] = useState(0); // Track hints used
-    
-    const [currentLevel, setCurrentLevel] = useState(1); // Track current level for Endless mode
-    const [totalScore, setTotalScore] = useState(0); // Track total score for Endless mode
-    const [isEndlessMode, setIsEndlessMode] = useState(false); // Track if in Endless mode
-
-    const { db, curGame } = useContext(DBContext);
-
-    const handleTimeUpdate = useCallback((seconds: number) => {
-        setGameTime(seconds);
-    }, []);
-
-    const handleWin = () => {
-        if (isEndlessMode) {
-            // In Endless mode, award points and continue to next level
-            const levelScore = 100 * currentLevel; // Points increase with level
-            setTotalScore(prev => prev + levelScore);
-            setCurrentLevel(prev => prev + 1);
-            
-            // Reset game after a brief delay
-            setTimeout(() => {
-                setWrongCount(0);
-                setGuessedWords([]);
-                setActiveCell(null);
-                generateCrossword();
-            }, 1500);
-        } else {
-            // Classic mode - end the game
-            insertWin(db, curGame && curGame.id, difficulty);
-            insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
-            insertCorrectWords(db, curGame && curGame.id, guessedWords.length, difficulty);
-            insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
-            setEndGameResult(true);
-            setEndGameModalVisible(true);
-        }
-    }
-
-    const handleLoss = () => {
-        if (isEndlessMode) {
-            // In Endless mode, losing ends the game and records the level
-            insertLoss(db, curGame && curGame.id, difficulty);
-            insertCorrectWords(db, curGame && curGame.id, currentLevel - 1, difficulty);
-            setEndGameResult(false);
-            setEndGameModalVisible(true);
-        } else {
-            // Classic mode
-            insertLoss(db, curGame && curGame.id, difficulty);
-            setEndGameResult(false);
-            setEndGameModalVisible(true);
-        }
-    }
-
+export function CrosswordRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<CrosswordSnapshot>) {
+    const { mode, difficulty } = run.identity;
+    const [active, setActive] = useState<{ index: number; row: number; col: number } | null>(null);
+    const [outcome, setOutcome] = useState<'win' | 'loss' | 'stopped' | null>(null);
+    const terminal = useRef(false);
+    const session = useGameSession<CrosswordSnapshot, 'win' | 'loss' | 'stopped'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (result, snapshot) => {
+            await checkpoint(snapshot);
+            await finalize(result, mode === 'Endless' ? [
+                { metric: 'endlessLevel', score: snapshot.state.level },
+                { metric: 'endlessScore', score: snapshot.state.score },
+                { metric: 'endlessCorrectWords', score: snapshot.state.correctWords },
+                { metric: 'endlessHintsUsed', score: snapshot.state.hintsUsed },
+            ] : [
+                { metric: 'correctWords', score: snapshot.state.correctWords },
+                { metric: 'hintsUsed', score: snapshot.state.hintsUsed },
+                ...(result === 'win' ? [{ metric: 'timeScore', score: Math.floor(snapshot.elapsedMs / 1000) }] : []),
+            ]);
+        },
+    });
+    const finish = (result: 'win' | 'loss' | 'stopped') => {
+        if (terminal.current) return;
+        terminal.current = true;
+        setOutcome(result);
+        void session.finish(result, session.runToken);
+    };
     useEffect(() => {
-        setIsEndlessMode(mode === 'Endless');
-        generateCrossword();
-    }, [mode]);
-
-    const getWordCount = (difficulty: string) => {
-        switch (difficulty) {
-            case 'Easy': return 6;
-            case 'Medium': return 9;
-            case 'Hard': return 14;
-            default: return 5;
-        }
-    }
-    
-    const generateCrossword = () => {
-        setIsLoading(true);
-        const size = 15;
-
-        const { grid, placedWords } = buildCrossword(size, wordsList, getWordCount(difficulty as string));
-
-        for (const word of placedWords) {
-            const wordData = crosswordData.find((data) => data.word === word.word);
-            if (wordData) {
-                word.clue = wordData.clue;
+        if (!session.isActive) { setActive(null); return; }
+        if (session.state.stopped) finish('stopped');
+        else if (session.state.wrongCount >= 4) finish('loss');
+        else if (session.state.guessedWords.length === session.state.placedWords.length) {
+            if (mode === 'Endless') {
+                try {
+                    session.change(previous => previous.guessedWords.length === previous.placedWords.length
+                        ? nextCrosswordLevel(previous, difficulty) : previous, session.runToken);
+                } catch {
+                    Alert.alert('Could not generate the next level', 'Your progress is safe. Pause and resume to retry.');
+                }
             }
+            else finish('win');
         }
+    }, [session.isActive, session.state, session.runToken, mode, difficulty]);
 
-        setGrid(grid);
-        setPlacedWords(placedWords);
-        setWordsToFind(placedWords);
-        setIsLoading(false);
+    const choose = (index: number, row: number, col: number) => {
+        if (session.isActive && !terminal.current && !session.getSnapshot().state.stopped) setActive({ index, row, col });
     };
-
-    const handleCellPress = (row: number, col: number) => {
-        setActiveCell({ row, col });
-    };
-
-    const handleGuessSubmit = (guess: string) => {
-        if (!activeCell) return;
-
-        // Find if the guess matches any word in the grid
-        const matchedWord = placedWords.find(word => {
-            const { row, col, direction } = word.startPosition;
-            const wordLength = word.word.length;
-            
-            if (direction === 'horizontal') {
-                return col <= activeCell.col && activeCell.col < col + wordLength && 
-                       row === activeCell.row;
-            } else {
-                return row <= activeCell.row && activeCell.row < row + wordLength && 
-                       col === activeCell.col;
-            }
+    const cellPress = (row: number, col: number) => {
+        const index = session.getSnapshot().state.placedWords.findIndex(word => {
+            const p = word.startPosition;
+            return !session.getSnapshot().state.guessedWords.includes(word.word) &&
+                (p.direction === 'horizontal' ? row === p.row && col >= p.col && col < p.col + word.word.length :
+                    col === p.col && row >= p.row && row < p.row + word.word.length);
         });
-
-        if (matchedWord && guess.toLowerCase() === matchedWord.word.toLowerCase()) {
-            // Add to guessed words if not already there
-            if (!guessedWords.some(w => w.word === matchedWord.word)) {
-                setGuessedWords([...guessedWords, matchedWord]);
-            }
-        }
-
-        // Check if all words have been guessed
-        if (guessedWords.length + 1 === wordsToFind.length) {
-            handleWin();
-        }
-
-        // Check if the guess is incorrect
-        if (matchedWord && guess.toLowerCase() !== matchedWord.word.toLowerCase()) {
-            setWrongCount(prevCount => prevCount + 1);
-        }
-
-        // Check if the wrong count exceeds 4
-        if (wrongCount >= 3) {
-            handleLoss();
-        }
-
-        
-        setActiveCell(null);
+        if (index >= 0) choose(index, row, col);
     };
-
-    const handleCluePress = (word: PlacedWord) => {
-        // Find the first cell of the word to focus on
-        const { row, col } = word.startPosition;
-        setActiveCell({ row, col });
+    const submit = (guess: string) => {
+        if (!active || terminal.current) return;
+        let result: 'win' | 'loss' | undefined;
+        let accepted: boolean;
+        try {
+            accepted = session.change(previous => {
+                if (previous.stopped || previous.level !== session.state.level) return previous;
+                const next = applyCrosswordGuess(previous, active.index, guess);
+                if (!next) return previous;
+                if (next.wrongCount >= 4) result = 'loss';
+                else if (next.guessedWords.length === next.placedWords.length) {
+                    if (mode === 'Endless') return nextCrosswordLevel(next, difficulty);
+                    result = 'win';
+                }
+                return next;
+            }, session.runToken);
+        } catch {
+            Alert.alert('Could not generate the next level', 'Your progress is safe. Submit the answer again to retry.');
+            return;
+        }
+        setActive(null);
+        if (accepted && result) finish(result);
     };
-
-    const restartGame = () => {
-        setGrid([]);
-        setPlacedWords([]);
-        setGuessedWords([]);
-        setActiveCell(null);
-        generateCrossword();
-    };
-
-    const handleStopEndless = () => {
-        // Record the level reached and show end game modal
-        insertWin(db, curGame && curGame.id, difficulty);
-        insertTimeScore(db, curGame && curGame.id, gameTime, difficulty);
-        // In endless mode, record the level as the score
-        insertCorrectWords(db, curGame && curGame.id, currentLevel - 1, difficulty);
-        insertHintsUsed(db, curGame && curGame.id, hintsUsed, difficulty);
-        setEndGameResult(true);
-        setEndGameModalVisible(true);
-    };
-
-    return (
-        <View style={styles.container}>
-            <EndGameMessage 
-                visible={endGameModalVisible} 
-                close={() => setEndGameModalVisible(false)} 
-                win={endGameResult} 
-                game={curGame} 
-                initialDifficulty={difficulty} 
-                restartGame={restartGame}
-            />
-            {isLoading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-                <>
-                    <CrosswordHeader
-                        wrongCount={wrongCount}
-                        wordsFound={guessedWords.length}
-                        totalWords={wordsToFind.length}
-                        onTimeUpdate={handleTimeUpdate}
-                        isEndlessMode={isEndlessMode}
-                        currentLevel={currentLevel}
-                        totalScore={totalScore}
-                        onStopEndless={handleStopEndless}
-                    />
-                    <CrosswordGrid 
-                        grid={grid}
-                        placedWords={placedWords} 
-                        guessedWords={guessedWords}
-                        activeCell={activeCell}
-                        onCellPress={handleCellPress}
-                        onGuessSubmit={handleGuessSubmit}
-                    />
-                    <CrosswordWords
-                        wordsToFind={wordsToFind}
-                        guessedWords={guessedWords}
-                        onCluePress={handleCluePress}
-                    />
-                </>
-            )}
-        </View>
-    );
+    const seconds = Math.floor(session.elapsedMs / 1000);
+    const clock = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    const guessed = session.state.placedWords.filter(word => session.state.guessedWords.includes(word.word));
+    return <View style={styles.container}>
+        <GameHeader leftContent={<Text>{session.state.wrongCount}/4</Text>}
+            centerContent={<Text accessibilityLabel={`Elapsed time ${clock}`}>{clock}</Text>}
+            rightContent={<Text>{guessed.length}/{session.state.placedWords.length}</Text>} />
+        {mode === 'Endless' && <Text>Level {session.state.level} · Score {session.state.score}</Text>}
+        <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+            onStart={session.start} onPause={session.pause} onResume={session.resume} onRetry={session.retry}
+            onLeave={() => session.leave(home)} onHelp={openHelp}
+            onRestart={session.state.stopped ? undefined : () => restart()} />
+        {mode === 'Endless' && session.isActive && <Button title="Stop" onPress={() => {
+            if (session.change(previous => ({ ...previous, stopped: true }), session.runToken)) finish('stopped');
+        }} />}
+        {session.isActive && <View style={styles.game}>
+            <CrosswordGrid key={session.runToken} grid={session.state.grid} placedWords={session.state.placedWords}
+                guessedWords={guessed} activeCell={active} onCellPress={cellPress} onGuessSubmit={submit} />
+            <CrosswordWords wordsToFind={session.state.placedWords} guessedWords={guessed}
+                onCluePress={(word: PlacedWord) => choose(session.state.placedWords.indexOf(word),
+                    word.startPosition.row, word.startPosition.col)} />
+        </View>}
+        {session.status === 'terminal' && <SessionResult
+            title={outcome === 'win' ? 'You won!' : outcome === 'stopped' ? 'Run stopped' : 'Game over'}
+            disabled={!session.isTerminalSaved} onReplay={() => session.leave(() => restart())}
+            onHome={() => session.leave(home)}>
+            <Text>{session.state.correctWords} correct words</Text>
+            {mode === 'Endless' && <Text>Level {session.state.level} · Score {session.state.score}</Text>}
+        </SessionResult>}
+    </View>;
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        paddingTop: 24,
-    },
+    container: { flex: 1, alignItems: 'center', paddingTop: 24 },
+    game: { flex: 1, width: '100%', alignItems: 'center' },
 });

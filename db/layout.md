@@ -2,6 +2,35 @@
 
 This document provides an overview of the schema for the SQLite database tables `Games` and `Scores`.
 
+## Session persistence (schema version 2)
+
+`GameSessions` retains each run and its versioned JSON checkpoint. An unfinished
+slot is unique per game and mode, except Daily Challenge slots also include the
+local start date and difficulty. Starting over requires the current slot ID as
+an explicit replacement guard. Checkpoint updates use optimistic revisions;
+retired runs cannot be saved or restored. The caller must validate the
+game-specific checkpoint version and contents before restoring.
+
+Finishing a run atomically retires it, records its outcome and compatible
+legacy score rows, and stores a Daily completion for a Daily win.
+`finishSession` writes legacy `result` values for wins (1) and losses (0);
+callers must not supply a `result` metric. Draws, stops and abandonment do not
+become wins or losses. Repeating the same terminal outcome is idempotent.
+Daily completion lookups here use SQLite only; callers must also consult legacy
+AsyncStorage completions when applicable.
+
+`SessionAchievementWork` records durable pending evaluation work.
+`flushPendingSessionAwards(db)` evaluates affected games using existing
+criteria and clears the work in the same transaction as progress, guarded
+unlocks, and point credits. If a flush fails, retry it separately; the
+committed outcome stays saved. Call it after database initialization and
+successful result saves, and retry on foregrounding.
+
+Native mutations use Expo's exclusive transaction connection. On web, session
+reads and mutations and achievement evaluation/awards share a serialized path
+on the provider handle. Unrelated code using that handle directly is not
+isolated; web callers must coordinate access before claiming full isolation.
+
 ## Table: `Games`
 
 The `Games` table stores information about different games.

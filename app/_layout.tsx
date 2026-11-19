@@ -7,6 +7,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import "react-native-reanimated";
 import { initializeDatabase } from '@/api/startup';
 import { DBContextProvider } from "@/contexts/DBContext";
+import { GameSessionProvider } from "@/contexts/GameSessionContext";
 import { UserContextProvider } from "@/contexts/UserContext";
 import { ThemeProvider as CustomThemeProvider } from "@/contexts/ThemeContext";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -50,7 +51,9 @@ export default function RootLayout() {
             <DBContextProvider>
                 <UserContextProvider>
                     <CustomThemeProvider>
-                        <RootLayoutNav />
+                        <GameSessionProvider>
+                            <RootLayoutNav />
+                        </GameSessionProvider>
                     </CustomThemeProvider>
                 </UserContextProvider>
             </DBContextProvider>

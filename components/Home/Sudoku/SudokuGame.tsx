@@ -1,215 +1,122 @@
-import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import { Button, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { generateSudokuPuzzle, checkMove } from '@/utils/SudokuGenerator';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ShakeView, GameVictoryConfetti } from '@/components/animations';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
 import SudokuBoard from './SudokuBoard';
 import SudokuHeader from './SudokuHeader';
-import EndGameMessage from '@/components/Modals/EndGameMessage';
-import { DBContext } from '@/contexts/DBContext';
-import { insertWin, insertLoss, insertTimeScore, insertMistakes } from '@/db/Scores/Scores';
-import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
-import { getTodaysSeed, markDailyChallengeCompleted } from '@/utils/DailyChallenge';
+import {
+    applySudokuMove, createSudokuSnapshot, frenzyDurationMs, isSudokuSnapshot,
+    type SudokuSnapshot,
+} from './SudokuSession';
+
+const instructions = 'Fill each row, column and 3×3 box with the numbers 1–9. Select a cell, then a number. ' +
+    'Classic ends after four mistakes. In Frenzy, each correct entry resets the countdown. ' +
+    'Pause or leave to save your progress; resume explicitly when you return.';
 
 export default function SudokuGame() {
-    const { difficulty = 'Easy', mode } = useLocalSearchParams<{ difficulty?: string; mode?: string }>();
-    const gameMode = typeof mode === 'string' ? mode : 'Classic'; // Default to Classic if not specified
-    
-    // Memoize today's seed since it only changes once per day
-    const todaysSeed = useMemo(() => {
-        return gameMode === 'Daily Challenge' ? getTodaysSeed() : undefined;
-    }, [gameMode]);
-    const [board, setBoard] = useState<number[][]>([]);
-    const [solvedBoard, setSolvedBoard] = useState<number[][]>([]);
-    const [initialNumbers, setInitialNumbers] = useState<{ [key: string]: boolean }>({});
+    return (
+        <StoredGameSession title="Sudoku" version={1}
+            create={identity => createSudokuSnapshot(identity.difficulty, identity.dailyDate)}
+            validate={isSudokuSnapshot} instructions={instructions}>
+            {props => <SudokuRun {...props} />}
+        </StoredGameSession>
+    );
+}
+
+export function SudokuRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<SudokuSnapshot>) {
+    const { mode, difficulty } = run.identity;
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
-
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [endGameResult, setEndGameResult] = useState<boolean>(false);
-
-    const [wrongCount, setWrongCount] = useState(0);
-    const [lossModalShown, setLossModalShown] = useState(false);
-    
     const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
     const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
-    
-    const [isLoading, setIsLoading] = useState(true);
-    const [generationFailed, setGenerationFailed] = useState(false);
-    const [generationAttempt, setGenerationAttempt] = useState(0);
+    const [outcome, setOutcome] = useState<'win' | 'loss' | null>(null);
+    const terminalRequested = useRef(false);
+    const session = useGameSession<SudokuSnapshot, 'win' | 'loss'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (result, snapshot) => {
+            await checkpoint(snapshot);
+            await finalize(result, [
+                { metric: 'mistakes', score: snapshot.state.mistakes },
+                ...(result === 'win' ? [{ metric: 'timeScore', score: Math.floor(snapshot.elapsedMs / 1000) }] : []),
+            ]);
+        },
+    });
+    const initialNumbers = useMemo(() => {
+        const givens: Record<string, boolean> = {};
+        session.state.givens.forEach((row, i) => row.forEach((digit, j) => {
+            if (digit) givens[`${i}-${j}`] = true;
+        }));
+        return givens;
+    }, [session.state.givens]);
+    const durationMs = mode === 'Frenzy' ? frenzyDurationMs(difficulty) : 0;
+    const remainingMs = Math.max(0, Math.min(durationMs,
+        durationMs - (session.elapsedMs - session.state.frenzyResetAtMs)));
 
-    const [gameTime, setGameTime] = useState(0); // Track game time
-    const [timerReset, setTimerReset] = useState(false); // For resetting timer on correct moves in Frenzy mode
-
-    const { db, curGame } = useContext(DBContext);
-
-    const handleTimeUpdate = useCallback((seconds: number) => {
-        setGameTime(seconds);
-    }, []);
-
-    const handleTimeExpired = useCallback(() => {
-        if (gameMode === 'Frenzy' && !lossModalShown) {
-            insertLoss(db, curGame!.id, difficulty);
-            insertMistakes(db, curGame!.id, wrongCount, difficulty);
-            setEndGameResult(false);
-            setEndGameModalVisible(true);
-            setLossModalShown(true);
-        }
-    }, [gameMode, lossModalShown, db, curGame, difficulty, wrongCount]);
-
-    const handleWin = async () => {
-        insertWin(db, curGame!.id, difficulty);
-        insertTimeScore(db, curGame!.id, gameTime, difficulty);
-        insertMistakes(db, curGame!.id, wrongCount, difficulty);
-        
-        // Mark daily challenge as completed if in Daily Challenge mode
-        if (gameMode === 'Daily Challenge') {
-            await markDailyChallengeCompleted('Sudoku', difficulty as string);
-        }
-        
-        setShowVictoryConfetti(true);
-        // Delay showing the modal slightly to let confetti play
-        setTimeout(() => {
-            setEndGameResult(true);
-            setEndGameModalVisible(true);
-        }, 500);
-    }
-
-    const handleLoss = () => {
-        insertLoss(db, curGame!.id, difficulty);
-        insertMistakes(db, curGame!.id, wrongCount, difficulty);
-        setEndGameResult(false);
-        setEndGameModalVisible(true);
-        setLossModalShown(true);
-    }
-
-    const handleInputChange = (row: number, col: number, value: string) => {
-        if (initialNumbers[`${row}-${col}`]) return; // Prevent changing initial numbers
-        const newBoard = [...board];
-        const intValue = parseInt(value) || 0;
-        // If the value is -1, clear the cell
-        if (intValue === -1) {
-            newBoard[row][col] = 0;
-            setBoard(newBoard);
-            return;
-        }
-        if (checkMove(solvedBoard, row, col, intValue)) {
-            newBoard[row][col] = intValue;
-            setBoard(newBoard);
-            // In Frenzy mode, reset the timer on correct move
-            if (gameMode === 'Frenzy') {
-                setTimerReset(prev => !prev); // Toggle to trigger reset
-            }
-        } else {
-            setWrongCount(prevCount => prevCount + 1);
-            setErrorShakeTrigger(prev => prev + 1); // Trigger shake animation
-        }
-        // Check if the board is solved
-        if (JSON.stringify(newBoard) === JSON.stringify(solvedBoard)) {
-            handleWin();
-        }
-        // Check if the board is lost (only for Classic mode - 4 mistakes rule)
-        if (gameMode === 'Classic' && wrongCount >= 3 && !lossModalShown) {
-            handleLoss();
-        }
-    };
-
-    const handleSelectNumber = (value: any) => {
-        setSelectedNumber(value);
+    const finish = (result: 'win' | 'loss') => {
+        if (terminalRequested.current) return;
+        terminalRequested.current = true;
+        setOutcome(result);
+        if (result === 'win') setShowVictoryConfetti(true);
+        void session.finish(result, session.runToken);
     };
 
     useEffect(() => {
-        setIsLoading(true);
-        setGenerationFailed(false);
-        // Simulate loading time to show spinner
-        const timeout = setTimeout(() => {
-            // Use seeded generation for Daily Challenge mode
-            const puzzle = generateSudokuPuzzle(difficulty, todaysSeed);
-            if (!puzzle) {
-                setGenerationFailed(true);
-                setIsLoading(false);
-                return;
-            }
-            const { completeBoard, puzzleBoard } = puzzle;
-            setBoard(puzzleBoard);
-            setSolvedBoard(completeBoard);
-            const initialNums: { [key: string]: boolean } = {};
-            puzzleBoard.forEach((row: any[], rowIndex: any) => {
-                row.forEach((cell: number, colIndex: any) => {
-                    if (cell !== 0) {
-                        initialNums[`${rowIndex}-${colIndex}`] = true;
-                    }
-                });
-            });
-            setInitialNumbers(initialNums);
-            setIsLoading(false);
-        }, 300);
-        return () => clearTimeout(timeout);
-    }, [difficulty, todaysSeed, generationAttempt]);
+        if (!session.isActive || terminalRequested.current) return;
+        // A crash between the last checkpoint and finalization must not reopen a completed board.
+        if (session.state.board.every(row => row.every(Boolean))) finish('win');
+        else if ((mode === 'Classic' && session.state.mistakes >= 4) ||
+            (mode === 'Frenzy' && remainingMs <= 0)) finish('loss');
+    }, [session.isActive, session.elapsedMs, session.state, mode, remainingMs]);
 
-    const router = useRouter();
-
-    const restartGame = (difficulty: string) => {
-        setWrongCount(0);
-        setLossModalShown(false);
-        router.replace(`/sudoku?difficulty=${difficulty}&mode=${gameMode}`);
-    }
-
-    if (generationFailed) {
-        return (
-            <View style={styles.container}>
-                <Text accessibilityRole="alert">Could not generate a Sudoku puzzle.</Text>
-                {todaysSeed === undefined && (
-                    <Button title="Try again" onPress={() => setGenerationAttempt(attempt => attempt + 1)} />
-                )}
-            </View>
-        );
-    }
+    const handleInputChange = (row: number, col: number, value: string) => {
+        if (!session.isActive || terminalRequested.current) return;
+        const snapshot = session.getSnapshot();
+        if (mode === 'Frenzy' && snapshot.elapsedMs - snapshot.state.frenzyResetAtMs >= durationMs) {
+            if (session.change(previous => previous, session.runToken)) finish('loss');
+            return;
+        }
+        const move = applySudokuMove(snapshot.state, row, col, Number(value), mode, snapshot.elapsedMs);
+        if (!move || !session.change(move.snapshot, session.runToken)) return;
+        if (move.mistake) setErrorShakeTrigger(previous => previous + 1);
+        if (move.outcome) finish(move.outcome);
+    };
 
     return (
         <View style={styles.container}>
-            <SudokuHeader 
-                wrongCount={wrongCount}
-                onTimeUpdate={handleTimeUpdate}
-                mode={gameMode}
-                difficulty={difficulty}
-                timerReset={timerReset}
-                onTimeExpired={handleTimeExpired}
-            />
-            {isLoading ? (
-                <LoadingSpinner size="large" />
-            ) : (
-                <ShakeView 
-                    trigger={errorShakeTrigger}
-                >
-                    <SudokuBoard 
-                        board={board} 
-                        handleInputChange={handleInputChange} 
-                        selectedNumber={selectedNumber} 
-                        initialNumbers={initialNumbers}
-                        selectNumber={handleSelectNumber}
-                    />
+            <SudokuHeader wrongCount={session.state.mistakes} mode={mode}
+                elapsedMs={session.elapsedMs} remainingMs={remainingMs} />
+            <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+                onStart={session.start} onPause={session.pause} onResume={session.resume}
+                onRetry={session.retry} onLeave={() => session.leave(home)}
+                onHelp={openHelp} onRestart={() => restart()} />
+            <View pointerEvents={session.isActive ? 'auto' : 'none'}
+                accessibilityElementsHidden={!session.isActive}
+                importantForAccessibility={session.isActive ? 'auto' : 'no-hide-descendants'}>
+                <ShakeView trigger={errorShakeTrigger}>
+                    <SudokuBoard key={session.runToken} board={session.state.board}
+                        handleInputChange={handleInputChange} selectedNumber={selectedNumber}
+                        initialNumbers={initialNumbers} selectNumber={value => {
+                            if (value === null || session.isActive) setSelectedNumber(value);
+                        }} />
                 </ShakeView>
+            </View>
+            {session.status === 'terminal' && (
+                <SessionResult title={outcome === 'win' ? 'You won!' : 'Game over'}
+                    disabled={!session.isTerminalSaved}
+                    onReplay={mode === 'Daily Challenge' ? undefined : () => session.leave(() => restart())}
+                    onHome={() => session.leave(home)}>
+                    <Text>{session.state.mistakes} mistakes</Text>
+                </SessionResult>
             )}
-            <EndGameMessage 
-                visible={endGameModalVisible} 
-                close={() => setEndGameModalVisible(false)} 
-                win={endGameResult} 
-                game={curGame} 
-                initialDifficulty={difficulty} 
-                restartGame={restartGame}
-            />
-            <GameVictoryConfetti
-                visible={showVictoryConfetti}
-                onComplete={() => setShowVictoryConfetti(false)}
-            />
+            <GameVictoryConfetti visible={showVictoryConfetti} onComplete={() => setShowVictoryConfetti(false)} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        paddingTop: 24,
-    },
+    container: { flex: 1, alignItems: 'center', paddingTop: 24 },
 });

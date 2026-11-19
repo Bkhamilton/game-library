@@ -1,219 +1,117 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { View, Text } from "@/components/Themed";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import EndGameMessage from "@/components/Modals/EndGameMessage";
-import { DBContext } from "@/contexts/DBContext";
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import TwoZeroFourEightBoard from "./TwoZeroFourEightBoard";
-import TwoZeroFourEightHeader from "./TwoZeroFourEightHeader";
-import useTheme from "@/hooks/useTheme";
-import { 
-    initializeBoardWithTiles, 
-    move, 
-    addRandomTile, 
-    canMove, 
-    hasWon,
-    getHighestTile,
-    Board,
-    Difficulty
-} from "@/utils/TwoZeroFourEightGenerator";
-import { insertHighScore, insertWin, insertLoss, insertTimeScore, insertTotalScore, insertMoves, insertHighestTile } from "@/db/Scores/Scores";
-import { getHighScoreByGame } from "@/db/Scores/Results";
+import { useSQLiteContext } from 'expo-sqlite';
+import { View, Text } from '@/components/Themed';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
+import useTheme from '@/hooks/useTheme';
+import { getHighestTile, move } from '@/utils/TwoZeroFourEightGenerator';
+import TwoZeroFourEightBoard from './TwoZeroFourEightBoard';
+import TwoZeroFourEightHeader from './TwoZeroFourEightHeader';
+import { applyTileMove, createTileSnapshot, isTileSnapshot, tileOutcome, type TileSnapshot } from './TwoZeroFourEightSession';
+
+const instructions = 'Use the arrows to slide tiles. Equal tiles merge and add to your score. ' +
+    'Reach 2048 to win; no legal moves ends the game. Pause or leave to save, then resume explicitly.';
 
 export default function TwoZeroFourEightGame() {
-    const router = useRouter();
-    const { difficulty } = useLocalSearchParams();
-    const [board, setBoard] = useState<Board>([]);
-    const [score, setScore] = useState(0);
-    const [highScore, setHighScore] = useState(0);
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [gameWon, setGameWon] = useState(false);
-    const [gameTime, setGameTime] = useState(0);
-    const [moves, setMoves] = useState(0);
+    return <StoredGameSession title="2048" version={1}
+        create={identity => createTileSnapshot(identity.difficulty)} validate={isTileSnapshot} instructions={instructions}>
+        {props => <TwoZeroFourEightRun {...props} />}
+    </StoredGameSession>;
+}
 
-    const { db, curGame } = useContext(DBContext);
+export function TwoZeroFourEightRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<TileSnapshot>) {
+    const db = useSQLiteContext();
     const { primary, text } = useTheme();
-
-    const handleTimeUpdate = useCallback((seconds: number) => {
-        setGameTime(seconds);
-    }, []);
-
-    // Load high score
+    const [highScore, setHighScore] = useState(0);
+    const [outcome, setOutcome] = useState<'win' | 'loss' | null>(null);
+    const terminalRequested = useRef(false);
+    const session = useGameSession<TileSnapshot, 'win' | 'loss'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (result, snapshot) => {
+            await checkpoint(snapshot);
+            await finalize(result, [
+                { metric: 'highScore', score: snapshot.state.score },
+                { metric: 'totalScore', score: snapshot.state.score },
+                { metric: 'moves', score: snapshot.state.moves },
+                { metric: 'highestTile', score: getHighestTile(snapshot.state.board) },
+                ...(result === 'win' ? [{ metric: 'timeScore', score: Math.floor(snapshot.elapsedMs / 1000) }] : []),
+            ]);
+        },
+    });
     useEffect(() => {
-        const loadHighScore = async () => {
-            if (db && curGame) {
-                const scores = await getHighScoreByGame(db, curGame.id);
-                if (scores && scores.length > 0) {
-                    setHighScore(scores[0].score);
-                }
-            }
-        };
-        loadHighScore();
-    }, [db, curGame]);
-
-    // Initialize game on mount (auto-start)
+        let current = true;
+        void db.getFirstAsync<{ score: number }>(
+            'SELECT MAX(score) AS score FROM Scores WHERE metric = ? AND gameId = ? AND difficulty = ?',
+            ['highScore', run.identity.gameId, run.identity.difficulty],
+        ).then(row => { if (current) setHighScore(row?.score ?? 0); })
+            .catch(error => { if (current) console.error('Could not load high score:', error); });
+        return () => { current = false; };
+    }, [db, run.identity.gameId, run.identity.difficulty]);
+    const finish = (result: 'win' | 'loss') => {
+        if (terminalRequested.current) return;
+        terminalRequested.current = true;
+        setOutcome(result);
+        void session.finish(result, session.runToken);
+    };
     useEffect(() => {
-        const initialBoard = initializeBoardWithTiles(difficulty as Difficulty);
-        setBoard(initialBoard);
-        setScore(0);
-        setMoves(0);
-    }, [difficulty]);
-
+        if (!session.isActive || terminalRequested.current) return;
+        const result = tileOutcome(session.state);
+        if (result) finish(result);
+    }, [session.isActive, session.runToken, session.state]);
     const handleMove = (direction: 'up' | 'down' | 'left' | 'right') => {
-        const { board: newBoard, moved, scoreGained } = move(board, direction);
-        
-        if (!moved) return;
-        
-        const boardWithNewTile = addRandomTile(newBoard, difficulty as Difficulty);
-        setBoard(boardWithNewTile);
-        
-        const newScore = score + scoreGained;
-        setScore(newScore);
-        setMoves(moves + 1);
-        
-        // Check for win
-        if (hasWon(boardWithNewTile) && !gameWon) {
-            setGameWon(true);
-            handleWin(newScore, moves + 1);
-        }
-        
-        // Check for loss
-        if (!canMove(boardWithNewTile)) {
-            handleLoss(newScore, moves + 1);
-        }
+        if (!session.isActive || terminalRequested.current) return;
+        if (!move(session.getSnapshot().state.board, direction).moved) return;
+        const result: { outcome?: 'win' | 'loss' } = {};
+        const accepted = session.change(previous => {
+            const move = applyTileMove(previous, direction);
+            result.outcome = move?.outcome;
+            return move?.snapshot ?? previous;
+        }, session.runToken);
+        if (accepted && result.outcome) finish(result.outcome);
     };
-
-    const handleWin = (finalScore: number, finalMoves: number) => {
-        if (db && curGame) {
-            const highestTile = getHighestTile(board);
-            insertWin(db, curGame.id, String(difficulty || 'Easy'));
-            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
-            insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
-            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
-            insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
-            insertHighestTile(db, curGame.id, highestTile, String(difficulty || 'Easy'));
-        }
-        setEndGameModalVisible(true);
-    };
-
-    const handleLoss = (finalScore: number, finalMoves: number) => {
-        if (db && curGame) {
-            const highestTile = getHighestTile(board);
-            insertLoss(db, curGame.id, String(difficulty || 'Easy'));
-            insertHighScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
-            insertTotalScore(db, curGame.id, finalScore, String(difficulty || 'Easy'));
-            insertMoves(db, curGame.id, finalMoves, String(difficulty || 'Easy'));
-            insertHighestTile(db, curGame.id, highestTile, String(difficulty || 'Easy'));
-        }
-        setEndGameModalVisible(true);
-    };
-
-    const restartGame = (difficulty: string) => {
-        router.replace(`/2048?difficulty=${difficulty}`);
-    };
-
-    return (
-        <View style={styles.container}>
-            <TwoZeroFourEightHeader 
-                highScore={highScore}
-                onTimeUpdate={handleTimeUpdate}
-            />
-            
-            <Text style={styles.score}>Score: {score}</Text>
-            
-            <Text style={styles.instructions}>Tap arrows to move tiles</Text>
-            
-            <TwoZeroFourEightBoard board={board} />
-            
-            {/* Directional Controls */}
+    const arrow = (direction: 'up' | 'down' | 'left' | 'right', icon: 'arrow-upward' | 'arrow-downward' | 'arrow-back' | 'arrow-forward') =>
+        <TouchableOpacity style={[styles.arrowButton, { backgroundColor: primary }]}
+            accessibilityRole="button" accessibilityLabel={`Move ${direction}`}
+            onPress={() => handleMove(direction)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <MaterialIcons name={icon} size={32} color={text} />
+        </TouchableOpacity>;
+    return <View style={styles.container}>
+        <TwoZeroFourEightHeader highScore={highScore} elapsedMs={session.elapsedMs} />
+        <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+            onStart={session.start} onPause={session.pause} onResume={session.resume}
+            onRetry={session.retry} onLeave={() => session.leave(home)} onHelp={openHelp} onRestart={() => restart()} />
+        <Text style={styles.score}>Score: {session.state.score}</Text>
+        <Text style={styles.instructions}>Tap arrows to move tiles</Text>
+        <View pointerEvents={session.isActive ? 'auto' : 'none'}
+            accessibilityElementsHidden={!session.isActive}
+            importantForAccessibility={session.isActive ? 'auto' : 'no-hide-descendants'}>
+            <TwoZeroFourEightBoard board={session.state.board} />
             <View style={styles.controlsContainer}>
-                {/* Up Button */}
-                <View style={styles.topRow}>
-                    <TouchableOpacity 
-                        style={[styles.arrowButton, { backgroundColor: primary }]}
-                        onPress={() => handleMove('up')}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <MaterialIcons name="arrow-upward" size={32} color={text} />
-                    </TouchableOpacity>
-                </View>
-                
-                {/* Left, Down, Right Buttons */}
+                <View style={styles.topRow}>{arrow('up', 'arrow-upward')}</View>
                 <View style={styles.bottomRow}>
-                    <TouchableOpacity 
-                        style={[styles.arrowButton, { backgroundColor: primary }]}
-                        onPress={() => handleMove('left')}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <MaterialIcons name="arrow-back" size={32} color={text} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                        style={[styles.arrowButton, { backgroundColor: primary }]}
-                        onPress={() => handleMove('down')}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <MaterialIcons name="arrow-downward" size={32} color={text} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                        style={[styles.arrowButton, { backgroundColor: primary }]}
-                        onPress={() => handleMove('right')}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                        <MaterialIcons name="arrow-forward" size={32} color={text} />
-                    </TouchableOpacity>
+                    {arrow('left', 'arrow-back')}{arrow('down', 'arrow-downward')}{arrow('right', 'arrow-forward')}
                 </View>
             </View>
-
-            <EndGameMessage
-                visible={endGameModalVisible}
-                close={() => setEndGameModalVisible(false)}
-                win={gameWon}
-                game={curGame}
-                initialDifficulty={difficulty}
-                restartGame={restartGame}
-            />
         </View>
-    );
+        {session.status === 'terminal' && <SessionResult title={outcome === 'win' ? 'You won!' : 'Game over'}
+            disabled={!session.isTerminalSaved} onReplay={() => session.leave(() => restart())}
+            onHome={() => session.leave(home)}>
+            <Text>Score: {session.state.score} · Moves: {session.state.moves}</Text>
+        </SessionResult>}
+    </View>;
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        paddingTop: 24,
-    },
-    score: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 10,
-        marginTop: 10,
-    },
-    instructions: {
-        fontSize: 14,
-        opacity: 0.6,
-        marginBottom: 20,
-    },
-    controlsContainer: {
-        marginTop: 30,
-        alignItems: 'center',
-    },
-    topRow: {
-        marginBottom: 8,
-    },
-    bottomRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 8,
-    },
-    arrowButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        borderRadius: 12,
-        minWidth: 80,
-        minHeight: 80,
-    },
+    container: { flex: 1, alignItems: 'center', paddingTop: 24 },
+    score: { fontSize: 28, fontWeight: 'bold', marginBottom: 10, marginTop: 10 },
+    instructions: { fontSize: 14, opacity: 0.6, marginBottom: 20 },
+    controlsContainer: { marginTop: 30, alignItems: 'center' },
+    topRow: { marginBottom: 8 },
+    bottomRow: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
+    arrowButton: { justifyContent: 'center', alignItems: 'center', padding: 20, borderRadius: 12, minWidth: 80, minHeight: 80 },
 });

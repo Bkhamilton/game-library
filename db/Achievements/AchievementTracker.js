@@ -1,16 +1,19 @@
 import { getGameIdByTitle } from '@/db/Games/Games';
-import { 
-    getUserAchievements, 
-    unlockAchievement, 
+import {
+    getUserAchievements,
+    unlockAchievementInTransaction,
     updateAchievementProgress,
-    isAchievementUnlocked 
 } from '@/db/Achievements/Achievements';
+import { withSessionDatabaseTransaction } from '../Sessions/Transaction';
 
-// Cache for game IDs to avoid repeated lookups
-const gameIdCache = new Map();
+let gameIdsByConnection = new WeakMap();
 
-// Helper function to get game ID with caching
 const getCachedGameId = async (db, gameTitle) => {
+    let gameIdCache = gameIdsByConnection.get(db);
+    if (!gameIdCache) {
+        gameIdCache = new Map();
+        gameIdsByConnection.set(db, gameIdCache);
+    }
     if (gameIdCache.has(gameTitle)) {
         return gameIdCache.get(gameTitle);
     }
@@ -246,129 +249,38 @@ const getProgressForAchievementWithStats = async (db, criteria, statsByGame) => 
         return 0;
     } catch (error) {
         console.error('Error getting progress:', error);
-        return 0;
-    }
-};
-
-// Optimized main function to check all achievements for a user
-export const checkAllAchievements = async (db, userId) => {
-    try {
-        const achievements = await getUserAchievements(db, userId);
-        
-        // Filter out already unlocked achievements
-        const lockedAchievements = achievements.filter(a => !a.unlocked);
-        
-        if (lockedAchievements.length === 0) {
-            return [];
-        }
-        
-        // Batch fetch all stats needed for achievement checking
-        const statsByGame = await batchGetAchievementStats(db, lockedAchievements);
-        
-        const newlyUnlocked = [];
-        const progressUpdates = [];
-        
-        // Process all achievements with cached stats
-        for (const achievement of lockedAchievements) {
-            // Get current progress
-            const currentProgress = await getProgressForAchievementWithStats(db, achievement.criteria, statsByGame);
-            
-            // Batch progress updates
-            progressUpdates.push({ userId, achievementId: achievement.id, progress: currentProgress });
-            
-            // Check if criteria is met
-            const isMet = await checkCriteriaWithStats(db, achievement.criteria, statsByGame);
-            
-            if (isMet) {
-                newlyUnlocked.push(achievement.id);
-            }
-        }
-        
-        // Batch update all progress at once
-        if (progressUpdates.length > 0) {
-            await batchUpdateAchievementProgress(db, progressUpdates);
-        }
-        
-        // Batch unlock all newly unlocked achievements
-        const unlockedResults = [];
-        for (const achievementId of newlyUnlocked) {
-            const unlockedAchievement = await unlockAchievement(db, userId, achievementId);
-            unlockedResults.push(unlockedAchievement);
-        }
-        
-        return unlockedResults;
-    } catch (error) {
-        console.error('Error checking all achievements:', error);
         throw error;
     }
 };
 
-// Batch update achievement progress
-const batchUpdateAchievementProgress = async (db, progressUpdates) => {
-    try {
-        // Use a transaction for better performance
-        await db.execAsync('BEGIN TRANSACTION');
-        
-        for (const update of progressUpdates) {
-            await updateAchievementProgress(db, update.userId, update.achievementId, update.progress);
+/** Award work must be acknowledged in the same transaction as these writes.
+ * @param {import('expo-sqlite').SQLiteDatabase} db
+ * @param {number} userId
+ * @param {string} [gameTitle]
+ */
+export const evaluateAchievementsInTransaction = async (db, userId, gameTitle) => {
+    const achievements = await getUserAchievements(db, userId);
+    const locked = achievements.filter(a => !a.unlocked && (gameTitle === undefined || a.criteria.game === gameTitle));
+    const statsByGame = await batchGetAchievementStats(db, locked);
+    const unlockedResults = [];
+
+    for (const achievement of locked) {
+        const progress = await getProgressForAchievementWithStats(db, achievement.criteria, statsByGame);
+        const isMet = await checkCriteriaWithStats(db, achievement.criteria, statsByGame);
+        await updateAchievementProgress(db, userId, achievement.id, progress);
+        if (isMet) {
+            const unlocked = await unlockAchievementInTransaction(db, userId, achievement.id);
+            if (unlocked) unlockedResults.push(unlocked);
         }
-        
-        await db.execAsync('COMMIT');
-    } catch (error) {
-        await db.execAsync('ROLLBACK');
-        console.error('Error batch updating achievement progress:', error);
-        throw error;
     }
+    return unlockedResults;
 };
 
-// Optimized function to check achievements after a game is completed
-export const checkAchievementsAfterGame = async (db, userId, gameTitle) => {
-    try {
-        const achievements = await getUserAchievements(db, userId);
-        
-        // Filter achievements related to this game and not yet unlocked
-        const gameAchievements = achievements.filter(a => 
-            !a.unlocked && a.criteria.game === gameTitle
-        );
-        
-        if (gameAchievements.length === 0) {
-            return [];
-        }
-        
-        // Batch fetch stats for this specific game
-        const statsByGame = await batchGetAchievementStats(db, gameAchievements);
-        
-        const newlyUnlocked = [];
-        const progressUpdates = [];
-        
-        for (const achievement of gameAchievements) {
-            const currentProgress = await getProgressForAchievementWithStats(db, achievement.criteria, statsByGame);
-            progressUpdates.push({ userId, achievementId: achievement.id, progress: currentProgress });
-            
-            const isMet = await checkCriteriaWithStats(db, achievement.criteria, statsByGame);
-            if (isMet) {
-                newlyUnlocked.push(achievement.id);
-            }
-        }
-        
-        // Batch update progress
-        if (progressUpdates.length > 0) {
-            await batchUpdateAchievementProgress(db, progressUpdates);
-        }
-        
-        // Unlock achievements
-        const unlockedResults = [];
-        for (const achievementId of newlyUnlocked) {
-            const unlockedAchievement = await unlockAchievement(db, userId, achievementId);
-            unlockedResults.push(unlockedAchievement);
-        }
-        
-        return unlockedResults;
-    } catch (error) {
-        console.error('Error checking achievements after game:', error);
-        throw error;
-    }
-};
+export const checkAllAchievements = (db, userId) =>
+    withSessionDatabaseTransaction(db, tx => evaluateAchievementsInTransaction(tx, userId));
+
+export const checkAchievementsAfterGame = (db, userId, gameTitle) =>
+    withSessionDatabaseTransaction(db, tx => evaluateAchievementsInTransaction(tx, userId, gameTitle));
 
 // Function to get achievement completion percentage for a user
 export const getAchievementCompletionPercentage = async (db, userId) => {
@@ -386,5 +298,5 @@ export const getAchievementCompletionPercentage = async (db, userId) => {
 
 // Clear cache function (can be called when needed)
 export const clearGameIdCache = () => {
-    gameIdCache.clear();
+    gameIdsByConnection = new WeakMap();
 };

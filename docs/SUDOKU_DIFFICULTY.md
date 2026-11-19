@@ -51,7 +51,7 @@ solution counter; do not lower the admission rules to fill a level.
 The same seed, level, collection, and algorithm reproduce the same puzzle.
 This changes boards relative to the old blank-count generator. Changing the
 collection or grading order in future releases can also change Daily boards;
-the current app does not persist in-progress Daily boards across such updates.
+compatible in-progress Daily saves restore the actual board across such updates.
 
 ## Verification
 

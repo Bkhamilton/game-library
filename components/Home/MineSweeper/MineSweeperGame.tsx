@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import { StyleSheet } from "react-native";
-import { View } from "@/components/Themed";
-import { revealAdjacentCells, getRemainingMineCount, checkWin, setSize, createBoard, initializeBoardWithFirstClick } from "@/utils/MineSweeperGenerator";
-import { useLocalSearchParams } from "expo-router";
-import { DBContext } from "@/contexts/DBContext";
-import Cell from "./Cell";
-import MineSweeperHeader from "./MineSweeperHeader";
-import EndGameMessage from "@/components/Modals/EndGameMessage";
-import useTheme from "@/hooks/useTheme";
-import { useRouter } from "expo-router";
-import { insertWin, insertLoss, insertTimeScore, insertMinesFlagged, insertMistakes } from '@/db/Scores/Scores';
-import { ShakeView, GameVictoryConfetti, LoadingSpinner } from '@/components/animations';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
+import { GameVictoryConfetti, ShakeView } from '@/components/animations';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
+import { getRemainingMineCount, setSize } from '@/utils/MineSweeperGenerator';
+import useTheme from '@/hooks/useTheme';
+import Cell from './Cell';
+import MineSweeperHeader from './MineSweeperHeader';
+import { applyMineSweeperMove, createMineSweeperSnapshot, isMineSweeperSnapshot,
+    mineSweeperFlags, mineSweeperOutcome, type MineSweeperSnapshot } from './MineSweeperSession';
 
 export interface CellProps {
     isRevealed: boolean;
@@ -19,215 +19,94 @@ export interface CellProps {
     adjacentMines: number;
 }
 
-export interface GameState {
-    board: CellProps[][];
-    minesCount: number;
-    isGameOver: boolean;
-    isGameWon: boolean;
-    timer: number;
-}
-
-export interface Board {
-    rows: number;
-    cols: number;
-    mines: number;
-}
+const instructions = 'Reveal every safe cell. Tap to reveal and long press to flag a suspected mine. ' +
+    'Your first reveal is safe. Pause or leave to save, and resume when you return.';
 
 export default function MineSweeperGame() {
-    const { difficulty = "Easy" } = useLocalSearchParams<{ difficulty?: string }>();
-    const [board, setBoard] = useState<CellProps[][]>([]);
-    const [gameState, setGameState] = useState<string>("active");
+    return <StoredGameSession title="Minesweeper" version={1}
+        create={identity => createMineSweeperSnapshot(identity.difficulty)}
+        validate={isMineSweeperSnapshot} instructions={instructions}>
+        {props => <MineSweeperRun {...props} />}
+    </StoredGameSession>;
+}
 
-    const [firstMoveMade, setFirstMoveMade] = useState(false);
-
-    const [trigger, setTrigger] = useState(false);
-
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [endGameResult, setEndGameResult] = useState<boolean>(false);
-    
-    const [errorShakeTrigger, setErrorShakeTrigger] = useState(0);
-    const [showVictoryConfetti, setShowVictoryConfetti] = useState(false);
-    
-    const [isLoading, setIsLoading] = useState(true);
-
-    const { db, curGame } = useContext(DBContext);
-
-    const [gameTime, setGameTime] = useState(0);
-    const [minesFlagged, setMinesFlagged] = useState(0);
-    const [incorrectFlags, setIncorrectFlags] = useState(0);
-
-    const handleTimeUpdate = useCallback((seconds: number) => {
-        setGameTime(seconds);
-    }, []);
-
-    const restartGame = (difficulty: string) => {
-        router.replace(`/minesweeper?difficulty=${difficulty}`);
-        setTrigger(!trigger);
-    };
-
-    useEffect(() => {
-        setIsLoading(true);
-        setTimeout(() => {
-            const emptyBoard = createBoard(difficulty);
-            setFirstMoveMade(false);
-            setGameState("active");
-            setBoard(emptyBoard);
-            setMinesFlagged(0);
-            setIncorrectFlags(0);
-            setIsLoading(false);
-        }, 300);
-    }, [difficulty, trigger]);
-
-    const handleWin = () => {
-        insertWin(db, curGame!.id, difficulty);
-        insertTimeScore(db, curGame!.id, gameTime, difficulty);
-        insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
-        insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
-        setGameState("won");
-        setShowVictoryConfetti(true);
-        // Delay showing the modal slightly to let confetti play
-        setTimeout(() => {
-            setEndGameResult(true);
-            setEndGameModalVisible(true);
-        }, 500);
-    }
-
-    const handleLoss = () => {
-        insertLoss(db, curGame!.id, difficulty);
-        insertMinesFlagged(db, curGame!.id, minesFlagged, difficulty);
-        insertMistakes(db, curGame!.id, incorrectFlags, difficulty);
-        setGameState("lost");
-        setErrorShakeTrigger(prev => prev + 1); // Trigger shake animation on loss
-        setEndGameResult(false);
-        setEndGameModalVisible(true);
-    }
-
-    const handleCellClick = (row: number, col: number, isLongPress: boolean) => {
-        if (!firstMoveMade) {
-            const newBoard = initializeBoardWithFirstClick(difficulty, row, col);
-            setBoard(newBoard);
-            setFirstMoveMade(true);
-            return;
-        }
-        if (gameState !== "active") return;
-
-        const newBoard = [...board];
-        const cell = newBoard[row][col];
-
-        if (isLongPress) {
-            // Toggle flag
-            if (!cell.isRevealed) {
-                const wasAlreadyFlagged = cell.isFlagged;
-                cell.isFlagged = !cell.isFlagged;
-                
-                // Track correct and incorrect flags
-                if (cell.isFlagged) {
-                    // Flag was just placed
-                    if (cell.isMine) {
-                        setMinesFlagged((prev) => prev + 1);
-                    } else {
-                        setIncorrectFlags((prev) => prev + 1);
-                    }
-                } else if (wasAlreadyFlagged) {
-                    // Flag was just removed
-                    if (cell.isMine) {
-                        setMinesFlagged((prev) => prev - 1);
-                    } else {
-                        setIncorrectFlags((prev) => prev - 1);
-                    }
-                }
-            }
-        } else {
-            // Reveal cell
-            if (!cell.isFlagged && !cell.isRevealed) {
-                if (cell.isMine) {
-                    handleLoss();
-                } else {
-                    // Reveal adjacent cells if no adjacent mines
-                    if (cell.adjacentMines === 0) {
-                        revealAdjacentCells(newBoard, row, col);
-                    }
-                    cell.isRevealed = true;
-                    // Check if the game is won
-                    if (checkWin(newBoard)) {
-                        handleWin();
-                    }
-                }
-                cell.isRevealed = true;
-            }
-        }
-
-        setBoard(newBoard);
-    };
-
-    const renderCell = (row: number, col: number) => {
-        const cell = board[row][col];
-        const cellSize = setSize(difficulty);
-        return (
-            <Cell
-                key={`${row}-${col}`}
-                revealed={cell.isRevealed}
-                flagged={cell.isFlagged}
-                mine={cell.isMine}
-                adjacentMines={cell.adjacentMines}
-                onPress={() => handleCellClick(row, col, false)}
-                onLongPress={() => handleCellClick(row, col, true)}
-                size={cellSize}
-            />
-        );
-    };
-
-    const router = useRouter();
-
+export function MineSweeperRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<MineSweeperSnapshot>) {
+    const [outcome, setOutcome] = useState<'win' | 'loss' | null>(null);
+    const [confetti, setConfetti] = useState(false);
+    const [shake, setShake] = useState(0);
+    const terminalRequested = useRef(false);
     const { primary } = useTheme();
+    const session = useGameSession<MineSweeperSnapshot, 'win' | 'loss'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (result, snapshot) => {
+            await checkpoint(snapshot);
+            const flags = mineSweeperFlags(snapshot.state);
+            await finalize(result, [
+                { metric: 'minesFlagged', score: flags.correct },
+                { metric: 'mistakes', score: flags.incorrect },
+                ...(result === 'win' ? [{ metric: 'timeScore', score: Math.floor(snapshot.elapsedMs / 1000) }] : []),
+            ]);
+        },
+    });
+    const finish = (result: 'win' | 'loss') => {
+        if (terminalRequested.current) return;
+        terminalRequested.current = true;
+        setOutcome(result);
+        if (result === 'win') setConfetti(true);
+        else setShake(previous => previous + 1);
+        void session.finish(result, session.runToken);
+    };
+    useEffect(() => {
+        if (!session.isActive || terminalRequested.current) return;
+        const result = mineSweeperOutcome(session.state);
+        if (result) finish(result);
+    }, [session.isActive, session.runToken, session.state]);
 
-    return (
-        <View style={styles.container}>
-            <MineSweeperHeader 
-                minesCount={getRemainingMineCount(difficulty, board)}
-                gameState={gameState} 
-                trigger={trigger}
-                onTimeUpdate={handleTimeUpdate}
-            />
-            {isLoading ? (
-                <LoadingSpinner size="large" />
-            ) : (
-                <ShakeView trigger={errorShakeTrigger}>
-                    <View style={[styles.board, { borderColor: primary }]}>
-                        {board.map((row, rowIndex) => (
-                            <View key={rowIndex} style={styles.row}>
-                                {row.map((cell, colIndex) => renderCell(rowIndex, colIndex))}
-                            </View>
-                        ))}
-                    </View>
-                </ShakeView>
-            )}
-            <EndGameMessage 
-                visible={endGameModalVisible} 
-                close={() => setEndGameModalVisible(false)} 
-                win={endGameResult} 
-                game={curGame} 
-                initialDifficulty={difficulty} 
-                restartGame={restartGame}
-            />
-            <GameVictoryConfetti
-                visible={showVictoryConfetti}
-                onComplete={() => setShowVictoryConfetti(false)}
-            />
+    const handleCellClick = (row: number, col: number, flag: boolean) => {
+        if (!session.isActive || terminalRequested.current) return;
+        const cell = session.getSnapshot().state.board[row]?.[col];
+        if (!cell || cell.isRevealed || (!flag && cell.isFlagged)) return;
+        const result: { outcome?: 'win' | 'loss' } = {};
+        const accepted = session.change(previous => {
+            const move = applyMineSweeperMove(previous, row, col, flag);
+            result.outcome = move?.outcome;
+            return move?.snapshot ?? previous;
+        }, session.runToken);
+        if (accepted && result.outcome) finish(result.outcome);
+    };
+    return <View style={styles.container}>
+        <MineSweeperHeader minesCount={getRemainingMineCount(run.identity.difficulty, session.state.board)}
+            elapsedMs={session.elapsedMs} />
+        <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+            onStart={session.start} onPause={session.pause} onResume={session.resume}
+            onRetry={session.retry} onLeave={() => session.leave(home)} onHelp={openHelp} onRestart={() => restart()} />
+        <View pointerEvents={session.isActive ? 'auto' : 'none'}
+            accessibilityElementsHidden={!session.isActive}
+            importantForAccessibility={session.isActive ? 'auto' : 'no-hide-descendants'}>
+            <ShakeView trigger={shake}>
+                <View style={[styles.board, { borderColor: primary }]}>
+                    {session.state.board.map((row, r) => <View key={r} style={styles.row}>
+                        {row.map((cell, c) => <Cell key={`${r}-${c}`} revealed={cell.isRevealed}
+                            flagged={cell.isFlagged} mine={cell.isMine} adjacentMines={cell.adjacentMines}
+                            onPress={() => handleCellClick(r, c, false)}
+                            onLongPress={() => handleCellClick(r, c, true)} size={setSize(run.identity.difficulty)} />)}
+                    </View>)}
+                </View>
+            </ShakeView>
         </View>
-    );
-};
+        {session.status === 'terminal' && <SessionResult title={outcome === 'win' ? 'You won!' : 'Game over'}
+            disabled={!session.isTerminalSaved} onReplay={() => session.leave(() => restart())}
+            onHome={() => session.leave(home)}>
+            <Text>{mineSweeperFlags(session.state).correct} correct flags</Text>
+        </SessionResult>}
+        <GameVictoryConfetti visible={confetti} onComplete={() => setConfetti(false)} />
+    </View>;
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        paddingTop: "25%",
-    },
-    board: {
-        borderWidth: 4,
-    },
-    row: {
-        flexDirection: "row",
-    },
+    container: { flex: 1, alignItems: 'center', paddingTop: 24 },
+    board: { borderWidth: 4 },
+    row: { flexDirection: 'row' },
 });

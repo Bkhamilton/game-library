@@ -1,14 +1,14 @@
 import React from 'react';
 import { Text } from '@/components/Themed';
 import GameHeader from '../GameHeader/GameHeader';
+import ElapsedClock from '@/components/Session/ElapsedClock';
 
 interface MemoryMatchHeaderProps {
     incorrectGuesses: number;
     maxIncorrectGuesses: number;
     matches: number;
     totalPairs: number;
-    onTimeUpdate?: (seconds: number) => void;
-    timerActive?: boolean;
+    elapsedMs: number;
 }
 
 export default function MemoryMatchHeader({ 
@@ -16,15 +16,13 @@ export default function MemoryMatchHeader({
     maxIncorrectGuesses,
     matches,
     totalPairs,
-    onTimeUpdate,
-    timerActive = true
+    elapsedMs
 }: MemoryMatchHeaderProps) {
     return (
         <GameHeader
             leftContent={<Text style={{ fontSize: 16 }}>{matches}/{totalPairs}</Text>}
             rightContent={<Text style={{ fontSize: 16 }}>{incorrectGuesses}/{maxIncorrectGuesses}</Text>}
-            onTimeUpdate={onTimeUpdate}
-            timerActive={timerActive}
+            centerContent={<ElapsedClock elapsedMs={elapsedMs} />}
         />
     );
 }

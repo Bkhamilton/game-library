@@ -1,183 +1,76 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import { StyleSheet } from "react-native";
-import { View } from "@/components/Themed";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import EndGameMessage from "@/components/Modals/EndGameMessage";
-import { DBContext } from "@/contexts/DBContext";
-import MemoryMatchBoard from "./MemoryMatchBoard";
-import MemoryMatchHeader from "./MemoryMatchHeader";
-import { 
-    initializeBoard, 
-    checkMatch, 
-    checkWin, 
-    getMaxIncorrectGuesses,
-    Card,
-    getBoardSize
-} from "@/utils/MemoryMatchGenerator";
-import { insertWin, insertLoss, insertTimeScore, insertTotalScore } from "@/db/Scores/Scores";
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
+import { getBoardSize, getMaxIncorrectGuesses } from '@/utils/MemoryMatchGenerator';
+import MemoryMatchBoard from './MemoryMatchBoard';
+import MemoryMatchHeader from './MemoryMatchHeader';
+import { createMemorySnapshot, isMemorySnapshot, resolveMemoryPair, type MemorySnapshot } from './MemoryMatchSession';
 
 export default function MemoryMatchGame() {
-    const router = useRouter();
-    const { difficulty } = useLocalSearchParams();
-    const [cards, setCards] = useState<Card[]>([]);
-    const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
-    const [matches, setMatches] = useState(0);
-    const [incorrectGuesses, setIncorrectGuesses] = useState(0);
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [gameWon, setGameWon] = useState(false);
-    const [gameTime, setGameTime] = useState(0);
-    const [canFlip, setCanFlip] = useState(true);
-    const [timerActive, setTimerActive] = useState(true);
-    const [isPreviewPhase, setIsPreviewPhase] = useState(true);
-
-    const { db, curGame } = useContext(DBContext);
-
-    const maxIncorrectGuesses = getMaxIncorrectGuesses(difficulty as string);
-    const { rows, cols } = getBoardSize(difficulty as string);
-    const totalPairs = (rows * cols) / 2;
-
-    const handleTimeUpdate = useCallback((seconds: number) => {
-        setGameTime(seconds);
-    }, []);
-
-    // Initialize the board when component mounts or difficulty changes
-    useEffect(() => {
-        const newCards = initializeBoard(difficulty as string);
-        // Start with all cards flipped for preview
-        const previewCards = newCards.map(card => ({ ...card, isFlipped: true }));
-        setCards(previewCards);
-        setMatches(0);
-        setIncorrectGuesses(0);
-        setFlippedIndices([]);
-        setGameWon(false);
-        setIsPreviewPhase(true);
-        setCanFlip(false);
-        
-        // After 1 second, flip all cards back
-        const timer = setTimeout(() => {
-            const hiddenCards = newCards.map(card => ({ ...card, isFlipped: false }));
-            setCards(hiddenCards);
-            setIsPreviewPhase(false);
-            setCanFlip(true);
-        }, 1500);
-        
-        return () => clearTimeout(timer);
-    }, [difficulty]);
-
-    // Handle card flipping logic
-    useEffect(() => {
-        if (flippedIndices.length === 2 && canFlip) {
-            setCanFlip(false);
-            const [firstIndex, secondIndex] = flippedIndices;
-            const firstCard = cards[firstIndex];
-            const secondCard = cards[secondIndex];
-
-            if (checkMatch(firstCard, secondCard)) {
-                // Cards match
-                setTimeout(() => {
-                    const newCards = [...cards];
-                    newCards[firstIndex].isMatched = true;
-                    newCards[secondIndex].isMatched = true;
-                    newCards[firstIndex].isFlipped = false;
-                    newCards[secondIndex].isFlipped = false;
-                    setCards(newCards);
-                    setMatches(matches + 1);
-                    setFlippedIndices([]);
-                    setCanFlip(true);
-
-                    // Check for win
-                    if (checkWin(newCards)) {
-                        handleWin();
-                    }
-                }, 600);
-            } else {
-                // Cards don't match
-                setTimeout(() => {
-                    const newCards = [...cards];
-                    newCards[firstIndex].isFlipped = false;
-                    newCards[secondIndex].isFlipped = false;
-                    setCards(newCards);
-                    setIncorrectGuesses(incorrectGuesses + 1);
-                    setFlippedIndices([]);
-                    setCanFlip(true);
-                }, 1000);
-            }
-        }
-    }, [flippedIndices, cards, matches, incorrectGuesses, canFlip]);
-
-    // Check for loss condition
-    useEffect(() => {
-        if (incorrectGuesses >= maxIncorrectGuesses && !gameWon && !endGameModalVisible) {
-            handleLoss();
-        }
-    }, [incorrectGuesses, maxIncorrectGuesses, gameWon, endGameModalVisible]);
-
-    const handleCardPress = (index: number) => {
-        if (!canFlip || flippedIndices.length >= 2 || isPreviewPhase) return;
-        
-        const newCards = [...cards];
-        newCards[index].isFlipped = true;
-        setCards(newCards);
-        setFlippedIndices([...flippedIndices, index]);
-    };
-
-    const handleWin = () => {
-        setTimerActive(false);
-        if (db && curGame) {
-            insertWin(db, curGame.id, String(difficulty || 'Easy'));
-            insertTimeScore(db, curGame.id, gameTime, String(difficulty || 'Easy'));
-            insertTotalScore(db, curGame.id, matches, String(difficulty || 'Easy'));
-        }
-        setGameWon(true);
-        setEndGameModalVisible(true);
-    };
-
-    const handleLoss = () => {
-        setTimerActive(false);
-        if (db && curGame) {
-            insertLoss(db, curGame.id, String(difficulty || 'Easy'));
-        }
-        setGameWon(false);
-        setEndGameModalVisible(true);
-    };
-
-    const restartGame = (difficulty: string) => {
-        router.replace(`/memorymatch?difficulty=${difficulty}`);
-    };
-
-    return (
-        <View style={styles.container}>
-            <MemoryMatchHeader
-                incorrectGuesses={incorrectGuesses}
-                maxIncorrectGuesses={maxIncorrectGuesses}
-                matches={matches}
-                totalPairs={totalPairs}
-                onTimeUpdate={handleTimeUpdate}
-                timerActive={timerActive}
-            />
-
-            <MemoryMatchBoard
-                cards={cards}
-                onCardPress={handleCardPress}
-                difficulty={difficulty as string}
-            />
-
-            <EndGameMessage
-                visible={endGameModalVisible}
-                close={() => setEndGameModalVisible(false)}
-                win={gameWon}
-                game={curGame}
-                initialDifficulty={difficulty}
-                restartGame={restartGame}
-            />
-        </View>
-    );
+    return <StoredGameSession title="Memory Match" version={1}
+        create={identity => createMemorySnapshot(identity.difficulty)} validate={isMemorySnapshot}
+        instructions="Find every matching pair before reaching the incorrect guess limit. Pause or leave to save your progress.">
+        {props => <MemoryMatchRun {...props} />}
+    </StoredGameSession>;
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        paddingTop: 24,
-    },
-});
+export function MemoryMatchRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<MemorySnapshot>) {
+    const difficulty = run.identity.difficulty;
+    const limit = getMaxIncorrectGuesses(difficulty);
+    const size = getBoardSize(difficulty);
+    const session = useGameSession<MemorySnapshot, 'win' | 'loss'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (outcome, snapshot) => {
+            await checkpoint(snapshot);
+            await finalize(outcome, [
+                { metric: 'totalScore', score: snapshot.state.matches },
+                { metric: 'mistakes', score: snapshot.state.mistakes },
+                ...(outcome === 'win' ? [{ metric: 'timeScore', score: Math.floor(snapshot.elapsedMs / 1000) }] : []),
+            ]);
+        },
+    });
+    const { isActive, runToken } = session;
+    useEffect(() => {
+        if (!isActive) return;
+        const s = session.getSnapshot().state;
+        if (s.outcome) { void session.finish(s.outcome, runToken); return; }
+        if (s.phase !== 'preview' && s.flipped.length !== 2) return;
+        const delay = s.phase === 'preview' ? 1500 :
+            s.cards[s.flipped[0]].value === s.cards[s.flipped[1]].value ? 600 : 1000;
+        const timer = setTimeout(() => {
+            session.change(previous => previous.phase === 'preview'
+                ? { ...previous, phase: 'play', cards: previous.cards.map(card => ({ ...card, isFlipped: false })) }
+                : resolveMemoryPair(previous, limit), runToken);
+        }, delay);
+        return () => clearTimeout(timer);
+    }, [isActive, runToken, session.state, limit]);
+
+    const press = (index: number) => {
+        const s = session.getSnapshot().state;
+        if (s.outcome || s.phase !== 'play' || s.flipped.length >= 2 ||
+            !s.cards[index] || s.cards[index].isFlipped || s.cards[index].isMatched) return;
+        session.change({ ...s, cards: s.cards.map((card, i) => i === index ? { ...card, isFlipped: true } : card),
+            flipped: [...s.flipped, index] }, runToken);
+    };
+    return <View style={styles.container}>
+        <MemoryMatchHeader incorrectGuesses={session.state.mistakes} maxIncorrectGuesses={limit}
+            matches={session.state.matches} totalPairs={size.rows * size.cols / 2} elapsedMs={session.elapsedMs} />
+        <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+            onStart={session.start} onPause={session.pause} onResume={session.resume} onRetry={session.retry}
+            onLeave={() => session.leave(home)} onHelp={openHelp} onRestart={() => restart()} />
+        <View pointerEvents={isActive ? 'auto' : 'none'} accessibilityElementsHidden={!isActive}
+            importantForAccessibility={isActive ? 'auto' : 'no-hide-descendants'}>
+            <MemoryMatchBoard cards={session.state.cards} onCardPress={press} difficulty={difficulty} />
+        </View>
+        {session.status === 'terminal' && <SessionResult title={session.state.outcome === 'win' ? 'You won!' : 'Game over'}
+            disabled={!session.isTerminalSaved} onReplay={() => session.leave(() => restart())} onHome={() => session.leave(home)}>
+            <Text>{session.state.matches} pairs matched</Text>
+        </SessionResult>}
+    </View>;
+}
+const styles = StyleSheet.create({ container: { flex: 1, alignItems: 'center', paddingTop: 24 } });

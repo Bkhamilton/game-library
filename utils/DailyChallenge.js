@@ -26,6 +26,9 @@ export const generateSeedFromDate = (dateKey) => {
     return Math.abs(hash);
 };
 
+export const readLegacyDailyCompletion = async (gameName, difficulty, dateKey) =>
+    await AsyncStorage.getItem(`dailyChallenge_${gameName}_${difficulty}_${dateKey}`) === 'completed';
+
 /**
  * Check if the daily challenge has been completed for a specific game and difficulty
  * @param {string} gameName - Name of the game (e.g., 'Sudoku')
@@ -35,9 +38,7 @@ export const generateSeedFromDate = (dateKey) => {
 export const isDailyChallengeCompleted = async (gameName, difficulty) => {
     try {
         const dailyKey = getDailyKey();
-        const storageKey = `dailyChallenge_${gameName}_${difficulty}_${dailyKey}`;
-        const value = await AsyncStorage.getItem(storageKey);
-        return value === 'completed';
+        return await readLegacyDailyCompletion(gameName, difficulty, dailyKey);
     } catch (error) {
         console.error('Error checking daily challenge status:', error);
         return false;

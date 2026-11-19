@@ -37,8 +37,8 @@ describe('SQLite startup', () => {
     it('sets up an empty database once and does not reseed on relaunch', async () => {
         await initializeDatabase(db);
 
-        expect(readVersion()).toBe(1);
-        expect(readTables()).toEqual(['Achievements', 'Games', 'Scores', 'UserAchievements', 'Users']);
+        expect(readVersion()).toBe(2);
+        expect(readTables()).toEqual(['Achievements', 'DailyCompletions', 'GameSessions', 'Games', 'Scores', 'SessionAchievementWork', 'UserAchievements', 'Users']);
         expect(sqlite.prepare('SELECT username, name FROM Users').all()).toEqual([
             { username: 'john_doe', name: 'John Doe' },
         ]);
@@ -68,7 +68,7 @@ describe('SQLite startup', () => {
 
         await initializeDatabase(db);
 
-        expect(readVersion()).toBe(1);
+        expect(readVersion()).toBe(2);
         expect(sqlite.prepare('SELECT id, username, name, totalPoints FROM Users').all())
             .toEqual([{ id: 1, username: 'dev', name: 'Dev Profile', totalPoints: 10 }]);
         expect(sqlite.prepare('SELECT gameId, score FROM Scores').all()).toEqual([{ gameId: 1, score: 42 }]);
@@ -99,7 +99,7 @@ describe('SQLite startup', () => {
 
         db.execAsync = exec;
         await initializeDatabase(db);
-        expect(readVersion()).toBe(1);
+        expect(readVersion()).toBe(2);
         expect(sqlite.prepare('SELECT COUNT(*) AS count FROM Users').get().count).toBe(1);
     });
 
@@ -113,10 +113,33 @@ describe('SQLite startup', () => {
     });
 
     it('does not open a database marked with an unsupported version', async () => {
-        sqlite.exec('PRAGMA user_version = 2');
+        sqlite.exec('PRAGMA user_version = 3');
 
-        await expect(initializeDatabase(db)).rejects.toThrow('Unsupported database version 2');
-        expect(readVersion()).toBe(2);
+        await expect(initializeDatabase(db)).rejects.toThrow('Unsupported database version 3');
+        expect(readVersion()).toBe(3);
         expect(readTables()).toEqual([]);
+    });
+
+    it('upgrades a version 1 database and rolls back an interrupted migration', async () => {
+        await initializeDatabase(db);
+        sqlite.exec(`
+            DROP TABLE SessionAchievementWork;
+            DROP TABLE DailyCompletions;
+            DROP TABLE GameSessions;
+            PRAGMA user_version = 1;
+            INSERT INTO Scores (gameId, score, metric, difficulty) VALUES (1, 123, 'timeScore', 'Easy');
+        `);
+        const exec = db.execAsync;
+        db.execAsync = async sql => {
+            await exec(sql);
+            if (sql.startsWith('PRAGMA user_version =')) throw new Error('Migration failed');
+        };
+        await expect(initializeDatabase(db)).rejects.toThrow('Migration failed');
+        expect(readVersion()).toBe(1);
+        expect(readTables()).not.toContain('GameSessions');
+        db.execAsync = exec;
+        await initializeDatabase(db);
+        expect(readVersion()).toBe(2);
+        expect(sqlite.prepare('SELECT score FROM Scores').get().score).toBe(123);
     });
 });

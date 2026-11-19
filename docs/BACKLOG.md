@@ -134,7 +134,9 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-01 - Define one session contract for existing modes
 
-**P1 | Source gap / product decision**
+**P1 | Source gap / product decision | Status: Implemented**
+
+- **Contract:** [Game sessions and mode matrix](GAME_SESSIONS.md).
 
 - **Issue:** Games do not share a clear definition of ready, playing, paused,
   completed, lost, drawn, or abandoned states.
@@ -149,7 +151,7 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-02 - Implement pause, interruption, and safe resumption
 
-**P1 | Source gap**
+**P1 | Source gap | Status: Implemented; device confirmation tracked by QA-02**
 
 - **Acceptance:** Every shipped game has a reachable pause/resume action.
   Backgrounding and relevant modal interruptions suspend input, timers,
@@ -163,10 +165,10 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-03 - Make Continue meaningful with saved sessions
 
-**P1 | Confirmed source defect / source gap**
+**P1 | Confirmed source defect / source gap | Status: Implemented; cold restart on devices tracked by QA-02**
 
-- **Evidence:** The selection modal displays a Continue button without an
-  action handler.
+- **Resolution:** Continue opens a validated SQLite checkpoint. Unreadable
+  saves are reported and can be discarded explicitly without affecting scores.
 - **Acceptance:** Offer Continue only when a compatible saved session exists.
   Restore board/content, mode, difficulty, elapsed time, moves/mistakes, hints,
   relevant RNG/sequence state, and daily identity. Handle corrupt or obsolete
@@ -178,7 +180,7 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-04 - Make restart, exit, and back navigation predictable
 
-**P1 | Source gap / validation task**
+**P1 | Source gap / validation task | Status: Implemented; device navigation tracked by QA-02**
 
 - **Acceptance:** Back, home, close, restart, and new-game actions follow the
   same preservation/confirmation rules. Players can leave a puzzle without
@@ -191,7 +193,11 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-05 - Record each terminal outcome exactly once
 
-**P1 | Source gap / validation task**
+**P1 | Source gap / validation task | Status: Implemented; device confirmation tracked by QA-02**
+
+- **Resolution:** Finalization is retry-safe by run ID and records the outcome,
+  applicable metrics, and Daily completion together. Achievement work is
+  persisted for retry separately.
 
 - **Acceptance:** A run produces one authoritative outcome with associated
   metrics. Repeated taps, repeated effects, remounting, or retrying a failed
@@ -206,7 +212,7 @@ scoring, retries, difficulty, daily rules, or legacy achievement totals.
 
 ### SESSION-06 - Standardize instruction, loading, and result flows
 
-**P1 | Source gap**
+**P1 | Source gap | Status: Implemented; device confirmation tracked by QA-02**
 
 - **Acceptance:** Each game explains its objective, controls, difficulty,
   mode-specific rules, and loss conditions before first play, with help

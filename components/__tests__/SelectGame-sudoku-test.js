@@ -44,3 +44,50 @@ it('does not show Sudoku technique claims for a different game', async () => {
     expect(screen.queryByText(/Rated by solving techniques/)).toBeNull();
     expect(screen.queryByText(/Requires naked\/hidden triples or X-Wing/)).toBeNull();
 });
+
+it('continues a saved Classic run at its saved difficulty, not the current selection', async () => {
+    const continueGame = jest.fn();
+    await render(
+        <SelectGame
+            visible
+            close={jest.fn()}
+            game={{ title: 'Sudoku', description: 'Number puzzle' }}
+            difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
+            selectGame={jest.fn()}
+            savedRuns={[
+                { id: 'classic', identity: { difficulty: 'Hard', mode: 'Classic' } },
+                { id: 'daily', identity: { difficulty: 'Easy', mode: 'Daily Challenge', dailyDate: '2026-11-18' } },
+            ]}
+            continueGame={continueGame}
+        />
+    );
+    expect(screen.getByText('Hard')).toBeTruthy();
+    expect(screen.queryByText(/2026-11-18/)).toBeNull();
+    await fireEvent.press(screen.getByText('Continue'));
+    expect(continueGame).toHaveBeenCalledWith('classic');
+});
+
+it('allows an older saved Daily to continue even when today is already complete', async () => {
+    const continueGame = jest.fn();
+    const checkDailyCompleted = jest.fn().mockResolvedValue(true);
+    await render(
+        <SelectGame
+            visible
+            close={jest.fn()}
+            game={{ title: 'Sudoku', description: 'Number puzzle' }}
+            difficulties={['Easy', 'Medium', 'Hard', 'Extreme']}
+            selectGame={jest.fn()}
+            savedRuns={[
+                { id: 'yesterday', identity: { difficulty: 'Hard', mode: 'Daily Challenge', dailyDate: '2026-11-18' } },
+            ]}
+            continueGame={continueGame}
+            checkDailyCompleted={checkDailyCompleted}
+        />
+    );
+    await fireEvent.press(screen.getByText('Mode:', { exact: false }));
+    await fireEvent.press(screen.getByText('Daily Challenge'));
+    expect(await screen.findByText('Completed Today')).toBeTruthy();
+    expect(screen.getByText('2026-11-18 · Hard')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Continue'));
+    expect(continueGame).toHaveBeenCalledWith('yesterday');
+});

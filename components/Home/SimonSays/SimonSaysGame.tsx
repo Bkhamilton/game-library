@@ -1,282 +1,131 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { View, Text } from "@/components/Themed";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import EndGameMessage from "@/components/Modals/EndGameMessage";
-import { DBContext } from "@/contexts/DBContext";
-import ColorTile from "./ColorTile";
-import SimonSaysHeader from "./SimonSaysHeader";
-import useTheme from "@/hooks/useTheme";
-import { 
-    getDifficultySettings, 
-    getTileColors, 
-    addToSequence, 
-    calculatePlaybackSpeed,
-    checkPartialSequence,
-    TileColor 
-} from "@/utils/SimonSaysGenerator";
-
-type GameState = 'idle' | 'countdown' | 'showing' | 'input' | 'gameover';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { View, Text } from '@/components/Themed';
+import { SessionControls, SessionResult } from '@/components/Session';
+import { StoredGameSession, type StoredGameProps } from '@/components/Session/StoredGameSession';
+import { useGameSession } from '@/hooks/useGameSession';
+import useTheme from '@/hooks/useTheme';
+import { addToSequence, calculatePlaybackSpeed, getDifficultySettings, getTileColors } from '@/utils/SimonSaysGenerator';
+import ColorTile from './ColorTile';
+import SimonSaysHeader from './SimonSaysHeader';
+import { createSimonSnapshot, isSimonSnapshot, type SimonSnapshot } from './SimonSaysSession';
 
 export default function SimonSaysGame() {
-    const router = useRouter();
-    const { difficulty } = useLocalSearchParams();
-    const [round, setRound] = useState(0);
-    const [isGameRunning, setIsGameRunning] = useState(false);
-    const [endGameModalVisible, setEndGameModalVisible] = useState(false);
-    const [gameState, setGameState] = useState<GameState>('idle');
-    const [sequence, setSequence] = useState<number[]>([]);
-    const [userSequence, setUserSequence] = useState<number[]>([]);
-    const [activeTile, setActiveTile] = useState<number | null>(null);
-    const [message, setMessage] = useState<string>("Watch the sequence...");
-    const [countdown, setCountdown] = useState<number | null>(null);
-
-    const { db, curGame } = useContext(DBContext);
-    const { primary } = useTheme();
-    const settings = getDifficultySettings(difficulty as string);
-    const tileColors = getTileColors(difficulty as string);
-    const playbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    useEffect(() => {
-        // Clean up timeouts on unmount
-        return () => {
-            if (playbackTimeoutRef.current) {
-                clearTimeout(playbackTimeoutRef.current);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        // Start countdown when game state changes to countdown
-        if (gameState === 'countdown' && countdown !== null && countdown > 0) {
-            const timer = setTimeout(() => {
-                setCountdown(countdown - 1);
-            }, 1000);
-            return () => clearTimeout(timer);
-        } else if (gameState === 'countdown' && countdown === 0) {
-            // Countdown finished, start the game
-            setGameState('idle');
-            setCountdown(null);
-        }
-    }, [gameState, countdown]);
-
-    useEffect(() => {
-        if (isGameRunning && gameState === 'idle' && countdown === null) {
-            setTimeout(() => {
-                startNewRound();
-            }, 200);
-        }
-    }, [isGameRunning, gameState, countdown]);
-
-    const startGame = () => {
-        setIsGameRunning(true);
-        setRound(0);
-        setSequence([]);
-        setUserSequence([]);
-        setGameState('countdown');
-        setCountdown(3);
-        setMessage("Get ready...");
-    };
-
-    const startNewRound = () => {
-        const newRound = round + 1;
-        setRound(newRound);
-        setUserSequence([]);
-        
-        // Add a new tile to the sequence
-        const newSequence = addToSequence(sequence, settings.tileCount);
-        setSequence(newSequence);
-        
-        // Show the sequence
-        setGameState('showing');
-        playSequence(newSequence, newRound);
-    };
-
-    const playSequence = (seq: number[], currentRound: number) => {
-        setMessage(`Round ${currentRound} - Watch carefully!`);
-        const speed = calculatePlaybackSpeed(currentRound, settings);
-        const flashDuration = speed * 0.6; // Flash for 60% of the interval
-        const pauseDuration = speed * 0.4; // Pause for 40% of the interval
-
-        let currentIndex = 0;
-
-        const playNext = () => {
-            if (currentIndex >= seq.length) {
-                // Sequence finished, now wait for user input
-                setGameState('input');
-                setMessage(`Your turn! Repeat the sequence.`);
-                return;
-            }
-
-            const tileIndex = seq[currentIndex];
-            
-            // Flash the tile
-            setActiveTile(tileIndex);
-            
-            playbackTimeoutRef.current = setTimeout(() => {
-                setActiveTile(null);
-                
-                // Pause before next tile
-                playbackTimeoutRef.current = setTimeout(() => {
-                    currentIndex++;
-                    playNext();
-                }, pauseDuration);
-            }, flashDuration);
-        };
-
-        playNext();
-    };
-
-    const handleTilePress = (tileIndex: number) => {
-        if (gameState !== 'input') return;
-
-        const newUserSequence = [...userSequence, tileIndex];
-        setUserSequence(newUserSequence);
-
-        // Flash the tile briefly
-        setActiveTile(tileIndex);
-        setTimeout(() => setActiveTile(null), 200);
-
-        // Check if the partial sequence is correct
-        if (!checkPartialSequence(newUserSequence, sequence)) {
-            // Wrong tile pressed
-            handleLoss();
-            return;
-        }
-
-        // Check if the user has completed the sequence
-        if (newUserSequence.length === sequence.length) {
-            // Correct! Move to next round
-            setMessage("Correct! Get ready for the next round...");
-            setTimeout(() => {
-                setGameState('idle');
-            }, 1000);
-        }
-    };
-
-    const restartGame = (difficulty: string) => {
-        router.replace(`/simonsays?difficulty=${difficulty}`);
-        setRound(0);
-        setSequence([]);
-        setUserSequence([]);
-        setIsGameRunning(false);
-        setEndGameModalVisible(false);
-        setGameState('idle');
-        setCountdown(null);
-        setMessage("Watch the sequence...");
-    };
-
-    const handleLoss = () => {
-        setIsGameRunning(false);
-        setGameState('gameover');
-        setMessage("Game Over!");
-        setEndGameModalVisible(true);
-    };
-
-    const renderTiles = () => {
-        const { rows, cols } = settings.gridLayout;
-        const tileSize = Math.min(320 / cols, 320 / rows);
-
-        // Render tiles in rows
-        const tileRows = [];
-        for (let row = 0; row < rows; row++) {
-            const tilesInRow = [];
-            for (let col = 0; col < cols; col++) {
-                const index = row * cols + col;
-                if (index < tileColors.length) {
-                    tilesInRow.push(
-                        <ColorTile
-                            key={index}
-                            color={tileColors[index]}
-                            isActive={activeTile === index}
-                            onPress={() => handleTilePress(index)}
-                            disabled={gameState !== 'input'}
-                            size={tileSize}
-                        />
-                    );
-                }
-            }
-            tileRows.push(
-                <View key={row} style={styles.tileRow}>
-                    {tilesInRow}
-                </View>
-            );
-        }
-
-        return tileRows;
-    };
-
-    return (
-        <View style={styles.container}>
-            <SimonSaysHeader 
-                round={round}
-                timerActive={isGameRunning && gameState !== 'gameover'}
-            />
-            
-            <View style={[styles.board, { borderColor: primary }]}>
-                {gameState === 'countdown' && countdown !== null ? (
-                    <Text style={styles.countdownText}>{countdown}</Text>
-                ) : isGameRunning ? (
-                    <>
-                        {renderTiles()}
-                    </>
-                ) : (
-                    <TouchableOpacity style={styles.startOverlay} onPress={startGame}>
-                        <Text style={styles.startText}>Tap to Start</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-
-            <Text style={styles.message}>{message}</Text>
-
-            <EndGameMessage
-                visible={endGameModalVisible}
-                close={() => setEndGameModalVisible(false)}
-                win={false}
-                game={curGame}
-                initialDifficulty={difficulty}
-                restartGame={restartGame}
-            />
-        </View>
-    );
+    return <StoredGameSession title="Simon Says" version={1} create={createSimonSnapshot} validate={isSimonSnapshot}
+        instructions="Watch the sequence, then repeat it. A wrong tile ends the run. After an interruption the current sequence is replayed.">
+        {props => <SimonSaysRun {...props} />}
+    </StoredGameSession>;
 }
 
+export function SimonSaysRun({ run, state, restored, checkpoint, finalize, restart, home, openHelp }: StoredGameProps<SimonSnapshot>) {
+    const [activeTile, setActiveTile] = useState<number | null>(null);
+    const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const activation = useRef<number | null>(null);
+    const { primary } = useTheme();
+    const settings = getDifficultySettings(run.identity.difficulty);
+    const colors = getTileColors(run.identity.difficulty);
+    const session = useGameSession<SimonSnapshot, 'loss'>({
+        initialState: state,
+        restored: restored ? { state, elapsedMs: run.snapshot.elapsedMs, revision: run.revision } : undefined,
+        checkpoint,
+        onTerminal: async (outcome, snapshot) => {
+            await checkpoint(snapshot);
+            await finalize(outcome, [{ metric: 'highScore', score: snapshot.state.completed }]);
+        },
+    });
+    const { isActive, runToken } = session;
+    useEffect(() => {
+        if (!isActive) return;
+        if (activation.current !== runToken) {
+            activation.current = runToken;
+            const s = session.getSnapshot().state;
+            if (s.phase === 'input' && !s.outcome) {
+                session.change({ ...s, phase: 'showing', input: [] }, runToken);
+            }
+        }
+    }, [isActive, runToken]);
+    useEffect(() => {
+        if (!isActive) { setActiveTile(null); return; }
+        const s = session.getSnapshot().state;
+        if (s.outcome) { void session.finish(s.outcome, runToken); return; }
+        if (s.phase === 'countdown' || s.phase === 'next') {
+            const timer = setTimeout(() => {
+                session.change(previous => previous.phase === 'countdown' && previous.countdown > 1
+                    ? { ...previous, countdown: previous.countdown - 1 }
+                    : { ...previous, countdown: 0, phase: 'showing',
+                        sequence: addToSequence(previous.sequence, settings.tileCount), input: [] }, runToken);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+        if (s.phase !== 'showing') return;
+        let cancelled = false;
+        let timer: ReturnType<typeof setTimeout>;
+        const speed = calculatePlaybackSpeed(s.sequence.length, settings);
+        const play = (index: number) => {
+            if (cancelled || !session.change(previous => previous, runToken)) return;
+            if (index >= s.sequence.length) {
+                setActiveTile(null);
+                session.change(previous => ({ ...previous, phase: 'input', input: [] }), runToken);
+                return;
+            }
+            setActiveTile(s.sequence[index]);
+            timer = setTimeout(() => {
+                if (cancelled || !session.change(previous => previous, runToken)) return;
+                setActiveTile(null);
+                timer = setTimeout(() => play(index + 1), speed * 0.4);
+            }, speed * 0.6);
+        };
+        play(0);
+        return () => { cancelled = true; clearTimeout(timer); setActiveTile(null); };
+    }, [isActive, runToken, session.state, settings]);
+    useEffect(() => () => {
+        if (flashTimer.current) clearTimeout(flashTimer.current);
+    }, [isActive, runToken]);
+
+    const press = (tile: number) => {
+        const s = session.getSnapshot().state;
+        if (s.phase !== 'input' || s.outcome) return;
+        const correct = s.sequence[s.input.length] === tile;
+        const input = correct ? [...s.input, tile] : s.input;
+        const complete = correct && input.length === s.sequence.length;
+        if (!session.change({ ...s, input, outcome: correct ? null : 'loss',
+            phase: complete ? 'next' : s.phase, completed: complete ? s.sequence.length : s.completed }, runToken)) return;
+        setActiveTile(tile);
+        if (flashTimer.current) clearTimeout(flashTimer.current);
+        flashTimer.current = setTimeout(() => {
+            if (session.change(previous => previous, runToken)) setActiveTile(null);
+        }, 200);
+    };
+    const { rows, cols } = settings.gridLayout;
+    const tileSize = Math.min(320 / cols, 320 / rows);
+    return <View style={styles.container}>
+        <SimonSaysHeader round={session.state.sequence.length} elapsedMs={session.elapsedMs} />
+        <SessionControls status={session.status} isSaving={session.isSaving} error={session.error}
+            onStart={session.start} onPause={session.pause} onResume={session.resume} onRetry={session.retry}
+            onLeave={() => session.leave(home)} onHelp={openHelp} onRestart={() => restart()} />
+        <View style={[styles.board, { borderColor: primary }]} pointerEvents={isActive ? 'auto' : 'none'}
+            accessibilityElementsHidden={!isActive} importantForAccessibility={isActive ? 'auto' : 'no-hide-descendants'}>
+            {session.state.phase === 'countdown' ? <Text style={styles.countdown}>{session.state.countdown}</Text> :
+                Array.from({ length: rows }, (_, row) => <View key={row} style={styles.row}>
+                    {colors.slice(row * cols, (row + 1) * cols).map((color, col) => {
+                        const index = row * cols + col;
+                        return <ColorTile key={index} color={color} isActive={activeTile === index}
+                            onPress={() => press(index)} disabled={!isActive || session.state.phase !== 'input' || !!session.state.outcome}
+                            size={tileSize} />;
+                    })}
+                </View>)}
+        </View>
+        <Text>{session.state.phase === 'input' ? 'Your turn! Repeat the sequence.' :
+            session.state.phase === 'showing' ? 'Watch carefully!' : 'Get ready...'}</Text>
+        {session.status === 'terminal' && <SessionResult title="Game over" disabled={!session.isTerminalSaved}
+            onReplay={() => session.leave(() => restart())} onHome={() => session.leave(home)}>
+            <Text>Highest completed round: {session.state.completed}</Text>
+        </SessionResult>}
+    </View>;
+}
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        paddingTop: 24,
-    },
-    board: {
-        width: 360,
-        height: 360,
-        justifyContent: "center",
-        alignItems: "center",
-        marginVertical: 20,
-    },
-    tileRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    message: {
-        fontSize: 18,
-        fontWeight: "600",
-        textAlign: "center",
-        marginTop: 10,
-    },
-    countdownText: {
-        fontSize: 80,
-        fontWeight: "bold",
-    },
-    startOverlay: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    startText: {
-        fontSize: 24,
-        fontWeight: "600",
-    },
+    container: { flex: 1, alignItems: 'center', paddingTop: 24 },
+    board: { width: 360, height: 360, justifyContent: 'center', alignItems: 'center', marginVertical: 20 },
+    row: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+    countdown: { fontSize: 80, fontWeight: 'bold' },
 });

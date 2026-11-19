@@ -5,7 +5,7 @@ const SETTINGS = {
     Extreme: { size: 19, mines: 90, cellSize: 20 },
 };
 
-const getSettings = (difficulty) => {
+export const getSettings = (difficulty) => {
     if (!Object.hasOwn(SETTINGS, difficulty)) {
         throw new Error(`Invalid Minesweeper difficulty: ${difficulty}`);
     }

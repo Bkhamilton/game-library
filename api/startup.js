@@ -11,7 +11,41 @@ import connectFourAchievements from '@/data/achievements/connect-four.json';
 import simonSaysAchievements from '@/data/achievements/simon-says.json';
 import generalAchievements from '@/data/achievements/general.json';
 
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
+
+const createSessionTables = async (db) => {
+    await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS GameSessions (
+            id TEXT PRIMARY KEY NOT NULL,
+            slotKey TEXT NOT NULL,
+            gameId INTEGER NOT NULL,
+            mode TEXT NOT NULL,
+            difficulty TEXT NOT NULL,
+            dailyDate TEXT,
+            snapshot TEXT NOT NULL,
+            revision INTEGER NOT NULL DEFAULT 0,
+            outcome TEXT,
+            createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            finishedAt DATETIME,
+            FOREIGN KEY (gameId) REFERENCES Games(id)
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_active_slot
+            ON GameSessions(slotKey) WHERE outcome IS NULL;
+        CREATE TABLE IF NOT EXISTS DailyCompletions (
+            gameId INTEGER NOT NULL,
+            mode TEXT NOT NULL,
+            difficulty TEXT NOT NULL,
+            dailyDate TEXT NOT NULL,
+            sessionId TEXT NOT NULL UNIQUE,
+            PRIMARY KEY (gameId, mode, difficulty, dailyDate),
+            FOREIGN KEY (sessionId) REFERENCES GameSessions(id)
+        );
+        CREATE TABLE IF NOT EXISTS SessionAchievementWork (
+            sessionId TEXT PRIMARY KEY NOT NULL,
+            FOREIGN KEY (sessionId) REFERENCES GameSessions(id)
+        );
+    `);
+};
 
 const createTables = async (db) => {
     await db.execAsync(`
@@ -134,13 +168,16 @@ export const initializeDatabase = async (db) => {
         if (version === DATABASE_VERSION) {
             return;
         }
-        if (version !== 0) {
+        if (version !== 0 && version !== 1) {
             throw new Error(`Unsupported database version ${version}; expected ${DATABASE_VERSION}.`);
         }
 
-        await createTables(db);
-        await checkTableColumns(db);
-        await seedDatabase(db);
+        if (version === 0) {
+            await createTables(db);
+            await checkTableColumns(db);
+            await seedDatabase(db);
+        }
+        await createSessionTables(db);
         await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
     });
 };

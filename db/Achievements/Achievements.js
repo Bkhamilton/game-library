@@ -1,4 +1,4 @@
-import * as SQLite from 'expo-sqlite';
+import { withSessionDatabaseTransaction } from '../Sessions/Transaction';
 
 // Function to get all achievements
 export const getAchievements = async (db) => {
@@ -85,7 +85,7 @@ export const updateAchievementProgress = async (db, userId, achievementId, progr
             `INSERT INTO UserAchievements (userId, achievementId, progress, unlocked)
              VALUES (?, ?, ?, 0)
              ON CONFLICT(userId, achievementId)
-             DO UPDATE SET progress = ?`,
+             DO UPDATE SET progress = ? WHERE UserAchievements.unlocked IS NOT 1`,
             [userId, achievementId, progress, progress]
         );
     } catch (error) {
@@ -94,31 +94,31 @@ export const updateAchievementProgress = async (db, userId, achievementId, progr
     }
 };
 
-// Function to unlock achievement
-export const unlockAchievement = async (db, userId, achievementId) => {
-    try {
-        const achievement = await getAchievementById(db, achievementId);
-        
-        await db.runAsync(
-            `INSERT INTO UserAchievements (userId, achievementId, unlocked, unlockedAt)
-             VALUES (?, ?, 1, CURRENT_TIMESTAMP)
-             ON CONFLICT(userId, achievementId)
-             DO UPDATE SET unlocked = 1, unlockedAt = CURRENT_TIMESTAMP`,
-            [userId, achievementId]
-        );
-        
-        // Update user total points
-        await db.runAsync(
-            'UPDATE Users SET totalPoints = totalPoints + ? WHERE id = ?',
-            [achievement.points, userId]
-        );
-        
-        return achievement;
-    } catch (error) {
-        console.error('Error unlocking achievement:', error);
-        throw error;
-    }
+// The caller owns the transaction covering both the unlock and the points.
+export const unlockAchievementInTransaction = async (tx, userId, achievementId) => {
+    const achievement = await getAchievementById(tx, achievementId);
+    if (!achievement) throw new Error('Achievement not found');
+
+    const unlocked = await tx.runAsync(
+        `INSERT INTO UserAchievements (userId, achievementId, unlocked, unlockedAt)
+         VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+         ON CONFLICT(userId, achievementId)
+         DO UPDATE SET unlocked = 1, unlockedAt = CURRENT_TIMESTAMP
+         WHERE UserAchievements.unlocked IS NOT 1`,
+        [userId, achievementId]
+    );
+    if (unlocked.changes === 0) return null;
+
+    const awarded = await tx.runAsync(
+        'UPDATE Users SET totalPoints = COALESCE(totalPoints, 0) + ? WHERE id = ?',
+        [achievement.points ?? 0, userId]
+    );
+    if (awarded.changes !== 1) throw new Error('Achievement user not found');
+    return achievement;
 };
+
+export const unlockAchievement = (db, userId, achievementId) =>
+    withSessionDatabaseTransaction(db, tx => unlockAchievementInTransaction(tx, userId, achievementId));
 
 // Function to get total points for a user
 export const getUserTotalPoints = async (db, userId) => {

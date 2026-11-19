@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Modal, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Text, View } from "@/components/Themed";
 import useTheme from "@/hooks/useTheme";
@@ -49,10 +49,16 @@ const AnimatedModalButton = ({ onPress, children, style, disabled }) => {
     );
 };
 
-export default function SelectGame({ visible, close, game, difficulties, selectGame }) {
+export default function SelectGame({
+    visible, close, game, difficulties, selectGame,
+    savedRuns, continueGame, checkDailyCompleted = isDailyChallengeCompleted,
+    sessionError, sessionsLoading, retrySessions, unavailableRuns, discardRun,
+}) {
     const [showDifficultyModal, setShowDifficultyModal] = useState(false);
     const [showModeModal, setShowModeModal] = useState(false);
-    const [isDailyChallengeDisabled, setIsDailyChallengeDisabled] = useState(false);
+    const [showSavedRuns, setShowSavedRuns] = useState(false);
+    const [dailyCheck, setDailyCheck] = useState(null);
+    const [dailyRetry, setDailyRetry] = useState(0);
 
     const openDifficultyModal = () => {
         setShowDifficultyModal(true);
@@ -92,20 +98,31 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
     }, [difficulties]);
 
     // Check if daily challenge has been completed
-    const checkDailyChallenge = useCallback(async () => {
-        if (selectedMode === 'Daily Challenge') {
-            const completed = await isDailyChallengeCompleted(game.title, selectedDifficulty);
-            setIsDailyChallengeDisabled(completed);
-        } else {
-            setIsDailyChallengeDisabled(false);
-        }
-    }, [selectedMode, selectedDifficulty, game.title]);
-    
+    const dailySelection = visible && selectedMode === 'Daily Challenge' && selectedDifficulty
+        ? `${game.title}:${selectedDifficulty}:${dailyRetry}`
+        : null;
     useEffect(() => {
-        if (visible) {
-            checkDailyChallenge();
+        let current = true;
+        if (dailySelection) {
+            checkDailyCompleted(game.title, selectedDifficulty).then(completed => {
+                if (current) setDailyCheck({ selection: dailySelection, status: completed ? 'completed' : 'available' });
+            }).catch(error => {
+                console.error('Could not read Daily challenge status:', error);
+                if (current) setDailyCheck({ selection: dailySelection, status: 'error' });
+            });
+        } else {
+            setDailyCheck(null);
         }
-    }, [visible, checkDailyChallenge]);
+        return () => { current = false; };
+    }, [dailySelection, selectedDifficulty, game.title, checkDailyCompleted]);
+
+    const dailyStatus = dailyCheck?.selection === dailySelection ? dailyCheck?.status : 'loading';
+    const dailyBlocked = selectedMode === 'Daily Challenge' && dailyStatus !== 'available';
+    const resumableRuns = savedRuns?.filter(run => run.identity.mode === selectedMode) ?? [];
+    const continueRun = id => {
+        setShowSavedRuns(false);
+        continueGame(id);
+    };
 
     return (
         <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={close}>
@@ -147,25 +164,64 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
                                 Difficulty: <Text style={{ fontWeight: "bold" }}>{selectedDifficulty}</Text>
                             </Text>
                         </AnimatedModalButton>
-                        <AnimatedModalButton style={{ backgroundColor: primary, opacity: 0.5 }}>
-                            <Text>Continue</Text>
-                        </AnimatedModalButton>
+                        {sessionError && (
+                            <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={retrySessions}>
+                                <Text>Could not load saved games. Retry</Text>
+                            </AnimatedModalButton>
+                        )}
+                        {unavailableRuns?.map(({ id }) => (
+                            <AnimatedModalButton key={id} style={{ backgroundColor: grayBackground }} onPress={() => discardRun(id)}>
+                                <Text>Incompatible save · Discard</Text>
+                            </AnimatedModalButton>
+                        ))}
+                        {resumableRuns.length > 0 && (
+                            <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() =>
+                                resumableRuns.length === 1 ? continueRun(resumableRuns[0].id) : setShowSavedRuns(true)
+                            }>
+                                <Text>Continue</Text>
+                                {resumableRuns.length === 1 && <Text>{savedRunLabel(resumableRuns[0])}</Text>}
+                            </AnimatedModalButton>
+                        )}
+                        {selectedMode === 'Daily Challenge' && dailyStatus === 'error' && (
+                            <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={() => setDailyRetry(retry => retry + 1)}>
+                                <Text>Could not check the Daily Challenge. Retry</Text>
+                            </AnimatedModalButton>
+                        )}
                         <AnimatedModalButton 
                             style={{ 
                                 backgroundColor: primary, 
-                                opacity: isDailyChallengeDisabled ? 0.3 : 1 
+                                opacity: dailyBlocked || sessionError || sessionsLoading || unavailableRuns?.length ? 0.3 : 1
                             }} 
                             onPress={() => selectGame(game.title, selectedDifficulty, selectedMode)}
-                            disabled={isDailyChallengeDisabled}
+                            disabled={dailyBlocked || Boolean(sessionError) || sessionsLoading || Boolean(unavailableRuns?.length)}
                         >
                             <Text>
-                                {isDailyChallengeDisabled ? 'Completed Today' : 'New Game'}
+                                {sessionsLoading ? 'Loading saved games' : !dailyBlocked ? 'New Game' :
+                                    dailyStatus === 'completed' ? 'Completed Today' :
+                                    dailyStatus === 'error' ? 'Daily Challenge Unavailable' : 'Checking Daily Challenge'}
                             </Text>
                         </AnimatedModalButton>
                         <AnimatedModalButton style={{ backgroundColor: grayBackground }} onPress={close}>
                             <Text>Close</Text>
                         </AnimatedModalButton>
                     </View>
+                    <Modal animationType="slide" transparent visible={visible && showSavedRuns} onRequestClose={() => setShowSavedRuns(false)}>
+                        <View style={styles.container}>
+                            <View style={[styles.innerContainer, { maxHeight: '90%' }]}>
+                                <ScrollView>
+                                    <Text accessibilityRole="header">Continue a saved game</Text>
+                                    {resumableRuns.map(run => (
+                                        <AnimatedModalButton key={run.id} style={{ backgroundColor: grayBackground }} onPress={() => continueRun(run.id)}>
+                                            <Text>{savedRunLabel(run)}</Text>
+                                        </AnimatedModalButton>
+                                    ))}
+                                    <AnimatedModalButton style={{ backgroundColor: primary }} onPress={() => setShowSavedRuns(false)}>
+                                        <Text>Close</Text>
+                                    </AnimatedModalButton>
+                                </ScrollView>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             </View>
             {/* Difficulty Modal */}
@@ -214,6 +270,10 @@ export default function SelectGame({ visible, close, game, difficulties, selectG
             </Modal>
         </Modal>
     );
+}
+
+function savedRunLabel({ identity }) {
+    return identity.dailyDate ? `${identity.dailyDate} · ${identity.difficulty}` : identity.difficulty;
 }
 
 const styles = StyleSheet.create({
